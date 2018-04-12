@@ -1,7 +1,0 @@
-from flask import Flask
-
-app = flask(__none__)
-
-@app.route('/')
-def hello_w:
-    return "Hello World!"

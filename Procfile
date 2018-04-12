@@ -1,1 +1,1 @@
-web: guincorn hello_w:app --log-file=-
+web: gunicorn hello:app --log-file=-
