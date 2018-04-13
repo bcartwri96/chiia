@@ -34,11 +34,12 @@ def resetdb_command():
         create_database(DB_URL)
 
     print('Creating tables.')
-    # import the models which the ORM will use to create the database
-    # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/
+    # import all modules here that might define models so that
+    # they will be registered properly on the metadata.  Otherwise
+    # you will have to import them first before calling init_db()
     import code.models
     Base.metadata.create_all(bind=engine)
-    db_session.commit() #reflect object on db
+    db_session.commit()
 
 def get_env_variable(name):
     try:
