@@ -37,9 +37,9 @@ def resetdb_command():
     # import all modules here that might define models so that
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
-    import models
-    db.create_all()
-    print('Shiny!')
+    import code.models
+    Base.metadata.create_all(bind=engine)
+    db_session.commit()
 
 def get_env_variable(name):
     try:
