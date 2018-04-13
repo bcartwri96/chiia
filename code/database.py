@@ -34,9 +34,8 @@ def resetdb_command():
         create_database(DB_URL)
 
     print('Creating tables.')
-    # import all modules here that might define models so that
-    # they will be registered properly on the metadata.  Otherwise
-    # you will have to import them first before calling init_db()
+    # import the models used to describe the tables we're creating (using the
+    # ORM). Link: http://flask-sqlalchemy.pocoo.org/2.3/models/
     import code.models
     Base.metadata.create_all(bind=engine)
     db_session.commit()
