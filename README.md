@@ -1,13 +1,13 @@
-##DEV DOCS:##
+#DEV DOCS#
 
-#Important Info#
+##Important Info##
 1) dev_master is our main branch where we do any and all development; PLEASE don't push to the master branch, because the master branch is also production
    which means it's linked to our heroku web app and so we're all ready to ship production code that's when we do the merge and resolve conflicts
 2) You **need** to be reasonably familiar with Heroku, Jinja2, Flask, gunicorn, WSGI, Python, something called the Process Model (see Heroku docs) and
    the MVC (model view controller) method. Check them all out; a simple Google search will fill you in!
 
 
-#For those who want to see this working but don't know what quite to do (this was me...)#
+##For those who want to see this working but don't know what quite to do (this was me...)##
 _disclaimer: this is only for Mac and Linux users; if you're on Windows, this is harder because Windows isn't built with bash/Python/scripting languages in
 general in mind..._
 1) Download Heroku CLI
@@ -28,3 +28,15 @@ general in mind..._
    correctly.
 10) Then you should be all good to run `heroku local web` and it'll look in the Procfile (in root dir) (which you know about because you read the docs;) )
     and it runs the command mapped by "web: long bash command here" or, if you want the developemnt server, run `heroku local dev`
+
+##What do all these files even do?##
+Well, good question!
+Below I enumerate a dictionary mapping the name of the file or directory and the semantics.
+| Name | Meaning |
+| --- | --- |
+| Procfile | Contains the mappings between `heroku local _something_` and the actual command which be is being executed on you local machine
+| code/ | This directory contains all the source code  |
+| requirements.txt | Contains the list of libraries which the project needs in order to execute! `pip install -r requirements.txt ` installs them  |
+| enviro_vars.sh  | file contains the list of environment variables which *absolutely* must be set in order for the development server to connect to the db |
+| config.py | Important for some reason so Flask knows what's happnening with the python modules etc. (?) |
+| readme.md  | this file. |
