@@ -40,3 +40,18 @@ Below I enumerate a dictionary mapping the name of the file or directory and the
 | enviro_vars.sh  | file contains the list of environment variables which *absolutely* must be set in order for the development server to connect to the db |
 | config.py | Important for some reason so Flask knows what's happnening with the python modules etc. (?) |
 | readme.md  | this file. |
+
+
+##How does this all work?##
+The basics are:
+1) When a user requests a site, they are first sent to the main.py file in ~/code and in there you'll notice the app checks what their URL is and links them 
+   the appropriate controller function.
+2) The controller function now has exact control over the what the user receives, and this is dictated by the controller function which was referenced.
+   We then do the necessary database connections (after importing the databae file) and then we serve them the appropriate template, passing it the necessary
+   information for it to work correctly.
+3) Note that the controller will use flask (imported as `fl` by convention) to `render_template` which means it parses the html file we write and adds in 
+   anything we tell it to using the syntactic markup language (with conditionals and loops built-in!) defined in Jinja2 (the markup lang.)
+4) Then the site is served to the user.
+
+
+Got the basics? Cool :)
