@@ -1,3 +1,8 @@
-<html>
-    This is the current time {{ current }} and the last recorded login was {{ user.date }}
-</html>
+{% include "layout.html" %}
+<title>CHIA | Login</title>
+{% block content %}
+  <!-- this illustrates the fact we can retreive information from the server
+  (specifically the time of the server and the database's first time recorded
+  respectively)-->
+  <p> This is the current time {{ current }} and the last recorded login was {{ user.date }} </p>
+{% endblock content %}
