@@ -1,11 +1,10 @@
 from flask import Flask as fl
 from flask_sqlalchemy import SQLAlchemy
 import os
-from code import controller as con
-from code.database import db_session
+import controller as con
+from database import db_session
 
 app = fl(__name__)
-app.debug=True
 
 # below defines the mapping between URI -> controller code
 @app.route('/')

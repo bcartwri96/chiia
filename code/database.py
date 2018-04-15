@@ -8,21 +8,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:////tmp/test.db', convert_unicode=True)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=engine))
-Base = declarative_base()
-Base.query = db_session.query_property()
-
-app = fl(__name__) #instantiate the app
+app = fl(__name__)
 
 #############################################################
 # model support code
 #############################################################
 
-@app.cli.command('resetdb')
-def resetdb_command():
+def resetdb():
     """Destroys and creates the database + tables."""
 
     from sqlalchemy_utils import database_exists, create_database, drop_database
@@ -36,9 +28,10 @@ def resetdb_command():
     print('Creating tables.')
     # import the models used to describe the tables we're creating (using the
     # ORM). Link: http://flask-sqlalchemy.pocoo.org/2.3/models/
-    import code.models
+    import models
     Base.metadata.create_all(bind=engine)
     db_session.commit()
+    print('Integrating models.')
 
 def get_env_variable(name):
     try:
@@ -49,7 +42,7 @@ def get_env_variable(name):
 
 
 #############################################################
-# setup - run FLASK_APP=code/database.py flask resetdb to reset db
+# setup - run python; import database; database.resetdb() to reset db
 #############################################################
 
 # the values of those depend on your setup
@@ -59,7 +52,9 @@ POSTGRES_PW = get_env_variable("POSTGRES_PW")
 POSTGRES_DB = get_env_variable("POSTGRES_DB")
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # silence the deprecation warning
-
-db = SQLAlchemy(app)
+engine = create_engine(DB_URL, convert_unicode=True)
+db_session = scoped_session(sessionmaker(autocommit=False,
+                                         autoflush=False,
+                                         bind=engine))
+Base = declarative_base()
+Base.query = db_session.query_property()

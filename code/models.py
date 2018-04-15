@@ -1,24 +1,12 @@
-# this file defines the models that govern our database.
-from flask import Flask as fl
-from flask_sqlalchemy import SQLAlchemy
-import os
+import database as db
+from flask import Flask
+import sqlalchemy as sa
 import datetime
-
-#############################################################
-# models
-#############################################################
-from sqlalchemy import Column, Integer, String, DateTime
-import code.database as db
 
 class User(db.Base):
     __tablename__ = 'users'
-
-    id = Column(Integer, primary_key=True)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
-
-    def __init__(self, id=None, date=None):
-            self.id = id
-            self.date = date
+    id = sa.Column(sa.Integer, primary_key=True)
+    date = sa.Column(sa.DateTime, default=datetime.datetime.now())
 
     def __repr__(self):
-        return '<User %r>' % (self.date)
+        return '<Date %r>' % self.date
