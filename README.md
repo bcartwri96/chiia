@@ -1,5 +1,30 @@
-DEV DOCS:
+##DEV DOCS:##
 
-1) This is where we'll mostly be working! Here we can make changes and this not affect our production code. We can push here and be happy, still! PLEASE DO NOT try merge with the
-master, because that is something we should do together as a team and a merge request can only be granted with owner permissions (I think?)
-2) More to follow when there is more to say...
+#Important Info#
+1) dev_master is our main branch where we do any and all development; PLEASE don't push to the master branch, because the master branch is also production
+   which means it's linked to our heroku web app and so we're all ready to ship production code that's when we do the merge and resolve conflicts
+2) You **need** to be reasonably familiar with Heroku, Jinja2, Flask, gunicorn, WSGI, Python, something called the Process Model (see Heroku docs) and
+   the MVC (model view controller) method. Check them all out; a simple Google search will fill you in!
+
+
+#For those who want to see this working but don't know what quite to do (this was me...)#
+_disclaimer: this is only for Mac and Linux users; if you're on Windows, this is harder because Windows isn't built with bash/Python/scripting languages in
+general in mind..._
+1) Download Heroku CLI
+2) Check out pipenv (for Python) (you can get it using Python's package manager PIP; `pip install heroku-cli`) and then set up a folder in the right spot on
+   your machine and then create a virtual environment (pipenv tutorial; follow it!) *ensure you've specifiec the python installation should be Python 3*
+3) Start your virtual env. 
+4) `heroku login` and authenticate (i'll need to add you as a Heroku developer after this so just message me and I'll do that)
+5) Then, because Heroku is cool, you can get the entire repo history, every branch, create the directory it's supposed to live in, and everything you'll 
+   need for local Heroku dev using `heroku git:clone -a chia-db`
+6) Wait for this to clone and then there should be a requirements.txt file in the root, so simply `pip install -r requirements.txt` and it should 
+   pull all the right versions of all the libraries you'll need to execute the project locally. (that might take a minute...)
+7) Download and install Postgres (it's a high level database tool)
+8) You'll need to set some environment variables (*lerarn what they are and how they work on your OS!!*); do this by running the enviro_vars.sh script
+   (`sh enviro_vars.sh`) *BUT be sure to modify the settigs inside so they work for your machine. In pacticular, the user who owns the postgres server 
+   won't be _bencartwright_ like it says!*
+9) Then check all this by jumping into the Python shell (`python3` or `python` (depending on which way your venv installs python)) and then cd into the 
+   code directory and run `python`; `import datbase as db` ; `db.resetdb()` and it should import the models and use the SQL ORM to create the database 
+   correctly.
+10) Then you should be all good to run `heroku local web` and it'll look in the Procfile (in root dir) (which you know about because you read the docs;) )
+    and it runs the command mapped by "web: long bash command here" or, if you want the developemnt server, run `heroku local dev`
