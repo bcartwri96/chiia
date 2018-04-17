@@ -1,0 +1,6 @@
+{% if current_user.is_authenticated %}
+  Hi {{ current_user.fname }}!
+{% endif %}
+{% if not current_user.is_authenticated %}
+  Hello there unauthenticated user!
+{% endif %}
