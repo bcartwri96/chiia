@@ -8,6 +8,8 @@ Important Info
    which means it's linked to our heroku web app and so we're all ready to ship production code that's when we do the merge and resolve conflicts
 3) You **need** to be reasonably familiar with Heroku, Jinja2, Flask, gunicorn, WSGI, Python, something called the Process Model (see Heroku docs) and
    the MVC (model view controller) method. Check them all out; a simple Google search will fill you in!
+4) Before you run any code using `heroku local dev` you'll need to set environment variables. On a mac/linux machine, just run `source enviro_vars.sh` to
+   do so!
 
 For those who want to see this working but don't know what quite to do (this was me...)
 ========
