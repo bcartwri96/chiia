@@ -1,6 +1,8 @@
+{% include "layout.html" %}
 {% if current_user.is_authenticated %}
-  Hi {{ current_user.fname }}!
+  Hi {{ current_user.fname }}! Your password is reallllllly secure: atm, it's {{ current_user.pw_hashed}}
 {% endif %}
 {% if not current_user.is_authenticated %}
-  Hello there unauthenticated user!
+  <br>Hello there unauthenticated user! Here is a link which you should <strong>not</strong> be able
+  to access: {{ url_for('logged_in') }}
 {% endif %}
