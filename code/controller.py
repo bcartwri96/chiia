@@ -3,6 +3,7 @@ import database as db
 import models as mod
 import flask_login as flog
 import datetime
+from passlib.hash import sha256_crypt
 
 lm = flog.LoginManager() # initialise the login lib
 
@@ -11,6 +12,7 @@ def index():
 
 def login():
     if fl.request.method == 'GET':
+        current = datetime.datetime.now()
         if 'logged_in' in fl.session:
             return fl.redirect(fl.url_for('index'))
         # user = mod.User.query.order_by(mod.User.id.desc()).first()
@@ -19,20 +21,20 @@ def login():
         username = fl.request.form['username']
         pw = fl.request.form['pw']
         # now check this against the database
-        user_list = mod.User.query.filter(mod.User.email == username)
-        print(user_list)
-        if 1 == 1: #len(user_list) == 1:
+        user_list = mod.User.query.filter(mod.User.email == username).all()
+        if len(user_list) == 1:
             user = user_list[0]
-            # user = mod.User()
-            # user =
-            # user.email = username
-            flog.login_user(user)
-            fl.session['logged_in'] = True
-            next = fl.request.args.get('next')
-            return fl.redirect(fl.url_for('index'))
+            # check that the password is correct
+            if sha256_crypt.verify(pw, user.pw_hashed):
+                flog.login_user(user)
+                fl.session['logged_in'] = True
+                next = fl.request.args.get('next')
+                return fl.redirect(fl.url_for('index'))
+            else:
+                return "Password Incorrect"
         else:
-            fl.flash("Login failed")
-            return fl.render_template(fl.url_for('login'))
+            error = "Login failed!"
+            return fl.render_template('/login.html', error=error)
 def create_account():
     if fl.request.method == 'GET':
         return fl.render_template('create_account.html')
@@ -44,6 +46,9 @@ def create_account():
         lang = fl.request.form['language']
         pw_raw = fl.request.form['pw_raw']
 
+        # hash the password
+        pw_hashed = sha256_crypt.encrypt(pw_raw)
+
         # convert to bool
         if lang == '1':
             lang = False
@@ -51,7 +56,7 @@ def create_account():
             lang = True
 
         # create user object and then commit to db
-        new_user = mod.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_raw)
+        new_user = mod.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_hashed)
         db.db_session.add(new_user)
         db.db_session.commit()
 

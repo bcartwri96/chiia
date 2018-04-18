@@ -20,7 +20,7 @@ class User(db.Base):
     #     self.pw_hashed = pw_hashed
 
     def __repr__(self):
-        return '<Details {fname}, {lname}, {email}, with language skills: {language}>'.format(fname=fname, lname=lname, email=email, language=language)
+        return '<Details {fname}, {lname}, {email}, with language skills: {language}>'.format(fname=self.fname, lname=self.lname, email=self.email, language=self.language)
     def get_id(self):
         return self.id
 

@@ -41,6 +41,7 @@ def logged_in():
 @flog.login_required
 def logout():
     flog.logout_user()
+    fl.session['logged_in'] = False
     return fl.redirect(fl.url_for('index'))
 
 @lm.user_loader

@@ -6,6 +6,9 @@
   respectively)-->
   <p> This is the current time {{ current }}. </p>
   <div class="container">
+    {% if error %}
+      <p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
     <form action={{ url_for('login') }} method="POST">
       <div class="form-group">
         <label>Email address</label>
