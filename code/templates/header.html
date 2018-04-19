@@ -1,0 +1,31 @@
+{% include "layout.html" %}
+<nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+  <a class="navbar-brand" href="{{ url_for('index') }}">CHIA_DB</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('index') }}">Dashboard <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+      </li>
+    </ul>
+    <span class="navbar-text">
+      {% if not request.endpoint == 'login' %}
+        {% if current_user.is_authenticated %}
+          <a class="btn btn-outline-warning my-2 my-sm-0" href="{{ url_for('logout')}}" role="button">Logout {{ current_user.fname }}</a>
+        {% endif %}
+        {% if not current_user.is_authenticated %}
+          <form class="form-inline my-2 my-lg-0" action={{ url_for('login')}} method="POST">
+            <input type="email" class="form-control" name="username" aria-describedby="emailHelp" placeholder="Email" style="margin-right: 10px;">
+            <input type="password" class="form-control" name="pw" placeholder="Password" style="margin-right: 10px;">
+            <button class="btn btn-outline-success my-2 my-sm-0" type=submit >Login</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </span>
+  </div>
+</nav>

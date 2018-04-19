@@ -3,7 +3,7 @@ import database as db
 import models as mod
 import flask_login as flog
 import datetime
-from passlib.hash import sha256_crypt
+from passlib.hash import sha512_crypt
 
 lm = flog.LoginManager() # initialise the login lib
 
@@ -15,7 +15,6 @@ def login():
         current = datetime.datetime.now()
         if 'logged_in' in fl.session:
             return fl.redirect(fl.url_for('index'))
-        # user = mod.User.query.order_by(mod.User.id.desc()).first()
         return fl.render_template('/login.html', current=current)
     else:
         username = fl.request.form['username']
@@ -25,16 +24,17 @@ def login():
         if len(user_list) == 1:
             user = user_list[0]
             # check that the password is correct
-            if sha256_crypt.verify(pw, user.pw_hashed):
+            if sha512_crypt.verify(pw, user.pw_hashed):
                 flog.login_user(user)
                 fl.session['logged_in'] = True
                 next = fl.request.args.get('next')
                 return fl.redirect(fl.url_for('index'))
             else:
-                return "Password Incorrect"
+                fl.flash("Password incorrect!", "error")
+                return fl.render_template('/login.html')
         else:
-            error = "Login failed!"
-            return fl.render_template('/login.html', error=error)
+            fl.flash("Login failed!", "error")
+            return fl.render_template('/login.html')
 def create_account():
     if fl.request.method == 'GET':
         return fl.render_template('create_account.html')
@@ -47,7 +47,7 @@ def create_account():
         pw_raw = fl.request.form['pw_raw']
 
         # hash the password
-        pw_hashed = sha256_crypt.encrypt(pw_raw)
+        pw_hashed = sha512_crypt.encrypt(pw_raw)
 
         # convert to bool
         if lang == '1':

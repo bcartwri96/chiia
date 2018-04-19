@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 import controller as con
 from database import db_session
+import database
 import models as ml
 import flask_login as flog
 import datetime
@@ -11,7 +12,7 @@ import datetime
 app = fl.Flask(__name__)
 lm = flog.LoginManager() # initialise the login lib
 lm.init_app(app) # init the login
-app.secret_key = 'super secret string'  # Change this!
+app.secret_key = database.get_env_variable("SECRET_KEY")  # Change this!
 app.permanent_session_lifetime = datetime.timedelta(hours=12)
 
 # below defines the mapping between URI -> controller code
@@ -41,7 +42,7 @@ def logged_in():
 @flog.login_required
 def logout():
     flog.logout_user()
-    fl.session['logged_in'] = False
+    fl.session.clear()
     return fl.redirect(fl.url_for('index'))
 
 @lm.user_loader

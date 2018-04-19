@@ -12,13 +12,6 @@ class User(db.Base):
     language = sa.Column(sa.Boolean, nullable=False) # true is english alone, false is mandarin, too.
     pw_hashed = sa.Column(sa.String, nullable=False)
 
-    # def __init__(self, fname, lname, email, language):
-    #     self.fname = fname
-    #     self.lname = lname
-    #     self.email = email
-    #     self.language = language
-    #     self.pw_hashed = pw_hashed
-
     def __repr__(self):
         return '<Details {fname}, {lname}, {email}, with language skills: {language}>'.format(fname=self.fname, lname=self.lname, email=self.email, language=self.language)
     def get_id(self):

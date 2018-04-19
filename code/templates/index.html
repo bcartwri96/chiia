@@ -1,6 +1,6 @@
-{% include "layout.html" %}
+{% include "header.html" %}
 {% if current_user.is_authenticated %}
-  Hi {{ current_user.fname }}! Your password is reallllllly secure: atm, it's {{ current_user.pw_hashed}}
+  Hi {{ current_user.fname }}! Your password is reallllllly secure: atm, it's something I'm not going to repeat!
 {% endif %}
 {% if not current_user.is_authenticated %}
   <br>Hello there unauthenticated user! Here is a link which you should <strong>not</strong> be able

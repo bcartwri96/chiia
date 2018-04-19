@@ -1,4 +1,4 @@
-{% include "layout.html" %}
+{% include "header.html" %}
 <title>CHIA | Login</title>
 {% block content %}
   <!-- this illustrates the fact we can retreive information from the server
@@ -6,9 +6,15 @@
   respectively)-->
   <p> This is the current time {{ current }}. </p>
   <div class="container">
-    {% if error %}
-      <p class=error><strong>Error:</strong> {{ error }}
-    {% endif %}
+    {% with messages = get_flashed_messages(category_filter=['error']) %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger" role="alert">
+          {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     <form action={{ url_for('login') }} method="POST">
       <div class="form-group">
         <label>Email address</label>
