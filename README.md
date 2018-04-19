@@ -11,6 +11,12 @@ Important Info
 4) Before you run any code using `heroku local dev` you'll need to set environment variables. On a mac/linux machine, just run `source enviro_vars.sh` to
    do so!
 
+An Important Note about Security
+========
+So you'll notice in enviro_vars.sh the first line contains an environment variable called secret key. This is a base64 encoded, operating system generated 24 character seed random variable I've produced, but we shouldn't all use the same environment variables. Instead, find out how your OS does it and then use theirs (it'll be more secure than anything you or I could mock up!)
+For mac users, it's really easy. Here it is in python:
+`python` (get into the shell); `import os`; `print(os.urandom(48))` and you've got it! Copy the value into the enviro script (replacing my one) before you start out and then you'll be fine. Do it wrong, and it'll screw up the secure sessions packages and code I've got running in the backend. 
+
 For those who want to see this working but don't know what quite to do (this was me...)
 ========
 _disclaimer: this is only for Mac and Linux users; if you're on Windows, this is harder because Windows isn't built with bash/Python/scripting languages in

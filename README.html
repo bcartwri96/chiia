@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>Untitled Document.md</title><script type="text/javascript">
 //<![CDATA[
-window.__cfRocketOptions = {byc:0,p:0,petok:"24a943beca59822996d2546cb3a64e4eb35fb8e1-1523929345-1800"};
+window.__cfRocketOptions = {byc:0,p:0,petok:"52394bcd908f222d8051967c214b00ce02ad14c3-1524102095-1800"};
 //]]>
 </script>
 <script type="text/javascript" src="https://ajax.cloudflare.com/cdn-cgi/scripts/935cb224/cloudflare-static/rocket.min.js"></script>
@@ -13,9 +13,14 @@ window.__cfRocketOptions = {byc:0,p:0,petok:"24a943beca59822996d2546cb3a64e4eb35
 which means it’s linked to our heroku web app and so we’re all ready to ship production code that’s when we do the merge and resolve conflicts</li>
 <li>You <strong>need</strong> to be reasonably familiar with Heroku, Jinja2, Flask, gunicorn, WSGI, Python, something called the Process Model (see Heroku docs) and<br>
 the MVC (model view controller) method. Check them all out; a simple Google search will fill you in!</li>
-<li>Before you run any code using <code>heroku local dev</code> you’ll need to set environment variables. On a mac/linux machine, just run <code>source enviro_vars.sh</code> to do so!</li>
+<li>Before you run any code using <code>heroku local dev</code> you’ll need to set environment variables. On a mac/linux machine, just run <code>source enviro_vars.sh</code> to<br>
+do so!</li>
 </ol>
-<h1><a id="For_those_who_want_to_see_this_working_but_dont_know_what_quite_to_do_this_was_me_12"></a>For those who want to see this working but don’t know what quite to do (this was me…)</h1>
+<h1><a id="An_Important_Note_about_Security_13"></a>An Important Note about Security</h1>
+<p>So you’ll notice in enviro_vars.sh the first line contains an environment variable called secret key. This is a base64 encoded, operating system generated 24 character seed random variable I’ve produced, but we shouldn’t all use the same environment variables. Instead, find out how your OS does it and then use theirs (it’ll be more secure than anything you or I could mock up!)<br>
+For mac users, it’s really easy. Here it is in python:<br>
+<code>python</code> (get into the shell); <code>import os</code>; <code>print(os.urandom(48))</code> and you’ve got it! Copy the value into the enviro script (replacing my one) before you start out and then you’ll be fine. Do it wrong, and it’ll screw up the secure sessions packages and code I’ve got running in the backend.</p>
+<h1><a id="For_those_who_want_to_see_this_working_but_dont_know_what_quite_to_do_this_was_me_19"></a>For those who want to see this working but don’t know what quite to do (this was me…)</h1>
 <p><em>disclaimer: this is only for Mac and Linux users; if you’re on Windows, this is harder because Windows isn’t built with bash/Python/scripting languages in<br>
 general in mind…</em></p>
 <ol>
@@ -38,7 +43,7 @@ correctly.</li>
 <li>Then you should be all good to run <code>heroku local web</code> and it’ll look in the Procfile (in root dir) (which you know about because you read the docs;) )<br>
 and it runs the command mapped by “web: long bash command here” or, if you want the developemnt server, run <code>heroku local dev</code></li>
 </ol>
-<h1><a id="What_do_all_these_files_even_do_35"></a>What do all these files even do?</h1>
+<h1><a id="What_do_all_these_files_even_do_42"></a>What do all these files even do?</h1>
 <p>Well, good question!<br>
 Below I enumerate a dictionary mapping the name of the file or directory and the semantics.</p>
 <table class="table table-striped table-bordered">
@@ -75,7 +80,7 @@ Below I enumerate a dictionary mapping the name of the file or directory and the
 </tr>
 </tbody>
 </table>
-<h1><a id="How_does_this_all_work_49"></a>How does this all work?</h1>
+<h1><a id="How_does_this_all_work_56"></a>How does this all work?</h1>
 <p>The basics are:</p>
 <ol>
 <li>When a user requests a site, they are first sent to the <a href="http://main.py">main.py</a> file in ~/code and in there you’ll notice the app checks what their URL is and links them<br>
@@ -88,7 +93,7 @@ anything we tell it to using the syntactic markup language (with conditionals an
 <li>Then the site is served to the user.</li>
 </ol>
 <p>Got the basics? Cool :)</p>
-<h1><a id="But_where_does_Heroku_come_in_64"></a>But where does Heroku come in?</h1>
+<h1><a id="But_where_does_Heroku_come_in_71"></a>But where does Heroku come in?</h1>
 <p>Another good question! Heroku is the Paas (platform as a service) we’ll use to host the production code and manage our database/web server. We don’t actually<br>
 have to interact with Heroku too much, but when we do it’ll be important that we do it right! Most of the time you’ll notice it because we<br>
 <code>git push heroku dev_master</code> instead of just <code>git push</code> because Heroku is set up as a ‘git remote’ which means when we push we need to tell it where to go<br>
