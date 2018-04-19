@@ -1,4 +1,5 @@
-#15 April 2018#
+15 April 2018
+===
 * There have been a couple of changes to the general structure. Firstly, I've
   added a script called the development scrip which you simply run on a unix
   machine and it lets you use Flask's development server and interactive
@@ -15,3 +16,19 @@
 
 * Readme provisionally complete  (I'm sure there will be much more
   eventually!)
+
+18 April 2018
+===
+* Login page logic working on
+* Using Bootstrap!
+
+19 April 2018
+===
+* Little bit of styling with Bootstrap
+* Added statics
+* Added header abstraction
+* Finished login
+* Added logged-in test page
+* It's occurred to me that there is no test cases at all yet, and I don't want to write any test code, so I'm not going to do that and I'll leave it to someone else I think...
+* Integrated secure sessions
+* Integrated passlib login system and auth system.
