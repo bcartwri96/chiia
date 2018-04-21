@@ -11,6 +11,7 @@ class User(db.Base):
     email = sa.Column(sa.String, nullable=False)
     language = sa.Column(sa.Boolean, nullable=False) # true is english alone, false is mandarin, too.
     pw_hashed = sa.Column(sa.String, nullable=False)
+    admin = sa.Column(sa.Boolean)
 
     def __repr__(self):
         return '<Details {fname}, {lname}, {email}, with language skills: {language}>'.format(fname=self.fname, lname=self.lname, email=self.email, language=self.language)
@@ -25,3 +26,9 @@ class User(db.Base):
 
     def is_authenticated(self):
         return True
+
+    def is_admin(self):
+        if self.admin:
+            return True
+        else:
+            return False

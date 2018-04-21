@@ -33,6 +33,14 @@ def resetdb():
     db_session.commit()
     print('Integrating models.')
 
+    # create user object and then commit to db
+    from passlib.hash import sha512_crypt
+    pw_hashed = sha512_crypt.encrypt("admin")
+    new_user = models.User(fname="admin", lname="admin", email="bcartwri96@gmail.com", language=False, pw_hashed=pw_hashed, admin=True)
+    db_session.add(new_user)
+    db_session.commit()
+    print("Creating an admin user.")
+
 def get_env_variable(name):
     try:
         return os.environ[name]

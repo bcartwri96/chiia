@@ -1,6 +1,10 @@
 {% include "header.html" %}
 {% if current_user.is_authenticated %}
-  Hi {{ current_user.fname }}! Your password is reallllllly secure: atm, it's something I'm not going to repeat!
+  {% if current_user.is_admin %}
+    {% include "leadanalyst/index.html"%}
+  {% elif not current_user.is_admin %}
+    {% include "analyst/index.html" %}
+  {% endif %}
 {% endif %}
 {% if not current_user.is_authenticated %}
   <br>Hello there unauthenticated user! Here is a link which you should <strong>not</strong> be able

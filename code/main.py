@@ -45,6 +45,8 @@ def logout():
     fl.session.clear()
     return fl.redirect(fl.url_for('index'))
 
+@app.route('/lead')
+
 @lm.user_loader
 def load_user(user_id):
     user = ml.User.query.get(user_id)

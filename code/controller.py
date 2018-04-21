@@ -56,7 +56,7 @@ def create_account():
             lang = True
 
         # create user object and then commit to db
-        new_user = mod.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_hashed)
+        new_user = mod.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_hashed, admin=False)
         db.db_session.add(new_user)
         db.db_session.commit()
 

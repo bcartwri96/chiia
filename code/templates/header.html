@@ -1,17 +1,43 @@
 {% include "layout.html" %}
-<nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+{% if current_user.is_admin %}
+  <nav class="navbar sticky-top navbar-expand-lg bg-dark">
+{% else %}
+  <nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+{% endif %}
   <a class="navbar-brand" href="{{ url_for('index') }}">CHIA_DB</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="{{ url_for('index') }}">Dashboard <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-      </li>
+      {% if current_user.is_authenticated %}
+        {% if current_user.is_admin %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('index') }}">Lead Analyst Dashboard <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Manage Profiles</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Create Tasks</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Update Roster</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Master Sheet</a>
+          </li>
+        {% elif current_user.is_admin %}
+          something
+        {% endif %}
+      {% elif not current_user.is_authenticated %}
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ url_for('create') }}">Create an Account</a>
+        </li>
+      {% endif %}
     </ul>
     <span class="navbar-text">
       {% if not request.endpoint == 'login' %}
@@ -19,10 +45,11 @@
           <a class="btn btn-outline-warning my-2 my-sm-0" href="{{ url_for('logout')}}" role="button">Logout {{ current_user.fname }}</a>
         {% endif %}
         {% if not current_user.is_authenticated %}
-          <form class="form-inline my-2 my-lg-0" action={{ url_for('login')}} method="POST">
+          <form class="form-inline" action={{ url_for('login')}} method="POST">
             <input type="email" class="form-control" name="username" aria-describedby="emailHelp" placeholder="Email" style="margin-right: 10px;">
             <input type="password" class="form-control" name="pw" placeholder="Password" style="margin-right: 10px;">
             <button class="btn btn-outline-success my-2 my-sm-0" type=submit >Login</button>
+            <a style="font-size: 10px; margin-left: 10px" href="{{ url_for('create') }}">Create account</a>
           </form>
         {% endif %}
       {% endif %}
