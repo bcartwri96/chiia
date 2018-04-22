@@ -1,0 +1,70 @@
+{% include "header.html" %}
+<div class="container">
+  {% block content %}
+  <br>
+  {% include "flashes.html" %}
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+        <th scope="col">Email</th>
+        <th scope="col">Language</th>
+        <th scope="col">Admin?</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for user in user_list %}
+      <tr>
+        <th scope="row">{{ user.id }}</th>
+        <td>{{ user.fname }}</td>
+        <td>{{ user.lname }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.language }}</td>
+        <td>{{ user.admin }}</td>
+        <td><a href="" type="button"> Edit User?</a></td>
+        <td><a onclick="checkDelete({{user.id}})" href="javascript:;" type="button">Delete?</></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <!-- produce a box for every user and hide them all.
+  this probs won't scale well... -->
+  {% for user in user_list %}
+    <div class="delete-box-gen" id="delete-box-{{ user.id }}">
+      <h5>Do you really want to delete {{ user.fname }}?</h5>
+      <button type="button" class="btn btn-danger"
+        src="{{ url_for('delete_user', id=user.id) }}">
+        <strong>Yeah</strong>, I really do.</button>
+      <button type="button" class="btn btn-secondary"
+        onclick=forget({{ user.id }})>
+        Nah, forget I even mentioned it.</button>
+    </div>
+  {% endfor %}
+
+  {% endblock content %}
+</div>
+
+<!-- small piece of js which sets all the deletes to hidden. on trigger it
+will present the specific delete box for that user id. -->
+<script type="text/javascript">
+  // start off with box invisible
+  box_gens = document.getElementsByClassName("delete-box-gen");
+  for (var i=0; i < box_gens.length; i++) {
+    box_gens[i].style.display = "none";
+  }
+
+  function checkDelete(id) {
+    box = document.getElementById("delete-box-"+id);
+    box.style.display = "block";
+  }
+
+  function forget(id) {
+    box = document.getElementById("delete-box-"+id);
+    box.style.display = "none";
+  }
+</script>

@@ -27,6 +27,9 @@ def login():
             if sha512_crypt.verify(pw, user.pw_hashed):
                 flog.login_user(user)
                 fl.session['logged_in'] = True
+                if user.admin:
+                    fl.session['admin'] = True
+
                 next = fl.request.args.get('next')
                 return fl.redirect(fl.url_for('index'))
             else:
@@ -59,6 +62,19 @@ def create_account():
         new_user = mod.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_hashed, admin=False)
         db.db_session.add(new_user)
         db.db_session.commit()
-
+        fl.flash('success', 'User created.')
         # take us back to the login page.
         return fl.redirect(fl.url_for('login'))
+
+
+def manage_profile():
+    if fl.request.method == "GET":
+        if "admin" in fl.session:
+            # serve the list of people who they can manipulate
+            user_list = mod.User.query.all()
+            return fl.render_template('leadanalyst/manage.html', user_list=user_list)
+        else:
+            #serve them the page that let's them mod their own user Profiles
+            return fl.render_template("analyst/manage.html")
+    else:
+        return fl.redirect(fl.url_for("index"))

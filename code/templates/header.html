@@ -1,5 +1,5 @@
 {% include "layout.html" %}
-{% if current_user.is_admin %}
+{% if current_user.admin %}
   <nav class="navbar sticky-top navbar-expand-lg bg-dark">
 {% else %}
   <nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
@@ -11,12 +11,12 @@
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
       {% if current_user.is_authenticated %}
-        {% if current_user.is_admin %}
+        {% if current_user.admin %}
           <li class="nav-item active">
             <a class="nav-link" href="{{ url_for('index') }}">Lead Analyst Dashboard <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('index') }}">Manage Profiles</a>
+            <a class="nav-link" href="{{ url_for('manage') }}">Manage Profiles</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('index') }}">Create Tasks</a>
@@ -27,9 +27,14 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('index') }}">Master Sheet</a>
           </li>
-        {% elif current_user.is_admin %}
-          something
-        {% endif %}
+          {% else %}
+            <li class="nav-item active">
+              <a class="nav-link" href="{{ url_for('index') }}">Analyst Dashboard <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('manage') }}">Manage Profile</a>
+            </li>
+          {% endif %}
       {% elif not current_user.is_authenticated %}
         <li class="nav-item active">
           <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>

@@ -1,8 +1,8 @@
 {% include "header.html" %}
 {% if current_user.is_authenticated %}
-  {% if current_user.is_admin %}
-    {% include "leadanalyst/index.html"%}
-  {% elif not current_user.is_admin %}
+  {% if current_user.admin %}
+    {% include "leadanalyst/index.html" %}
+  {% elif not current_user.admin %}
     {% include "analyst/index.html" %}
   {% endif %}
 {% endif %}

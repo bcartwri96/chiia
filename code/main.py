@@ -41,11 +41,33 @@ def logged_in():
 @app.route("/logout")
 @flog.login_required
 def logout():
-    flog.logout_user()
     fl.session.clear()
+    flog.logout_user()
     return fl.redirect(fl.url_for('index'))
 
-@app.route('/lead')
+@app.route("/manage")
+@flog.login_required
+def manage():
+    return con.manage_profile()
+
+@app.route('/delete-user/<int:id>')
+def delete_user(id):
+    if 'admin' in fl.session:
+        # show the user profile for that user
+        this_is_the_one = ml.User.query.filter(ml.User.id == id).all()
+        if len(this_is_the_one) == 1:
+            this_is_the_one = this_is_the_one[0]
+            if not current_user.id == this_is_the_one.id:
+                database.db_session.delete(this_is_the_one)
+                database.db_session.commit()
+                fl.flash("Successful deletion of "+this_is_the_one.fname+"!", "success")
+                return fl.redirect(fl.url_for('manage'))
+            else:
+                fl.flash("Don't try and delete yourself, you wally", "error")
+                return fl.redirect(fl.url_for('manage'))
+        else:
+            fl.flash("Error! There seems to be more than one of this user")
+            return fl.redirect(fl.url_for('index'))
 
 @lm.user_loader
 def load_user(user_id):
