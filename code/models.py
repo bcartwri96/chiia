@@ -12,11 +12,15 @@ class User(db.Base):
     language = sa.Column(sa.Boolean, nullable=False) # true is english alone, false is mandarin, too.
     pw_hashed = sa.Column(sa.String, nullable=False)
     admin = sa.Column(sa.Boolean)
+    confirmed = sa.Column(sa.Boolean, default=False)
 
     def __repr__(self):
         return '<Details {fname}, {lname}, {email}, with language skills: {language}>'.format(fname=self.fname, lname=self.lname, email=self.email, language=self.language)
     def get_id(self):
         return self.id
+
+    def is_valid(self):
+        return self.confirmed
 
     def is_active(self):
         return self._user.enabled
