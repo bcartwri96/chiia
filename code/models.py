@@ -15,7 +15,8 @@ class User(db.Base):
     confirmed = sa.Column(sa.Boolean, default=False)
 
     def __repr__(self):
-        return '<Details {fname}, {lname}, {email}, with language skills: {language}>'.format(fname=self.fname, lname=self.lname, email=self.email, language=self.language)
+        return '<Details {fname}, {lname}, {email}, with language skills: {language} where account conf = {conf}>'.format(fname=self.fname,
+            lname=self.lname, email=self.email, language=self.language, conf=self.confirmed)
     def get_id(self):
         return self.id
 
