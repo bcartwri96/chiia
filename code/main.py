@@ -55,6 +55,11 @@ def logout():
 def manage():
     return con.manage_profile()
 
+@app.route("/edit-user/<int:id>", methods=['GET', 'POST'])
+@flog.login_required
+def edit_user(id):
+    return con.edit_user(id)
+
 @app.route('/delete-user/<int:id>')
 def delete_user(id):
     return con.delete_user(id)
