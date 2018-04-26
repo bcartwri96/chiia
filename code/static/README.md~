@@ -22,3 +22,6 @@ then run place it in the markup like this:
 ```
 replacing 3d rotations with the correct icon for you. Then get the right hex value for IE,
 too.
+
+* mention all the things we use in the layout i.e bootstrap, iconfonts, jquery, etc.
+* mention how to call this
