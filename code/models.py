@@ -1,10 +1,13 @@
 import database as db
 from flask import Flask
 import sqlalchemy as sa
+import sqlalchemy.orm as sao
 import datetime
 
 class User(db.Base):
     __tablename__ = 'users'
+    __table_args__ = {'extend_existing': True}
+
     id = sa.Column(sa.Integer, primary_key=True)
     fname = sa.Column(sa.String, nullable=False)
     lname = sa.Column(sa.String, nullable=False)
@@ -37,3 +40,16 @@ class User(db.Base):
             return True
         else:
             return False
+
+
+class Admin(db.Base):
+    __tablename__ = 'admin'
+    id = sa.Column(sa.Integer, primary_key=True)
+    search_names = sao.relationship('Search_Names', backref='admin', lazy=True)
+
+class Search_Names(db.Base):
+    __tablename__ = 'search_names'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String, nullable=False)
+    admin_id = sa.Column(sa.Integer, sa.ForeignKey('admin.id'), nullable=False)

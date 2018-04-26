@@ -65,7 +65,7 @@ def edit_user(id):
 def delete_user(id):
     return con.delete_user(id)
 
-@app.route("/settings")
+@app.route("/settings", methods=['GET', 'POST'])
 def settings():
     return con.settings()
 

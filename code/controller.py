@@ -4,6 +4,8 @@ import models as ml
 import flask_login as flog
 import datetime
 from passlib.hash import sha512_crypt
+import forms as fm
+import flask_wtf as wtf
 
 lm = flog.LoginManager() # initialise the login lib
 
@@ -167,3 +169,17 @@ def manage_profile():
             return fl.redirect(fl.url_for('edit_user', id=user_id))
     else:
         fl.abort(404)
+
+def settings():
+    form = fm.Settings_Search(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('settings.html', form=form)
+
+    else:
+        if form.validate_on_submit():
+            update = 
+            fl.flash("Search updated ", "success")
+            return fl.render_template('settings.html', form=form)
+        else:
+            fl.flash("Search not updated", "error")
+            return fl.render_template("settings.html", form=form)

@@ -1,0 +1,18 @@
+{% include "header.html" %}
+
+<div class="container">
+  <h3 class="display-3">Settings</h3>
+  <br>
+  <h5 class="display-5">Search Types</h5>
+  <form action="{{ url_for('settings') }}" method="POST" >
+    <div class="input-group mb-3">
+      {{ form.csrf_token }}
+      {{ form.search_name(class_="form-control", placeholder="Add a search type") }}
+      <!-- <input type="text" class="form-control" placeholder="Add a search type" aria-label="search_type"> -->
+      <div class="input-group-append">
+        <button class="btn btn-outline-primary" type="button">Validate & Add</button>
+        <!-- in here we want to be sending an ajax script to the server to find
+        out whether it's already been taken or not -->
+      </div>
+    </div>
+</div>
