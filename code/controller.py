@@ -27,7 +27,7 @@ def login():
             # check that the password is correct
             if sha512_crypt.verify(pw, user.pw_hashed):
                 flog.login_user(user)
-                fl.session['logged_in'] = True
+                fl.session['logged_in'] = user.id
                 if user.admin:
                     fl.session['admin'] = True
 
@@ -80,61 +80,61 @@ def confirm_account(id):
     return fl.redirect(fl.url_for('index'))
 
 def edit_user(id):
-    if 'admin' in fl.session:
-        user = ml.User.query.get(id)
-        if fl.request.method == 'GET':
-            if user:
-                return fl.render_template('edit-user.html', user=user)
-            else:
-                return fl.abort(404)
+    user = ml.User.query.get(id)
+    if fl.request.method == 'GET':
+        if user:
+            return fl.render_template('edit-user.html', user=user)
         else:
-            fname = fl.request.form['fname']
-            lname = fl.request.form['lname']
-            email = fl.request.form['email']
-            lang = fl.request.form['language']
-            pw_raw = fl.request.form['pw_raw']
-            try:
-                admin = fl.request.form['admin']
-            except KeyError:
-                admin = None
+            return fl.abort(404)
+    else:
+        fname = fl.request.form['fname']
+        lname = fl.request.form['lname']
+        email = fl.request.form['email']
+        lang = fl.request.form['language']
+        pw_raw = fl.request.form['pw_raw']
+        try:
+            admin = fl.request.form['admin']
+        except KeyError:
+            admin = None
 
-            pw_hashed = sha512_crypt.encrypt(pw_raw)
+        pw_hashed = sha512_crypt.encrypt(pw_raw)
 
-            # convert to bool
-            if lang == '1':
-                lang = False
-            elif lang == '2':
-                lang = True
+        # convert to bool
+        if lang == '1':
+            lang = False
+        elif lang == '2':
+            lang = True
 
-            # check whether they are the same as before
-            if not fname == "":
-                if not fname == user.fname:
-                    user.fname = fname
-            if not lname == "":
-                if not lname == user.lname:
-                    user.lname = lname
-            if not email == "":
-                if not email == user.email:
-                    user.email = email
-            if not lang == "":
-                if not lang == user.language:
-                    user.language == lang
+        # check whether they are the same as before
+        if not fname == "":
+            if not fname == user.fname:
+                user.fname = fname
+        if not lname == "":
+            if not lname == user.lname:
+                user.lname = lname
+        if not email == "":
+            if not email == user.email:
+                user.email = email
+        if not lang == "":
+            if not lang == user.language:
+                user.language == lang
+        # only run this last part if you're an admin
+        if 'admin' in fl.session:
             if not admin == user.admin:
                 if admin == 'on':
                     user.admin = True
                 else:
                     user.admin = False
-            # if not pw_raw == None:
-            #     if not pw_hashed == user.pw_hashed:
-            #         user.pw_hashed = pw_hashed
+
+        if not pw_raw == "":
+            if not pw_hashed == user.pw_hashed:
+                user.pw_hashed = pw_hashed
 
 
-            db.db_session.commit()
-            next = fl.request.args.get('next')
-            fl.flash(user.fname + "'s details updated", 'success')
-            return fl.redirect(fl.url_for('manage'))
-    else:
-        return fl.abort(404)
+        db.db_session.commit()
+        next = fl.request.args.get('next')
+        fl.flash(user.fname + "'s details updated", 'success')
+        return fl.redirect(fl.url_for('manage'))
 
 def delete_user(id):
     if 'admin' in fl.session:
@@ -162,6 +162,8 @@ def manage_profile():
             return fl.render_template('leadanalyst/manage.html', user_list=user_list)
         else:
             #serve them the page that let's them ml their own user Profiles
-            return fl.render_template("analyst/manage.html")
+            # get session user object
+            user_id = fl.session['logged_in']
+            return fl.redirect(fl.url_for('edit_user', id=user_id))
     else:
-        return fl.redirect(fl.url_for("index"))
+        fl.abort(404)

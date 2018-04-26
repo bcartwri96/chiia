@@ -7,6 +7,7 @@ import database
 import models as ml
 import flask_login as flog
 import datetime
+from flask_bootstrap import Bootstrap
 
 
 app = fl.Flask(__name__)
@@ -63,6 +64,10 @@ def edit_user(id):
 @app.route('/delete-user/<int:id>')
 def delete_user(id):
     return con.delete_user(id)
+
+@app.route("/settings")
+def settings():
+    return con.settings()
 
 @lm.user_loader
 def load_user(user_id):

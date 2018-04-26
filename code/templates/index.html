@@ -1,48 +1,48 @@
 {% include "header.html" %}
 {% if current_user.is_authenticated %}
     {% include "flashes.html" %}
-    {% if unconfirmed_list|length > 0 %}
-      <br>
-      <div style="width:40%">
-        <h3>List of Unconfirmed Users</h3>
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Email</th>
-              <th scope="col">Mandarin Skills?</th>
-              <th scope="col">Confirm</th>
-              {% if current_user.admin %}
-                <th scope="col">Delete Request</th>
-              {% endif %}
-            </tr>
-          </thead>
-          <tbody>
-          {% for user in unconfirmed_list %}
-            <tr>
-              <th scope="row">{{ user.id }}</th>
-              <td>{{ user.fname }}</td>
-              <td>{{ user.lname }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.language }}</td>
-              <td><a href="/confirm_account/{{ user.id }}" type="button">Confirm</a></td>
-              {% if current_user.admin %}
-                <td><a onclick="checkDelete({{user.id}})" href="javascript:;" type="button">Delete Request</></td>
-              {% endif %}
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <p>All users confirmed.</p>
-    {% endif %}
   {% if current_user.admin %}
     {% include "leadanalyst/index.html" %}
   {% elif not current_user.admin %}
     {% include "analyst/index.html" %}
+  {% endif %}
+  {% if unconfirmed_list|length > 0 %}
+    <br>
+    <div style="width:40%">
+      <h3>List of Unconfirmed Users</h3>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Email</th>
+            <th scope="col">Mandarin Skills?</th>
+            <th scope="col">Confirm</th>
+            {% if current_user.admin %}
+              <th scope="col">Delete Request</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+        {% for user in unconfirmed_list %}
+          <tr>
+            <th scope="row">{{ user.id }}</th>
+            <td>{{ user.fname }}</td>
+            <td>{{ user.lname }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.language }}</td>
+            <td><a href="/confirm_account/{{ user.id }}" type="button">Confirm</a></td>
+            {% if current_user.admin %}
+              <td><a onclick="checkDelete({{user.id}})" href="javascript:;" type="button">Delete Request</></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>All users confirmed.</p>
   {% endif %}
 {% endif %}
 {% if not current_user.is_authenticated %}
