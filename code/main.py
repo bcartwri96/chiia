@@ -16,6 +16,8 @@ lm.init_app(app) # init the login
 app.secret_key = database.get_env_variable("SECRET_KEY")  # Change this!
 app.permanent_session_lifetime = datetime.timedelta(hours=12)
 
+# main pages
+# ==========
 # below defines the mapping between URI -> controller code
 @app.route('/')
 def index():
@@ -39,11 +41,6 @@ def create():
 def confirm_account(id):
     return con.confirm_account(id)
 
-@app.route('/logged-in')
-@flog.login_required
-def logged_in():
-    return "This is a page for those who have logged in!"
-
 @app.route("/logout")
 @flog.login_required
 def logout():
@@ -51,6 +48,13 @@ def logout():
     flog.logout_user()
     return fl.redirect(fl.url_for('index'))
 
+@app.route("/settings", methods=['GET', 'POST'])
+@flog.login_required
+def settings():
+    return con.settings()
+
+# user actions
+# ============
 @app.route("/manage")
 @flog.login_required
 def manage():
@@ -65,11 +69,14 @@ def edit_user(id):
 def delete_user(id):
     return con.delete_user(id)
 
-@app.route("/settings", methods=['GET', 'POST'])
-@flog.login_required
-def settings():
-    return con.settings()
+# datasets
+# ========
+@app.route("/dataset/create", methods=['GET', 'POST'])
+def create_dataset():
+    return con.create_dataset()
 
+# required for login manager
+# ========
 @lm.user_loader
 def load_user(user_id):
     user = ml.User.query.get(user_id)

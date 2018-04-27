@@ -4,6 +4,8 @@ import sqlalchemy as sa
 import sqlalchemy.orm as sao
 import datetime
 
+# general classes
+# ---------------
 class User(db.Base):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
@@ -41,14 +43,40 @@ class User(db.Base):
         else:
             return False
 
+class Dataset(db.Base):
+    __tablename__ = 'dataset'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String, nullable=False)
+    search_type = sa.Column(sa.String, nullable=False)
+    user_created = sa.Column(sa.Integer, nullable=False)
+    time_created = sa.Column(sa.DateTime, nullable=False)
+    year_start = sa.Column(sa.DateTime, nullable=False)
+    year_end = sa.Column(sa.DateTime, nullable=False)
+    access = sao.relationship("Dataset_Authd", backref='dataset', lazy=True)
+
+class Dataset_Authd(db.Base):
+    __tablename__ = 'dataset-authd'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    access = sa.Column(sa.Integer, nullable=False)
+    dataset_id = sa.Column(sa.Integer, sa.ForeignKey('dataset.id'), nullable=False)
+
+
+# settings page
+# ----------
 
 class Admin(db.Base):
     __tablename__ = 'admin'
+    __table_args__ = {'extend_existing': True}
+
     id = sa.Column(sa.Integer, primary_key=True)
     search_names = sao.relationship('Search_Names', backref='admin', lazy=True)
 
 class Search_Names(db.Base):
     __tablename__ = 'search-names'
+    __table_args__ = {'extend_existing': True}
+
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
     admin_id = sa.Column(sa.Integer, sa.ForeignKey('admin.id'), nullable=False)

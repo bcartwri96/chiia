@@ -191,3 +191,27 @@ def settings():
         else:
             fl.flash("Search not updated", "error")
             return fl.render_template("settings.html", form=form)
+
+def create_dataset():
+    form = fm.Create_Dataset(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('leadanalyst/dataset/create.html', form=form)
+    else:
+        # process
+        if form.validate_on_submit():
+            # submit to db
+            user = fl.session['logged_in']
+            ds = ml.Dataset(name=form.name.data, \
+            search_type=int(form.search_type.data), user_created=int(user), \
+            year_start=form.year_start.data, year_end=form.year_end.data)
+            ds_auth = ml.Dataset_Authd(access=1)
+            time_created = datetime.datetime.now()
+            ds.time_created = time_created
+            ds.access.append(ds_auth)
+            db.db_session.add(ds)
+            db.db_session.commit()
+            fl.flash("Added the dataset!", "success")
+            return fl.render_template('leadanalyst/dataset/create.html', form=form)
+        else:
+            fl.flash("Dataset not created", "error")
+            return fl.render_template('leadanalyst/dataset/create.html', form=form)
