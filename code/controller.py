@@ -144,14 +144,18 @@ def delete_user(id):
         this_is_the_one = ml.User.query.filter(ml.User.id == id).all()
         if len(this_is_the_one) == 1:
             this_is_the_one = this_is_the_one[0]
-            if not current_user.id == this_is_the_one.id:
-                database.db_session.delete(this_is_the_one)
-                database.db_session.commit()
-                fl.flash("Successful deletion of "+this_is_the_one.fname+"!", "success")
-                return fl.redirect(fl.url_for('manage'))
+            if 'logged_in' in fl.session:
+                current_user = fl.session['logged_in']
+                if not current_user == this_is_the_one.id:
+                    # db.db_session.delete(this_is_the_one)
+                    # db.db_session.commit()
+                    fl.flash("Successful deletion of "+this_is_the_one.fname+"!", "success")
+                    return fl.redirect(fl.url_for('manage'))
+                else:
+                    fl.flash("Don't try and delete yourself, you wally", "error")
+                    return fl.redirect(fl.url_for('manage'))
             else:
-                fl.flash("Don't try and delete yourself, you wally", "error")
-                return fl.redirect(fl.url_for('manage'))
+                fl.abort(403)
         else:
             fl.flash("Error! There seems to be more than one of this user")
             return fl.redirect(fl.url_for('index'))

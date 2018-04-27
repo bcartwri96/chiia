@@ -1,6 +1,5 @@
 {% include "header.html" %}
 {% if current_user.is_authenticated %}
-    {% include "flashes.html" %}
   {% if current_user.admin %}
     {% include "leadanalyst/index.html" %}
   {% elif not current_user.admin %}
@@ -40,6 +39,19 @@
         {% endfor %}
         </tbody>
       </table>
+      <!-- produce a box for every user and hide them all.
+      this probs won't scale well... -->
+      {% for user in unconfirmed_list %}
+        <div class="delete-box-gen" id="delete-box-{{ user.id }}">
+          <h5>Do you really want to delete {{ user.fname }}?</h5>
+          <a href={{ url_for('delete_user', id=user.id) }}>
+            <button type="button" class="btn btn-danger">
+            <strong>Yeah</strong>, I really do.</button></a>
+          <button type="button" class="btn btn-secondary"
+            onclick=forget({{ user.id }})>
+            Nah, forget I even mentioned it.</button>
+        </div>
+      {% endfor %}
     </div>
   {% else %}
     <p>All users confirmed.</p>
@@ -49,3 +61,23 @@
   <br>Hello there unauthenticated user! Here is a link which you should <strong>not</strong> be able
   to access: {{ url_for('logged_in') }}
 {% endif %}
+
+<!-- small piece of js which sets all the deletes to hidden. on trigger it
+will present the specific delete box for that user id. -->
+<script type="text/javascript">
+  // start off with box invisible
+  box_gens = document.getElementsByClassName("delete-box-gen");
+  for (var i=0; i < box_gens.length; i++) {
+    box_gens[i].style.display = "none";
+  }
+
+  function checkDelete(id) {
+    box = document.getElementById("delete-box-"+id);
+    box.style.display = "block";
+  }
+
+  function forget(id) {
+    box = document.getElementById("delete-box-"+id);
+    box.style.display = "none";
+  }
+</script>
