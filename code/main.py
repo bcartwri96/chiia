@@ -66,6 +66,7 @@ def delete_user(id):
     return con.delete_user(id)
 
 @app.route("/settings", methods=['GET', 'POST'])
+@flog.login_required
 def settings():
     return con.settings()
 

@@ -48,8 +48,7 @@ class Admin(db.Base):
     search_names = sao.relationship('Search_Names', backref='admin', lazy=True)
 
 class Search_Names(db.Base):
-    __tablename__ = 'search_names'
-
+    __tablename__ = 'search-names'
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
     admin_id = sa.Column(sa.Integer, sa.ForeignKey('admin.id'), nullable=False)

@@ -177,8 +177,12 @@ def settings():
 
     else:
         if form.validate_on_submit():
-            update = 
-            fl.flash("Search updated ", "success")
+            update = ml.Admin()
+            new_search_names = ml.Search_Names(name=form.search_name.data)
+            update.search_names.append(new_search_names)
+            db.db_session.add(update)
+            db.db_session.commit()
+            fl.flash("Search updated with "+form.search_name.data, "success")
             return fl.render_template('settings.html', form=form)
         else:
             fl.flash("Search not updated", "error")

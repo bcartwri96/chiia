@@ -3,5 +3,5 @@ import flask_wtf as wtf
 from wtforms import StringField
 from wtforms.validators import DataRequired, EqualTo
 
-class Settings_Search(wtf.Form):
+class Settings_Search(wtf.FlaskForm):
     search_name = StringField('name', [DataRequired()])
