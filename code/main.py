@@ -71,9 +71,24 @@ def delete_user(id):
 
 # datasets
 # ========
+
+@app.route("/dataset/", methods=['GET', 'POST'])
+def manage_datasets():
+    return con.manage_datasets()
+
 @app.route("/dataset/create", methods=['GET', 'POST'])
 def create_dataset():
     return con.create_dataset()
+
+@app.route("/dataset/edit/<int:id>", methods=['GET', 'POST'])
+def edit_dataset(id):
+    return con.edit_dataset(id)
+
+@app.route("/dataset/delete/<int:id>", methods=['GET', 'POST'])
+def delete_dataset(id):
+    return con.delete_dataset(id)
+
+
 
 # required for login manager
 # ========

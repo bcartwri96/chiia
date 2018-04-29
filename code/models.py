@@ -45,6 +45,7 @@ class User(db.Base):
 
 class Dataset(db.Base):
     __tablename__ = 'dataset'
+    __table_args__ = {'extend_existing' : True}
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
@@ -53,14 +54,16 @@ class Dataset(db.Base):
     time_created = sa.Column(sa.DateTime, nullable=False)
     year_start = sa.Column(sa.DateTime, nullable=False)
     year_end = sa.Column(sa.DateTime, nullable=False)
+    owner = sa.Column(sa.Integer, nullable=False)
     access = sao.relationship("Dataset_Authd", backref='dataset', lazy=True)
 
 class Dataset_Authd(db.Base):
     __tablename__ = 'dataset-authd'
+    __table_args__ = {'extend_existing' : True}
 
     id = sa.Column(sa.Integer, primary_key=True)
     access = sa.Column(sa.Integer, nullable=False)
-    dataset_id = sa.Column(sa.Integer, sa.ForeignKey('dataset.id'), nullable=False)
+    dataset_id = sa.Column(sa.Integer, sa.ForeignKey('dataset.id', ondelete='SET NULL'))
 
 
 # settings page

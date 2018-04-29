@@ -58,8 +58,7 @@
   {% endif %}
 {% endif %}
 {% if not current_user.is_authenticated %}
-  <br>Hello there unauthenticated user! Here is a link which you should <strong>not</strong> be able
-  to access: {{ url_for('logged_in') }}
+  <br>Hello there unauthenticated user!
 {% endif %}
 
 <!-- small piece of js which sets all the deletes to hidden. on trigger it
