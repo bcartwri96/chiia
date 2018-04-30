@@ -1,0 +1,78 @@
+{% include "header.html" %}
+  <div class="container" width=40%>
+    <!-- TODO: can you make this way prettier please.  -->
+    <h3 class="display-3">Manage Datasets</h3>
+    <!-- TODO: make this button sit in a row (right hand side) with the
+          manage dataset heading -->
+    <a href="{{ url_for('create_dataset') }}"><i class="material-icons"
+      style="font-size: 36px">add_box</i></a>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Search Type</th>
+          <th scope="col">Year Start</th>
+          <th scope="col">Year End</th>
+          <th scope="col">Owner</th>
+          <th scope="col">Time Created</th>
+          <th scope="col"># with Access</th>
+          <th scope="col">Edit?</th>
+          <th scope="col">Delete?</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for set in list %}
+        <tr>
+          <th scope="row">{{ set.id }}</th>
+          <td>{{ set.name }}</td>
+          <td>{{ st[set.id] }}</td>
+          <td>{{ set.year_start }}</td>
+          <td>{{ set.year_end }}</td>
+          <td>{{ set.owner }}</td>
+          <td>{{ set.time_created }}</td>
+          <td>{{ access_id_num[set.id] }}</td>
+          <td><a href="{{ url_for('edit_dataset', id=set.id) }}" type="button">Edit</a></td>
+          {% if current_user.admin %}
+            <td><a onclick="checkDelete({{set.id}})" href="javascript:;" type="button">Delete</></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- produce a box for every user and hide them all.
+    this probs won't scale well... -->
+    {% for set in list %}
+      <div class="delete-box-gen" id="delete-box-{{ set.id }}">
+        <h5>Do you really want to delete {{ set.name }}?</h5>
+        <a href={{ url_for('delete_dataset', id=set.id) }}>
+          <button type="button" class="btn btn-danger">
+          <strong>Yeah</strong>, I really do.</button></a>
+        <button type="button" class="btn btn-secondary"
+          onclick=forget({{ set.id }})>
+          Nah, forget I even mentioned it.</button>
+      </div>
+    {% endfor %}
+  </div>
+
+
+  <!-- small piece of js which sets all the deletes to hidden. on trigger it
+  will present the specific delete box for that user id. -->
+  <script type="text/javascript">
+    // start off with box invisible
+    box_gens = document.getElementsByClassName("delete-box-gen");
+    for (var i=0; i < box_gens.length; i++) {
+      box_gens[i].style.display = "none";
+    }
+
+    function checkDelete(id) {
+      box = document.getElementById("delete-box-"+id);
+      box.style.display = "block";
+    }
+
+    function forget(id) {
+      box = document.getElementById("delete-box-"+id);
+      box.style.display = "none";
+    }
+  </script>

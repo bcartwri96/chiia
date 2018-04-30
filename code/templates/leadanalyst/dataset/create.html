@@ -1,0 +1,36 @@
+{% include "header.html" %}
+
+<!-- TODO: this needs to be made way prettier haha  -->
+<div class="container">
+  <h3 class="display-3">Create Dataset</h3>
+  <form action="{{ url_for('create_dataset') }}" method="POST">
+    <div class="form-group">
+      <label for="exampleFormControlInput1">Name</label>
+      {{ form.csrf_token }}
+      {{ form.name(class_="form-control", placeholder="Name") }}
+    </div>
+    <div class="form-group">
+      <label for="exampleFormControlSelect1">{{ form.search_type.label }}</label>
+      {% for error in form.search_type.errors %}
+       {{ error }}
+      {% endfor %}
+      {{ form.search_type(class_="form-control") }}
+    <div class="form-group">
+      {% for error in form.year_start.errors %}
+       {{ error }}
+      {% endfor %}
+
+      {{ form.year_start(class_="form-control", placeholder="Yeah Start") }}
+      {% for error in form.year_end.errors %}
+       {{ error }}
+      {% endfor %}
+      {{ form.year_end(class_="form-control", placeholder="Year End") }}
+
+      {% for error in form.access.errors %}
+       {{ error }}
+      {% endfor %}
+      {{ form.access(class_="form-control", placeholder="User ID") }}
+    </div>
+    <button class="btn btn-outline-primary" type="submit">Make Dataset</button>
+  </form>
+</div>

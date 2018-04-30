@@ -36,10 +36,14 @@ def resetdb():
     # create user object and then commit to db
     from passlib.hash import sha512_crypt
     pw_hashed = sha512_crypt.encrypt("admin")
-    new_user = models.User(fname="admin", lname="admin", email="bcartwri96@gmail.com", language=False, pw_hashed=pw_hashed, admin=True)
-    db_session.add(new_user)
+    pw_hashed_an = sha512_crypt.encrypt("test")
+    new_admin = models.User(fname="admin", lname="admin", email="bcartwri96@gmail.com", language=False, pw_hashed=pw_hashed, admin=True, confirmed=True)
+    new_analyst = models.User(fname="Johny", lname="Test", email="test@test.com", language=True, pw_hashed=pw_hashed_an, admin=False)
+    db_session.add(new_admin)
+    db_session.add(new_analyst)
     db_session.commit()
     print("Creating an admin user.")
+    print("Creating an test user.")
 
 def get_env_variable(name):
     try:

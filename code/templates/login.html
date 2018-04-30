@@ -1,8 +1,6 @@
 {% include "header.html" %}
 <title>CHIA | Login</title>
 {% block content %}
-  {% include "flashes.html" %}
-  <p> This is the current time {{ current }}. </p>
   <div class="container">
     <!-- in here is where the include will go -->
     <form action={{ url_for('login') }} method="POST">
