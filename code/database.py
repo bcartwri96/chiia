@@ -70,9 +70,11 @@ POSTGRES_DB = get_env_variable("POSTGRES_DB")
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
 
 # when sending to the REAL WORLD!
-DATABASE_URL = get_env_variable("DATABASE_URL")
-if DATABASE_URL != None:
+try:
+    DATABASE_URL = get_env_variable("DATABASE_URL")
     DB_URL = DATABASE_URL
+except Exception:
+    pass
 
 engine = create_engine(DB_URL, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,

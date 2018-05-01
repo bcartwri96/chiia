@@ -28,13 +28,18 @@ def login():
             user = user_list[0]
             # check that the password is correct
             if sha512_crypt.verify(pw, user.pw_hashed):
-                flog.login_user(user)
-                fl.session['logged_in'] = user.id
-                if user.admin:
-                    fl.session['admin'] = True
+                if user.confirmed:
+                    flog.login_user(user)
+                    fl.session['logged_in'] = user.id
+                    if user.admin:
+                        fl.session['admin'] = True
 
-                next = fl.request.args.get('next')
-                return fl.redirect(fl.url_for('index'))
+                    next = fl.request.args.get('next')
+                    return fl.redirect(fl.url_for('index', next=next))
+                else:
+                    fl.flash("Account not confirmed yet! Wait for confirmation",
+                    "error")
+                    return fl.render_template('/login.html')
             else:
                 fl.flash("Password incorrect!", "error")
                 return fl.render_template('/login.html')
