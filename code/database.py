@@ -17,10 +17,6 @@ app = fl(__name__)
 def resetdb():
     """Destroys and creates the database + tables."""
 
-    #from sqlalchemy_utils import database_exists, create_database, drop_database
-    # if database_exists(DB_URL):
-    #     print('Deleting database.')
-    #     drop_database(DB_URL)
     metadata = sa.MetaData()
     metadata.reflect(engine)
     for tbl in reversed(metadata.sorted_tables):
@@ -75,7 +71,9 @@ DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USE
 
 # when sending to the REAL WORLD!
 DATABASE_URL = get_env_variable("DATABASE_URL")
-DB_URL = DATABASE_URL
+if DATABASE_URL != None:
+    DB_URL = DATABASE_URL
+
 engine = create_engine(DB_URL, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
