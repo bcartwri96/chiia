@@ -14,6 +14,18 @@ app = fl(__name__)
 # model support code
 #############################################################
 
+def createdb():
+    """Destroys and creates the database and tables"""
+    from sqlalchemy_utils import database_exists, create_database, drop_database
+    if not database_exists(DB_URL):
+        print('Creating database.')
+        create_database(DB_URL)
+    else:
+        drop_database(DB_URL)
+        create_database(DB_URL)
+        print("Deleted and created new database")
+        create_tables()
+
 def resetdb():
     """Destroys and creates the database + tables."""
 
@@ -21,10 +33,9 @@ def resetdb():
     metadata.reflect(engine)
     for tbl in reversed(metadata.sorted_tables):
         tbl.drop(engine)
-    # if not database_exists(DB_URL):
-    #     print('Creating database.')
-    #     create_database(DB_URL)
+    create_tables()
 
+def create_tables():
     print('Creating tables.')
     # import the models used to describe the tables we're creating (using the
     # ORM). Link: http://flask-sqlalchemy.pocoo.org/2.3/models/

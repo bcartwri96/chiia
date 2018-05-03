@@ -4,8 +4,8 @@ import sqlalchemy as sa
 import sqlalchemy.orm as sao
 import datetime
 
-# general classes
-# ---------------
+# User related classes
+# ====================
 class User(db.Base):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
@@ -43,6 +43,9 @@ class User(db.Base):
         else:
             return False
 
+# Dataset related classes
+# =======================
+
 class Dataset(db.Base):
     __tablename__ = 'dataset'
     __table_args__ = {'extend_existing' : True}
@@ -67,7 +70,7 @@ class Dataset_Authd(db.Base):
 
 
 # settings page
-# ----------
+# =============
 
 class Admin(db.Base):
     __tablename__ = 'admin'
@@ -83,3 +86,20 @@ class Search_Names(db.Base):
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
     admin_id = sa.Column(sa.Integer, sa.ForeignKey('admin.id'), nullable=False)
+
+# tasks
+# ======
+
+association_table = sao.Table('association', Base.metadata,
+    sa.Column('task', sa.Integer, sa.ForeignKey('tasks.id')),
+    sa.Column('transaction', sa.Integer, sa.ForeignKey('transaction.id'))
+)
+
+class Task(db.Base):
+    __tablename__ = 'tasks'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    nickname = sa.Column(sa.String, nullable=False)
+    date_created = sa.Column(sa.DateTime, nullable=False)
+
+    transactions = sao.relationship("transactions", backref="tasks")
