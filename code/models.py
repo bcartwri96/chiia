@@ -103,3 +103,9 @@ class Task(db.Base):
     date_created = sa.Column(sa.DateTime, nullable=False)
 
     transactions = sao.relationship("transactions", backref="tasks")
+
+class Transactions(db.Base):
+    __tablename__ = 'transactions'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = ...
