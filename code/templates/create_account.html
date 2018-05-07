@@ -1,5 +1,26 @@
-{% include 'layout.html' %}
+{% include "layout.html" %}
 
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: black;">
+
+<a class="navbar-brand" href="{{ url_for('index') }}">CHIIA DATABBASE</a>
+
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarText">
+  <ul class="navbar-nav mr-auto">
+ </ul>
+  <span class="navbar-text">
+        <form class="form-inline" action={{ url_for('login')}} method="POST">
+          <input type="email" class="form-control" name="username" aria-describedby="emailHelp" placeholder="Email" style="margin-right: 10px;">
+          <input type="password" class="form-control" name="pw" placeholder="Password" style="margin-right: 10px;">
+          <button class="btn btn-outline-success my-2 my-sm-0" type=submit >Login</button>
+        </form>
+  </span>
+</div>
+</nav>
+  <br> </br>
 {% block content %}
 <title>CHIA | Create Account</title>
 <form action={{ url_for('create') }} method="POST">
@@ -12,6 +33,7 @@
         <input type="text" class="form-control" name="lname" placeholder="Last name">
       </div>
     </div>
+    <br>
     <div class="row">
       <div class="col">
         <input type="text" class="form-control" name="email" placeholder="Email">
@@ -20,18 +42,20 @@
         <input type="password" class="form-control" name="pw_raw" placeholder="Password">
       </div>
     </div>
+      <br>
     <div class="row">
-      <div class="col center">
-        <input class="form-check-input" type="radio" name="language" value="1" checked>
-          <label class="form-check-label">
+      <div class="col">
+        <input class="form-check-input" type="radio" name="language" style="margin-left: 5px;" value="1" checked>
+          <label class="form-check-label" style="padding-left: 25px;">
             English Only
           </label>
-        <input class="form-check-input" type="radio" name="language" style="margin-left: 20px;" value="2">
-          <label class="form-check-label" style="padding-left: 40px;">
+        <input class="form-check-input" type="radio" name="language" style="margin-left: 30px;" value="2">
+          <label class="form-check-label" style="padding-left: 50px;">
             English and Mandarin
           </label>
       </div>
     </div>
+      <br>
     <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
