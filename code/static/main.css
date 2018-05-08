@@ -18,6 +18,35 @@
     url(iconfont/MaterialIcons-Regular.ttf) format('truetype');
 }
 
+a.navbar-brand {
+    font-family: glacial-indefference, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color:Yellow !important;
+    letter-spacing: 1.4px;
+    /*border-bottom: solid 1px #006600;*/
+    text-transform: uppercase;
+}
+
+a.nav-link {
+  font-family: glacial-indefference, sans-serif;
+  font-size: 14px;
+  font-weight: notmal;
+  color:whitesmoke !important;
+  letter-spacing: 1.2px;
+}
+
+
+
+
+Headbody{
+  background-color: blue;
+}
+
+body {
+    background-color: whitesmoke;
+}
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;

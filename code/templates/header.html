@@ -2,9 +2,10 @@
 {% if current_user.admin %}
   <nav class="navbar sticky-top navbar-expand-lg bg-dark">
 {% else %}
-  <nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+  <nav class="navbar sticky-top navbar-expand-lg navbar-light" style="background-color: black;">
 {% endif %}
-  <a class="navbar-brand" href="{{ url_for('index') }}">CHIIA_DB</a>
+    <a class="navbar-brand" href="{{ url_for('index') }}">CHIIA DATABBASE</a>
+
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -36,9 +37,7 @@
             </li>
           {% endif %}
       {% elif not current_user.is_authenticated %}
-        <li class="nav-item active">
-          <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
-        </li>
+
         <li class="nav-item active">
           <a class="nav-link" href="{{ url_for('create') }}">Create an Account</a>
         </li>
@@ -47,19 +46,22 @@
     <span class="navbar-text">
       {% if not request.endpoint == 'login' %}
         {% if current_user.is_authenticated %}
-          <a class="btn btn-outline-warning my-2 my-sm-0" href="{{ url_for('settings') }}" style="padding: 3px;"><i class="material-icons" style="-webkit-transform: translateY(2px);">settings</i></a>
-          <a class="btn btn-outline-warning my-2 my-sm-0" href="{{ url_for('logout')}}" role="button">Logout {{ current_user.fname }}</a>
+          <a class="btn btn-outline-warning my-2 my-sm-0" style="color:yellow;" href="{{ url_for('settings') }}" style="padding: 3px;"><i class="material-icons" style="-webkit-transform: translateY(2px);">settings</i></a>
+          <a class="btn btn-outline-warning my-2 my-sm-0" style="color:yellow;" href="{{ url_for('logout')}}" role="button">Logout {{ current_user.fname }}</a>
         {% endif %}
         {% if not current_user.is_authenticated %}
           <form class="form-inline" action={{ url_for('login')}} method="POST">
             <input type="email" class="form-control" name="username" aria-describedby="emailHelp" placeholder="Email" style="margin-right: 10px;">
             <input type="password" class="form-control" name="pw" placeholder="Password" style="margin-right: 10px;">
-            <button class="btn btn-outline-success my-2 my-sm-0" type=submit >Login</button>
-            <a style="font-size: 10px; margin-left: 10px" href="{{ url_for('create') }}">Create account</a>
+            <button class="btn btn-outline-warning my-2 my-sm-0" type=submit >Login</button>
+
           </form>
         {% endif %}
       {% endif %}
     </span>
+
+
+
   </div>
 </nav>
 <div class="container">
