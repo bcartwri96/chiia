@@ -66,6 +66,7 @@ def edit_user(id):
     return con.edit_user(id)
 
 @app.route('/delete-user/<int:id>')
+@flog.login_required
 def delete_user(id):
     return con.delete_user(id)
 
@@ -73,25 +74,45 @@ def delete_user(id):
 # ========
 
 @app.route("/dataset/", methods=['GET', 'POST'])
+@flog.login_required
 def manage_datasets():
     return con.manage_datasets()
 
 @app.route("/dataset/create", methods=['GET', 'POST'])
+@flog.login_required
 def create_dataset():
     return con.create_dataset()
 
 @app.route("/dataset/edit/<int:id>", methods=['GET', 'POST'])
+@flog.login_required
 def edit_dataset(id):
     return con.edit_dataset(id)
 
 @app.route("/dataset/delete/<int:id>", methods=['GET', 'POST'])
+@flog.login_required
 def delete_dataset(id):
     return con.delete_dataset(id)
 
+# Stages
+# ========
 
+@app.route('/transaction/manage', methods=['GET', 'POST'])
+@flog.login_required
+def manage_transactions():
+    return con.manage_transactions()
+
+@app.route('/transaction/<int:id>', methods=['GET', 'POST'])
+@flog.login_required
+def manage_ind_trans(id):
+    return con.manage_ind_trans(id)
+
+@app.route('/transaction/create', methods=['GET', 'POST'])
+@flog.login_required
+def create_transaction():
+    return con.create_transaction()
 
 # required for login manager
-# ========
+# ===========================
 @lm.user_loader
 def load_user(user_id):
     user = ml.User.query.get(user_id)

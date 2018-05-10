@@ -137,6 +137,8 @@ class Transactions(db.Base):
 # base stage class
 class Base_Stage_Task(db.Base):
     __table_args__ = {'extend_existing' : True}
+    # idea to make abstract credit to:
+    # https://mail.python.org/pipermail/flask/2016-February/000261.html
     __abstract__ = True
 
     # unique identifier for each sta

@@ -313,3 +313,21 @@ def delete_dataset(id):
         return fl.redirect(fl.url_for('manage_datasets'))
     else:
         return fl.redirect(fl.url_for('manage_datasets'))
+
+
+# get all transactions if admin and get all transactions
+# relevant to an analyst
+def manage_transactions():
+    if fl.request.method == 'GET':
+        if fl.session['admin']:
+            # query the db and fetch all
+            # current transactions
+            trans = ml.Transactions.query.all()
+            return fl.render_template('manage_transactions.html', trans=trans)
+        else:
+            fl.abort(404)
+    else:
+        fl.abort(404)
+
+def create_transaction():
+    fl.abort(404)
