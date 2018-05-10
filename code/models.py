@@ -139,7 +139,8 @@ class Base_Stage_Task(db.Base):
     __table_args__ = {'extend_existing' : True}
     __abstract__ = True
 
-    # unique identifier for each staid = sa.Column(sa.Integer, primary_key=True)
+    # unique identifier for each sta
+    s_id = sa.Column(sa.Integer, primary_key=True)
     # describes the state of the current state with reference
     # to the transaction id
     stage = sa.Column(sa.Integer, nullable=False)
