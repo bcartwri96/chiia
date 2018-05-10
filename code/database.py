@@ -36,6 +36,7 @@ def resetdb():
     create_tables()
 
 def create_tables():
+    """Works the models into the db in using the ORM"""
     print('Creating tables.')
     # import the models used to describe the tables we're creating (using the
     # ORM). Link: http://flask-sqlalchemy.pocoo.org/2.3/models/
