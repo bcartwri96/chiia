@@ -1,0 +1,21 @@
+{% include "header.html" %}
+<div class="container">
+  <h4 class="display-4">Create a Transaction</h4>
+  <!-- TODO: add in the placeholders and get that working via the frontend.
+       IT'S TOO LATE FOR THIS JUNK!! -->
+  <form action="{{ url_for('create_transaction') }}" method="POST">
+    <div class="form-group">
+      <label for="exampleFormControlInput1">Name</label>
+      {{ form.csrf_token }}
+      {{ form.name(class_="form-control") }}
+      <label for="exampleFormControlInput1">Amount</label>
+      {{ form.amount(class_="form-control") }}
+      <label for="exampleFormControlInput1">Who is Assigned</label>
+      {{ form.who_assigned(class_="form-control") }}
+      <label for="exampleFormControlInput1">Who was Previous Responsible</label>
+      {{ form.who_previous_stages(class_="form-control") }}
+    </div>
+    <button class="btn btn-outline-primary" type="submit">Create transaction</button>
+  </form>
+
+</div>

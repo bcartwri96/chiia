@@ -1,0 +1,7 @@
+*/.DS_Store
+code/*
+chia-venv/*
+.idea/*
+__pycache__/*
+*/__pycache__/*
+chia-venv/pip-selfcheck.json

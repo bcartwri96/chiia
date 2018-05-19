@@ -57,10 +57,17 @@ def create_tables():
     new_search_names = models.Search_Names(name="Factiva")
     update.search_names.append(new_search_names)
     db_session.add(update)
-    db_session.commit()
     print("Creating an admin user.")
     print("Creating an test user.")
     print("Creating a new search type")
+
+    week = models.Frequencies()
+    week.name = "Weekly"
+    week.weeks_in_freq = 52
+    db_session.add(week)
+    print("Adding weekly frequency")
+
+    db_session.commit()
 
 def get_env_variable(name):
     try:

@@ -26,6 +26,11 @@
       {% endfor %}
       {{ form.year_end(class_="form-control", placeholder="Year End") }}
 
+      {% for error in form.freq.errors %}
+       {{ error }}
+      {% endfor %}
+      {{ form.freq(class_="form-control", placeholder="Frequency") }}
+
       {% for error in form.access.errors %}
        {{ error }}
       {% endfor %}

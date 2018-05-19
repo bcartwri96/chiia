@@ -248,7 +248,7 @@ def create_dataset():
             ds = ml.Dataset(name=form.name.data, \
             search_type=int(form.search_type.data), user_created=int(user), \
             year_start=form.year_start.data, year_end=form.year_end.data, \
-            owner=user)
+            owner=user, freq=int(form.freq.data))
             ds_auth_owner = ml.Dataset_Authd(access=user)
             ds_auth = ml.Dataset_Authd(access=form.access.data)
             time_created = datetime.datetime.now()
@@ -258,10 +258,44 @@ def create_dataset():
             db.db_session.add(ds)
             db.db_session.commit()
             fl.flash("Added the dataset!", "success")
+
+            # now break up this into the correct amount of tasks
+            freq_list = get_time_list(form.year_start.data, \
+            form.year_end.data, form.freq.data)
+
             return fl.render_template('leadanalyst/dataset/create.html', form=form)
         else:
+            # return str(form.freq.data)
             fl.flash("Dataset not created", "error")
+            fl.flash(str(form.errors), 'error')
             return fl.render_template('leadanalyst/dataset/create.html', form=form)
+
+
+def get_time_list(initial, end, interval):
+    """the purpose of this function is to calculate the amount and at what
+    intervals they should occur."""
+    import datetime as dt
+    # ensure data is actually legit
+    try:
+        initial = dt.datetime.strptime(initial, "%Y-%m-%d %H:%M:%S")
+        end = dt.datetime.strptime(end,  "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        fl.flask("Internal Server Error", "error")
+        return None
+    except TypeError:
+        pass
+    # time delta indicates the period we need to calculate over
+    time_delta = end-initial
+    # now divide this between the interval
+    int = dt.timedelta(days = interval)
+    # int = num tasks per frequency
+    # now create and return a list of each interval
+    res = []
+    for i in range(0, round(time_delta.days/int.days), 1):
+        t_start = initial + dt.timedelta(i*int.days)
+        t_end = t_start + dt.timedelta(int.days - 1)
+        print (dt.datetime.strftime(t_start, "%d-%m-%y") + "->" + dt.datetime.strftime(t_end, "%d-%m-%y"))
+
 
 def edit_dataset(id):
     form = fm.Edit_Dataset(fl.request.form)
@@ -330,4 +364,11 @@ def manage_transactions():
         fl.abort(404)
 
 def create_transaction():
-    fl.abort(404)
+    # get the current user's id and then submit that
+    form = fm.Create_Transaction(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('create_trans.html', form=form)
+    else:
+        # other auto vars to be stored
+        # dataset_id =
+        pass

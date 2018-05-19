@@ -55,6 +55,8 @@ class Dataset(db.Base):
     name = sa.Column(sa.String, nullable=False)
     search_type = sa.Column(sa.String, nullable=False)
     user_created = sa.Column(sa.Integer, nullable=False)
+    freq = sa.Column(sa.Integer, nullable=False)
+    # daily = 1; weekly = 2; monthly = 3;
     time_created = sa.Column(sa.DateTime, nullable=False)
     year_start = sa.Column(sa.DateTime, nullable=False)
     year_end = sa.Column(sa.DateTime, nullable=False)
@@ -88,6 +90,12 @@ class Search_Names(db.Base):
     name = sa.Column(sa.String, nullable=False)
     admin_id = sa.Column(sa.Integer, sa.ForeignKey('admin.id'), nullable=False)
 
+class Frequencies(db.Base):
+    __tablename__ = 'frequencies'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String, nullable=False)
+    weeks_in_freq = sa.Column(sa.Integer, nullable=False)
 
 # tasks
 # ======
@@ -114,14 +122,15 @@ class Transactions(db.Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
-    date = sa.Column(sa.DateTime, nullable=False)
+    date_start = sa.Column(sa.DateTime, nullable=False)
+    date_end = sa.Column(sa.DateTime, nullable=False)
     stage = sa.Column(sa.Integer, nullable=False)
     amount = sa.Column(sa.Float, nullable=False)
     who_assigned = sa.Column(sa.Integer, nullable=False)
     who_previous_stages = sa.Column(sa.PickleType)
 
     dataset_id = sa.Column(sa.Integer, nullable=False)
-    task_id = sa.Column(sa.Integer, nullable=False)
+    task_id = sa.Column(sa.Integer)
     # will a transaction have a link to the task?
     # I don't think it needs to, but we'll include
     # it for completeness
@@ -141,15 +150,14 @@ class Base_Stage_Task(db.Base):
     # https://mail.python.org/pipermail/flask/2016-February/000261.html
     __abstract__ = True
 
-    # unique identifier for each sta
+    # unique identifier for each stage
     s_id = sa.Column(sa.Integer, primary_key=True)
     # describes the state of the current state with reference
     # to the transaction id
     stage = sa.Column(sa.Integer, nullable=False)
     # speaking of the transaction id, we need to know exactly
     # what the transaction is which we're referring to
-    tid = sa.Column(sa.Integer, nullable=False)
-
+    entity_name = sa.Column(sa.String, nullable=False)
 class Stage_2(Base_Stage_Task):
     __tablename__ = 'stage_2'
     __table_args__ = {'extend_existing' : True}
