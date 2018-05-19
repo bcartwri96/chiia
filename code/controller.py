@@ -294,7 +294,8 @@ def get_time_list(initial, end, interval):
     for i in range(0, round(time_delta.days/int.days), 1):
         t_start = initial + dt.timedelta(i*int.days)
         t_end = t_start + dt.timedelta(int.days - 1)
-        print (dt.datetime.strftime(t_start, "%d-%m-%y") + "->" + dt.datetime.strftime(t_end, "%d-%m-%y"))
+        res.append(dt.datetime.strftime(t_start, "%d-%m-%y") + "->" + dt.datetime.strftime(t_end, "%d-%m-%y"))
+    print(res)
 
 
 def edit_dataset(id):
