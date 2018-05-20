@@ -237,6 +237,8 @@ def manage_datasets():
 
 # ds creation.
 def create_dataset():
+    import datetime as dt
+    from sqlalchemy import func, asc
     form = fm.Create_Dataset(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('leadanalyst/dataset/create.html', form=form)
@@ -256,13 +258,26 @@ def create_dataset():
             ds.access.append(ds_auth)
             ds.access.append(ds_auth_owner)
             db.db_session.add(ds)
-            db.db_session.commit()
             fl.flash("Added the dataset!", "success")
-
             # now break up this into the correct amount of tasks
-            freq_list = get_time_list(form.year_start.data, \
+            freq_list, start, end = get_time_list(form.year_start.data, \
             form.year_end.data, form.freq.data)
+            ds_id = ml.Dataset.query.order_by(asc(ml.Dataset.id)).first()
+            if ds_id == None:
+                ds_id = 1
+            else:
+                ds_id = ds_id.id
+            for i in range(0, len(freq_list), 1):
+                # create a task for every frequency object
+                t_cur = ml.Tasks()
+                t_cur.nickname = freq_list[i]
+                t_cur.date_created = dt.datetime.now()
+                t_cur.dataset_owner = int(ds_id)
+                t_cur.date_start = start[i]
+                t_cur.date_end = end[i]
+                db.db_session.add(t_cur)
 
+            db.db_session.commit()
             return fl.render_template('leadanalyst/dataset/create.html', form=form)
         else:
             # return str(form.freq.data)
@@ -290,12 +305,16 @@ def get_time_list(initial, end, interval):
     int = dt.timedelta(days = interval)
     # int = num tasks per frequency
     # now create and return a list of each interval
-    res = []
+    name = []
+    start_date = []
+    end_date = []
     for i in range(0, round(time_delta.days/int.days), 1):
         t_start = initial + dt.timedelta(i*int.days)
-        t_end = t_start + dt.timedelta(int.days - 1)
-        res.append(dt.datetime.strftime(t_start, "%d-%m-%y") + "->" + dt.datetime.strftime(t_end, "%d-%m-%y"))
-    print(res)
+        t_end = t_start + dt.timedelta(7 - 1)
+        start_date.append(t_start)
+        end_date.append(t_end)
+        name.append(dt.datetime.strftime(t_start, "%d-%m-%y") + "->" + dt.datetime.strftime(t_end, "%d-%m-%y"))
+    return name, start_date, end_date
 
 
 def edit_dataset(id):
@@ -358,7 +377,9 @@ def manage_transactions():
             # query the db and fetch all
             # current transactions
             trans = ml.Transactions.query.all()
-            return fl.render_template('manage_transactions.html', trans=trans)
+            tasks = ml.Tasks.query.all()
+            return fl.render_template('manage_transactions.html', trans=trans,\
+            tasks=tasks)
         else:
             fl.abort(404)
     else:

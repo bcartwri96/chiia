@@ -95,7 +95,7 @@ class Frequencies(db.Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
-    weeks_in_freq = sa.Column(sa.Integer, nullable=False)
+    days_in_freq = sa.Column(sa.Integer, nullable=False)
 
 # tasks
 # ======
@@ -108,6 +108,8 @@ class Tasks(db.Base):
     nickname = sa.Column(sa.String, nullable=False)
     date_created = sa.Column(sa.DateTime, nullable=False)
     dataset_owner = sa.Column(sa.Integer, nullable=False)
+    date_start = sa.Column(sa.DateTime, nullable=False)
+    date_end = sa.Column(sa.DateTime, nullable=False)
     # if the stage has moved from a task to the first of the
     # proper stages, we set this true for bookkeeping purposes.
     is_staged = sa.Column(sa.Boolean)

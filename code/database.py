@@ -63,7 +63,7 @@ def create_tables():
 
     week = models.Frequencies()
     week.name = "Weekly"
-    week.weeks_in_freq = 52
+    week.days_in_freq = 7
     db_session.add(week)
     print("Adding weekly frequency")
 
