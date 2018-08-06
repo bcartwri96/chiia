@@ -106,6 +106,11 @@ def manage_transactions():
 def manage_ind_trans(id):
     return con.manage_ind_trans(id)
 
+@app.route('/task/edit/<int:id>', methods=['GET', 'POST'])
+@flog.login_required
+def edit_task(id):
+    return con.edit_task(id)
+
 @app.route('/transaction/create', methods=['GET', 'POST'])
 @flog.login_required
 def create_transaction():

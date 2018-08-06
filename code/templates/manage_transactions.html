@@ -1,43 +1,49 @@
 {% include "header.html" %}
 
 <div class="container">
+  <div class="row">
+    <div class="col-lg-6">
+      <h3 class="display-3">Manage Tasks</h3>
+      <a href="{{ url_for('create_transaction') }}"><i class="material-icons"
+        style="font-size: 36px">add_box</i></a>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tasks %}
+            <tr>
+              <th scope="row">{{ t.id }}</th>
+              <td scope="row">{{ t.nickname }}</td>
+              <td scope="row"><a role="button" href="{{ url_for('edit_task', id=t.id) }}">Edit</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-lg-6">
 
-  <h3 class="display-3">Manage Transactions</h3>
-  <a href="{{ url_for('create_transaction') }}"><i class="material-icons"
-    style="font-size: 36px">add_box</i></a>
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for t in tasks %}
-        <tr>
-          <th scope="row">{{ t.id }}</th>
-          <td scope="row">{{ t.nickname }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-
-  <h3 class="display-3">Manage Transactions</h3>
-  <a href="{{ url_for('create_transaction') }}"><i class="material-icons"
-    style="font-size: 36px">add_box</i></a>
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for tran in trans %}
-        <tr>
-          <th scope="row">{{ tran.id }}</th>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      <h3 class="display-3">Manage Transactions</h3>
+      <a href="{{ url_for('create_transaction') }}"><i class="material-icons"
+        style="font-size: 36px">add_box</i></a>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tran in trans %}
+            <tr>
+              <th scope="row">{{ tran.id }}</th>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

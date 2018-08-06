@@ -269,12 +269,14 @@ def create_dataset():
                 ds_id = ds_id.id
             for i in range(0, len(freq_list), 1):
                 # create a task for every frequency object
+
                 t_cur = ml.Tasks()
                 t_cur.nickname = freq_list[i]
                 t_cur.date_created = dt.datetime.now()
                 t_cur.dataset_owner = int(ds_id)
                 t_cur.date_start = start[i]
                 t_cur.date_end = end[i]
+                t_cur.who_assigned = int(user)
                 db.db_session.add(t_cur)
 
             db.db_session.commit()
@@ -357,6 +359,48 @@ def edit_dataset(id):
         db.db_session.commit()
         fl.flash("Updated dataset", "success")
         return fl.redirect(fl.url_for("manage_datasets"))
+
+def edit_task(id):
+    """take a task id and allow the user to edit who all the properties of
+    a task."""
+    form = fm.Edit_Task(fl.request.form)
+    if fl.request.method == 'GET':
+        t = ml.Tasks.query.get(id)
+        form.nickname.data = t.nickname
+        form.date_start.data = t.date_start
+        form.date_end.data = t.date_end
+        form.who_assigned.data = t.who_assigned
+        form.dataset_owner.data = t.dataset_owner
+        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t)
+
+    else:
+        #process the form
+        if form.validate_on_submit():
+            fl.flash("debug 2", 'error')
+            amount = fl.request.form['amount']
+            fl.flash(amount, 'error')
+            # nickname = fl.request.form['nickname']
+            # date_start = fl.request.form['date_start']
+            # date_end = fl.request.form['date_end']
+            # amount = fl.request.form['amount']
+            # who_assigned = fl.request.form['who_assigned']
+            # dataset_owner = fl.request.form['dataset_owner']
+            #
+            t_db = ml.Tasks.query.get(id)
+            # t_db.nickname = nickname
+            # t_db.date_start = date_start
+            # t_db.date_end = date_end
+            # t_db.who_assigned = who_assigned
+            # t_db.dataset_owner = dataset_owner
+            #
+            db.db_session.add(t_db)
+            db.db_session.commit()
+            fl.flash("Updated task", "success")
+            # else:
+            #     fl.flash("Failed to update task", "failed")
+        else:
+            fl.flash("debug", "error")
+        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db)
 
 # delete a ds.
 def delete_dataset(id):

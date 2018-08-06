@@ -42,6 +42,14 @@ class Create_Transaction(wtf.FlaskForm):
     dataset_id = HiddenField('ds_id')
     task_id = HiddenField('t_id')
 
+class Edit_Task(wtf.FlaskForm):
+    nickname = StringField('nickname', validators=[DataRequired("Please ensure you've entered a name")])
+    date_start = DateField('date_start', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    date_end = DateField('date_end', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    who_assigned = IntegerField('who_assigned')
+    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+
+
 # chin_inv_file_no = FloatField('chin_inv_file_no', \
 # validators=[NumberRange(0, 99999999, "Invalid file number")])
 # counterpart_file_no = FloatField('counterpart_file_no', \

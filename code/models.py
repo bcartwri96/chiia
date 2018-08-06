@@ -113,20 +113,52 @@ class Tasks(db.Base):
     # if the stage has moved from a task to the first of the
     # proper stages, we set this true for bookkeeping purposes.
     is_staged = sa.Column(sa.Boolean)
+    who_assigned = sa.Column(sa.Integer, nullable=False)
 
 
-# transactions
+# How does this transaction thing work?
+# Broadly, _if everything goes well_ then we have
+# transactions, stage 2, stage 3 and then stage 4
+# one single article with a particular search method
+# will be the object of all these steps - this means we
+# need to track the progress of these stages and how each,
+# for instance, transaction will connect to it's stage 2 etc.
+
+# Transactions are technically stage 1 and so we can treat them
+# the same as we might treat stage 2, 3 or 4.
+
+# stages
+# ======
+
+# base stage class
+class Base_Stage_Task(db.Base):
+    __table_args__ = {'extend_existing' : True}
+    # idea to make abstract credit to:
+    # https://mail.python.org/pipermail/flask/2016-February/000261.html
+    __abstract__ = True
+
+    # unique identifier for each stage
+    s_id = sa.Column(sa.Integer, primary_key=True)
+    # describes the current state with reference
+    # to the transaction id
+    stage = sa.Column(sa.Integer, nullable=False)
+    # speaking of the transaction id, we need to know exactly
+    # what the transaction is which we're referring to
+    entity_name = sa.Column(sa.String, nullable=False)
+    who_assigned = sa.Column(sa.Integer)
+
+# transactions (stage 1)
 # =============
 
-class Transactions(db.Base):
+class Transactions(Base_Stage_Task):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing' : True}
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    name = sa.Column(sa.String, nullable=False)
+    # id = sa.Column(sa.Integer, primary_key=True)
+    # name = sa.Column(sa.String, nullable=False)
     date_start = sa.Column(sa.DateTime, nullable=False)
     date_end = sa.Column(sa.DateTime, nullable=False)
-    stage = sa.Column(sa.Integer, nullable=False)
+    # stage = sa.Column(sa.Integer, nullable=False)
     amount = sa.Column(sa.Float, nullable=False)
     who_assigned = sa.Column(sa.Integer, nullable=False)
     who_previous_stages = sa.Column(sa.PickleType)
@@ -141,28 +173,12 @@ class Transactions(db.Base):
     # can be done, need a redo or archived.
     state = sa.Column(sa.Integer, nullable=False)
 
+    trans_id = sao.relationship("Stage_Rels")
 
-# stages
-# ======
 
-# base stage class
-class Base_Stage_Task(db.Base):
-    __table_args__ = {'extend_existing' : True}
-    # idea to make abstract credit to:
-    # https://mail.python.org/pipermail/flask/2016-February/000261.html
-    __abstract__ = True
-
-    # unique identifier for each stage
-    s_id = sa.Column(sa.Integer, primary_key=True)
-    # describes the state of the current state with reference
-    # to the transaction id
-    stage = sa.Column(sa.Integer, nullable=False)
-    # speaking of the transaction id, we need to know exactly
-    # what the transaction is which we're referring to
-    entity_name = sa.Column(sa.String, nullable=False)
 class Stage_2(Base_Stage_Task):
     __tablename__ = 'stage_2'
-    __table_args__ = {'extend_existing' : True}
+    # __table_args__ = {'extend_existing' : True}
 
     # num times assigned to an analyst
     reviews = sa.Column(sa.Integer, nullable=False)
@@ -192,6 +208,8 @@ class Stage_2(Base_Stage_Task):
     linked_iid = sa.Column(sa.Integer)
     nickname_iid = sa.Column(sa.String)
     file_checked_la = sa.Column(sa.Boolean)
+
+    stage_2_id = sao.relationship("Stage_Rels")
 
 class Stage_3(Base_Stage_Task):
     __tablename__ = 'stage_3'
@@ -230,3 +248,14 @@ class Stage_4(Base_Stage_Task):
     linked_iid = sa.Column(sa.Integer)
     nickname_iid = sa.Column(sa.String)
     file_checked_la = sa.Column(sa.Boolean)
+
+# Establish a table to store the relationships
+# between each of the different stages so we can see
+# the progression.
+
+class Stage_Rels(db.Base):
+    __tablename__ = 'stage_rels'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    trans_id = sa.Column(sa.Integer, sa.ForeignKey('transactions.s_id'))
+    stage_2_id = sa.Column(sa.Integer, sa.ForeignKey('stage_2.s_id'))

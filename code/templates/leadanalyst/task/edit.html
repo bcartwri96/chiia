@@ -1,0 +1,19 @@
+{% include "header.html" %}
+<div class="container">
+  <h4 class="display-4">Edit a Task</h4>
+    <body>
+    <form action="{{ url_for('edit_task', id=t.id) }}" method="POST">
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Nickname</label>
+        {{ form.csrf_token }}
+        {{ form.nickname(class_="form-control") }}
+        <label for="exampleFormControlInput1">Date Start</label>
+        {{ form.date_start(class="form-control") }}
+        <label for="exampleFormControlInput1">Date End</label>
+        {{ form.date_end(class="form-control") }}
+        <label for="exampleFormControlInput1">Who owns the dataset?</label>
+        {{ form.dataset_owner(class_="form-control") }}
+      </div>
+      <button class="btn btn-outline-primary" type="submit">Edit task</button>
+    </form>
+    </body>
