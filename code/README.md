@@ -1,4 +1,7 @@
-DEV Docs
+DEV DOCS
+-------
+
+Important Info
 =========
 1) **REALLY IMPORTANT FIRST STEP: checkout the dev_master branch of the project (explained below); for the git noobs (like me...): `git checkout dev_master`**
 2) dev_master is our main branch where we do any and all development; PLEASE don't push to the master branch, because the master branch is also production
@@ -12,7 +15,7 @@ An Important Note about Security
 ========
 So you'll notice in enviro_vars.sh the first line contains an environment variable called secret key. This is a base64 encoded, operating system generated 24 character seed random variable I've produced, but we shouldn't all use the same environment variables. Instead, find out how your OS does it and then use theirs (it'll be more secure than anything you or I could mock up!)
 For mac users, it's really easy. Here it is in python:
-`python` (get into the shell); `import os`; `print(os.urandom(48))` and you've got it! Copy the value into the enviro script (replacing my one) before you start out and then you'll be fine. Do it wrong, and it'll screw up the secure sessions packages and code I've got running in the backend.
+`python` (get into the shell); `import os`; `print(os.urandom(48))` and you've got it! Copy the value into the enviro script (replacing my one) before you start out and then you'll be fine. Do it wrong, and it'll screw up the secure sessions packages and code I've got running in the backend. 
 
 For those who want to see this working but don't know what quite to do (this was me...)
 ========
@@ -77,25 +80,3 @@ That's really it. Heroku is our web server, essentially. We'll also be asking Su
 it's on a hobby plan) which is fine for what we're currently doing, but I don't think Susan will want to wait ~20 seconds for her webpage to load normally!
 After a little while of inactivity on a heroku hobby plan, the webserver dyno (remember a dyno is an abstraction of a web service like an apache server etc.)
 will simply go to sleep and when a user interupts that with a request, it can take some time to get started again!
-=======
-# CHIIA-DB
-
-## CHIIA DATABASE WORKFORCE STRUCTURE
-
-### About our Project:
-**The Chinese Investment in Australia (CHIIA) Database** is a public database of Mainland Chinese direct commercial investment in Australia. The CHIIA database publishes a detailed dataset of individual commercial transactions of all sizes, which aligns with complementary data from the Australian Bureau of Statistics and the American Enterprise Institute’s Global Investment Tracker. The CHIIA methodology produces data from transparent sources, using consistent classifications and methods, making it suitable for use in peer-reviewed academic publications. The CHIIA methodology is published online to inform those who use this data and allow our colleagues around the world to create similar databases for their country. The CHIIA database was created, and is maintained by the East Asian Bureau of Economic Research at the Crawford School of Public Policy at The Australian National University.
-
-### Team:
-
-| Name        | Uni id       |
-| ------------- |:-------------:|
-| Anurag Vijay Kumar     | u6320283|
-| Ao Sun     | u6126510     |   
-| Benjamin Cartwright  | u5838255      |
-| Nidhi Chaudhary   | u6281543     |
-| Rajkamal Dhull  |u6345375     |
-
-
-
-
-To view more about this project, please proceed to our [Landing Page.](https://sites.google.com/s/1wjU4dPP7f6Wb2QxUPzAfJoV6wSTdz2Ts/p/1NkN570w5u3MzU_j_zp-6VNILJb1qo1dS/edit?authuser=2)
