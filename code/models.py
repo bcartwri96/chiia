@@ -115,6 +115,7 @@ class Tasks(db.Base):
     is_staged = sa.Column(sa.Boolean)
     who_assigned = sa.Column(sa.Integer, nullable=False)
 
+    task_id = sao.relationship("Stage_Rels")
 
 # How does this transaction thing work?
 # Broadly, _if everything goes well_ then we have
@@ -231,6 +232,8 @@ class Stage_3(Base_Stage_Task):
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
 
+    stage_3_id = sao.relationship("Stage_Rels")
+
 class Stage_4(Base_Stage_Task):
     __tablename__ = 'stage_4'
 
@@ -249,6 +252,8 @@ class Stage_4(Base_Stage_Task):
     nickname_iid = sa.Column(sa.String)
     file_checked_la = sa.Column(sa.Boolean)
 
+    stage_4_id = sao.relationship("Stage_Rels")
+
 # Establish a table to store the relationships
 # between each of the different stages so we can see
 # the progression.
@@ -259,3 +264,6 @@ class Stage_Rels(db.Base):
     id = sa.Column(sa.Integer, primary_key=True)
     trans_id = sa.Column(sa.Integer, sa.ForeignKey('transactions.s_id'))
     stage_2_id = sa.Column(sa.Integer, sa.ForeignKey('stage_2.s_id'))
+    stage_3_id = sa.Column(sa.Integer, sa.ForeignKey('stage_3.s_id'))
+    stage_4_id = sa.Column(sa.Integer, sa.ForeignKey('stage_4.s_id'))
+    tasks_id = sa.Column(sa.Integer, sa.ForeignKey('tasks.id'))

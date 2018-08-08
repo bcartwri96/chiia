@@ -1,0 +1,54 @@
+import models as ml
+task = ml.Tasks()
+task.nickname = "ben"
+from datetime import datetime as dt
+ds = dt.now()
+de = dt.now()
+task.id = 5
+task.date_created = ds
+task.date_started = ds
+task.date_end = de
+task.date_start = ds
+task.date_end = de
+task.is_staged = False
+task.who_assigned = 1
+task.dataset_owner = 1
+trans = ml.Transactions()
+trans.stage = 2
+trans.dataset_id = 1
+trans.entity_name = "ben"
+trans.who_assigned = 1
+trans.date_start = ds
+trans.date_end = de
+trans.amount = 100
+trans.state = 1
+s2 = ml.Stage_2()
+s2.reviews = 1
+s2.stage = 1
+s2.entity_name = "ben"
+s2.date_assigned = de
+s2.chin_inv_file_no = 1
+s2.counterpart_file_no = 2
+sr = ml.Stage_Rels()
+sr.tasks_id = task.id
+trans.id = 9
+sr.trans_id = trans.id
+s2.id = 7
+sr.stage_2_id = s2.id
+
+#checks
+
+sr.id
+trans.id
+task.id
+s2.id
+trans.trans_id = [sr]
+task.task_id = [sr]
+s2.stage_2_id = [sr]
+
+import database as db
+db.db_session.add(sr)
+db.db_session.add(task)
+db.db_session.add(trans)
+db.db_session.add(s2)
+db.db_session.commit()
