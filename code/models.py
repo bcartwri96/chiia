@@ -4,6 +4,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as sao
 import datetime
 from sqlalchemy.ext.declarative import declared_attr
+from proj_types import State
 
 # User related classes
 # ====================
@@ -110,12 +111,28 @@ class Tasks(db.Base):
     dataset_owner = sa.Column(sa.Integer, nullable=False)
     date_start = sa.Column(sa.DateTime, nullable=False)
     date_end = sa.Column(sa.DateTime, nullable=False)
-    # if the stage has moved from a task to the first of the
-    # proper stages, we set this true for bookkeeping purposes.
-    is_staged = sa.Column(sa.Boolean)
+
+    date_conducted = sa.Column(sa.DateTime)
+    search_term = sa.Column(sa.String)
+
+    # describes the current state with reference
+    # to the transaction id
+    stage = sa.Column(sa.Integer, nullable=False)
+
     who_assigned = sa.Column(sa.Integer, nullable=False)
+    num_inv_found = sa.Column(sa.Integer, nullable=False)
+    num_inv_progressing = sa.Column(sa.Integer, nullable=False)
 
     task_id = sao.relationship("Stage_Rels")
+    state = sa.Column(sa.Enum(State), nullable=False)
+    # How will state work? It can be three possible points: Pending, Accept,
+    # Rejected and Working. It describes the relationship between the LA and the analyst.
+    # There are some defined states which let the user in question know whether
+    # the LA has seen and accepted their change, whether they have rejected it,
+    # whether it is yet to be considered or whether the A is still working on it
+    # and therefore has no need for the LA to examine their work. These states
+    # can be found in the proj_types.py file.
+
 
 # How does this transaction thing work?
 # Broadly, _if everything goes well_ then we have
@@ -140,13 +157,11 @@ class Base_Stage_Task(db.Base):
 
     # unique identifier for each stage
     s_id = sa.Column(sa.Integer, primary_key=True)
-    # describes the current state with reference
-    # to the transaction id
-    stage = sa.Column(sa.Integer, nullable=False)
     # speaking of the transaction id, we need to know exactly
     # what the transaction is which we're referring to
     entity_name = sa.Column(sa.String, nullable=False)
     who_assigned = sa.Column(sa.Integer)
+    # LA_accept = sa.Column(sa.Boolean)
 
 # transactions (stage 1)
 # =============
@@ -161,7 +176,6 @@ class Transactions(Base_Stage_Task):
     date_end = sa.Column(sa.DateTime, nullable=False)
     # stage = sa.Column(sa.Integer, nullable=False)
     amount = sa.Column(sa.Float, nullable=False)
-    who_assigned = sa.Column(sa.Integer, nullable=False)
     who_previous_stages = sa.Column(sa.PickleType)
 
     dataset_id = sa.Column(sa.Integer, nullable=False)

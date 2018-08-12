@@ -1,0 +1,32 @@
+{% include "header.html" %}
+
+<h3 class="display-3">Manage Tasks</h3>
+<a href="{{ url_for('create_transaction') }}"><i class="material-icons"
+  style="font-size: 36px">add_box</i></a>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Who Assigned</th>
+      <th scope="col">Stage</th>
+      <th scope="col">Week</th>
+      <th scope="col">Search Term</th>
+      <th scope="col">Investors Found</th>
+      <th scope="col"># of Progressing Investors</th>
+      <th scope="col">Accept/Reject</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tasks %}
+      <tr>
+        <th scope="row">{{ t.id }}</th>
+        <td scope="row">{{ t.nickname }}</td>
+        <td scope="row">{{ t.who_assigned }}</td>
+        <td scope="row">{{ t.stage }}</td>
+        <td scope="row"><a role="button" href="{{ url_for('edit_task', id=t.id) }}">Edit</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>

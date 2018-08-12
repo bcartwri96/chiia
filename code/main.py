@@ -96,6 +96,11 @@ def delete_dataset(id):
 # Stages
 # ========
 
+@app.route('/tasks/manage', methods=['GET', 'POST'])
+@flog.login_required
+def manage_tasks():
+    return con.manage_tasks()
+
 @app.route('/transaction/manage', methods=['GET', 'POST'])
 @flog.login_required
 def manage_transactions():

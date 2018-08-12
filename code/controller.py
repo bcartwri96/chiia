@@ -5,6 +5,7 @@ import flask_login as flog
 import datetime
 from passlib.hash import sha512_crypt
 import forms as fm
+from proj_types import State
 import flask_wtf as wtf
 
 lm = flog.LoginManager() # initialise the login lib
@@ -277,6 +278,10 @@ def create_dataset():
                 t_cur.date_start = start[i]
                 t_cur.date_end = end[i]
                 t_cur.who_assigned = int(user)
+                t_cur.stage = 1
+                t_cur.num_inv_found = 0
+                t_cur.num_inv_progressing = 0
+                t_cur.state = State.Working
                 db.db_session.add(t_cur)
 
             db.db_session.commit()
@@ -305,7 +310,6 @@ def get_time_list(initial, end, interval):
     time_delta = end-initial
     # now divide this between the interval
     int = dt.timedelta(days = interval)
-    # int = num tasks per frequency
     # now create and return a list of each interval
     name = []
     start_date = []
@@ -371,36 +375,32 @@ def edit_task(id):
         form.date_end.data = t.date_end
         form.who_assigned.data = t.who_assigned
         form.dataset_owner.data = t.dataset_owner
-        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t)
+        return fl.render_template('leadanalyst/task/manage.html', form=form, t=t)
 
     else:
         #process the form
         if form.validate_on_submit():
-            fl.flash("debug 2", 'error')
-            amount = fl.request.form['amount']
-            fl.flash(amount, 'error')
-            # nickname = fl.request.form['nickname']
+
+            #get the vars
+            nickname = fl.request.form['nickname']
+            search_term = fl.request.form['search_term']
             # date_start = fl.request.form['date_start']
             # date_end = fl.request.form['date_end']
-            # amount = fl.request.form['amount']
             # who_assigned = fl.request.form['who_assigned']
-            # dataset_owner = fl.request.form['dataset_owner']
-            #
+
             t_db = ml.Tasks.query.get(id)
-            # t_db.nickname = nickname
+            t_db.nickname = nickname
             # t_db.date_start = date_start
             # t_db.date_end = date_end
             # t_db.who_assigned = who_assigned
-            # t_db.dataset_owner = dataset_owner
-            #
+            t_db.search_term = search_term
+
             db.db_session.add(t_db)
             db.db_session.commit()
             fl.flash("Updated task", "success")
-            # else:
-            #     fl.flash("Failed to update task", "failed")
         else:
-            fl.flash("debug", "error")
-        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db)
+            fl.flash("Failed to update task", "error")
+        return fl.render_template('leadanalyst/task/index.html', form=form, t=t_db)
 
 # delete a ds.
 def delete_dataset(id):
@@ -412,6 +412,18 @@ def delete_dataset(id):
     else:
         return fl.redirect(fl.url_for('manage_datasets'))
 
+
+def manage_tasks():
+    """This will present the page which let's LA see all current transactions"""
+    if fl.request.method == 'GET':
+        if fl.session['admin']:
+            t = ml.Tasks.query.all()
+            return fl.render_template('leadanalyst/task/manage.html', tasks=t)
+        else:
+            current_user = fl.session['logged_in']
+            # not LA, so only get tasks allocated to them
+            t = ml.Tasks.query.filter(ml.Tasks.who_assigned == current_user).all()
+            return fl.render_template('analyst/task/manage.html', tasks=t)
 
 # get all transactions if admin and get all transactions
 # relevant to an analyst
