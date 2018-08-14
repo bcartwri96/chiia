@@ -375,7 +375,7 @@ def edit_task(id):
         form.date_end.data = t.date_end
         form.who_assigned.data = t.who_assigned
         form.dataset_owner.data = t.dataset_owner
-        return fl.render_template('leadanalyst/task/manage.html', form=form, t=t)
+        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t)
 
     else:
         #process the form

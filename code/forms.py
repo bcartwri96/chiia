@@ -4,7 +4,7 @@
 
 import flask_wtf as wtf
 import models as ml
-from wtforms import StringField, IntegerField, SelectField, DateField, FloatField, HiddenField
+from wtforms import StringField, IntegerField, SelectField, DateField, FloatField, HiddenField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, Required, NumberRange
 
 class Settings_Search(wtf.FlaskForm):
@@ -49,6 +49,13 @@ class Edit_Task(wtf.FlaskForm):
     who_assigned = IntegerField('who_assigned')
     search_term = StringField('search_term', validators=[DataRequired()])
     dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+
+    # creating Transactions
+    entity_name = StringField('entity_name', validators=[DataRequired()])
+    rumour_date = DateField('rumour', validators=[DataRequired()])
+    anouncement_date = DateField('annoucement', validators=[DataRequired()])
+    mandarin_next = BooleanField('mandarin')
+    
 
 
 # chin_inv_file_no = FloatField('chin_inv_file_no', \
