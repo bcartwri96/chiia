@@ -418,7 +418,17 @@ def manage_tasks():
     if fl.request.method == 'GET':
         if fl.session['admin']:
             t = ml.Tasks.query.all()
-            return fl.render_template('leadanalyst/task/manage.html', tasks=t)
+            weeks = []
+            # week calculation
+            for cur in t:
+                ds = cur.date_start
+                de = cur.date_end
+                time_delta = ds-de
+                # time_delta = time_delta(days=time_delta)
+                weeks.append(time_delta)
+
+            return fl.render_template('leadanalyst/task/manage.html',
+            all=zip(t,weeks))
         else:
             current_user = fl.session['logged_in']
             # not LA, so only get tasks allocated to them

@@ -101,6 +101,21 @@ def delete_dataset(id):
 def manage_tasks():
     return con.manage_tasks()
 
+@app.route('/tasks/edit/<int:id>', methods=['GET', 'POST'])
+@flog.login_required
+def edit_task(id):
+    return con.edit_task(id)
+
+@app.route('/tasks/accept_task/<int:id>', methods=['POST'])
+@flog.login_required
+def accept_task(id):
+    return con.accept_task(id)
+
+@app.route('/tasks/reject_task/<int:id>', methods=['POST'])
+@flog.login_required
+def reject_task(id):
+    return con.reject_task(id)
+
 @app.route('/transaction/manage', methods=['GET', 'POST'])
 @flog.login_required
 def manage_transactions():
@@ -110,11 +125,6 @@ def manage_transactions():
 @flog.login_required
 def manage_ind_trans(id):
     return con.manage_ind_trans(id)
-
-@app.route('/task/edit/<int:id>', methods=['GET', 'POST'])
-@flog.login_required
-def edit_task(id):
-    return con.edit_task(id)
 
 @app.route('/transaction/create', methods=['GET', 'POST'])
 @flog.login_required

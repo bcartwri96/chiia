@@ -1,8 +1,8 @@
 {% include "header.html" %}
 
+<h3 class="display-3">View Recent Tasks</h3>
+
 <h3 class="display-3">Manage Tasks</h3>
-<a href="{{ url_for('create_transaction') }}"><i class="material-icons"
-  style="font-size: 36px">add_box</i></a>
 <table class="table">
   <thead>
     <tr>
@@ -15,15 +15,21 @@
       <th scope="col">Investors Found</th>
       <th scope="col"># of Progressing Investors</th>
       <th scope="col">Accept/Reject</th>
+      <th scope="col">Edit</th>
     </tr>
   </thead>
   <tbody>
-    {% for t in tasks %}
+    {% for t,w in all %}
       <tr>
         <th scope="row">{{ t.id }}</th>
         <td scope="row">{{ t.nickname }}</td>
         <td scope="row">{{ t.who_assigned }}</td>
         <td scope="row">{{ t.stage }}</td>
+        <td scope="row">{{ w }}</td>
+        <td scope="row">{{ t.search_term }}</td>
+        <td scope="row">{{ t.num_inv_found }}</td>
+        <td scope="row">{{ t.num_inv_progressing }}</td>
+        <td scope="row"><a role="button" href="{{ url_for('accept_task', id=t.id)}}">Accept/</a><a role="button" href="{{ url_for('reject_task', id=t.id)}}">Reject</a></td>
         <td scope="row"><a role="button" href="{{ url_for('edit_task', id=t.id) }}">Edit</a></td>
       </tr>
     {% endfor %}
