@@ -15,9 +15,23 @@
         {{ form.search_term(class="form-control") }}
         <label for="exampleFormControlInput1">Who owns the dataset?</label>
         {{ form.dataset_owner(class_="form-control") }}
+        <br>
+        <h5 class="display-5">Transactions</h5><a href="someJSWhichPopsUpANewForm()"><i class="material-icons"
+          style="font-size: 36px">add_box</i></a><br>
+        <label for="exampleFormControlInput1">What's the entity name?</label>
+        {{ trans.csrf_token }}
+        {{ trans.entity_name(class_="form-control") }}
+        <label for="exampleFormControlInput1">What was the rumour date?</label>
+        {{ trans.rumour_date(class_="form-control") }}
+        <label for="exampleFormControlInput1">What was the annoucement date?</label>
+        {{ trans.anouncement_date(class_="form-control") }}
+        <label for="exampleFormControlInput1">Mandarin skills required?</label>
+        {{ trans.mandarin(class_="form-control") }}
+        <label for="exampleFormControlInput1">Amount?</label>
+        {{ trans.amount(class_="form-control") }}
+        <label for="exampleFormControlInput1">Manually allocate users?</label>
+        {{ trans.who_assigned(class_="form-control") }}
       </div>
-
-      
 
       <button class="btn btn-outline-primary" type="submit">Edit task</button>
     </form>

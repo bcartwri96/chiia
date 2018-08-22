@@ -93,6 +93,7 @@ class Search_Names(db.Base):
 
 class Frequencies(db.Base):
     __tablename__ = 'frequencies'
+    __table_args__ = {'extend_existing': True}
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
@@ -172,8 +173,10 @@ class Transactions(Base_Stage_Task):
 
     # id = sa.Column(sa.Integer, primary_key=True)
     # name = sa.Column(sa.String, nullable=False)
-    date_start = sa.Column(sa.DateTime, nullable=False)
-    date_end = sa.Column(sa.DateTime, nullable=False)
+
+    # date_start = sa.Column(sa.DateTime, nullable=False)
+    # date_end = sa.Column(sa.DateTime, nullable=False)
+
     # stage = sa.Column(sa.Integer, nullable=False)
     amount = sa.Column(sa.Float, nullable=False)
     who_previous_stages = sa.Column(sa.PickleType)
@@ -183,6 +186,11 @@ class Transactions(Base_Stage_Task):
     # will a transaction have a link to the task?
     # I don't think it needs to, but we'll include
     # it for completeness
+
+    # record the following
+    annoucement_date = sa.Column(sa.DateTime)
+    rumour_date = sa.Column(sa.DateTime)
+    mandarin = sa.Column(sa.Boolean)
 
     # this is the state of each of the transactions.
     # can be done, need a redo or archived.

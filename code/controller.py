@@ -368,19 +368,57 @@ def edit_task(id):
     """take a task id and allow the user to edit who all the properties of
     a task."""
     form = fm.Edit_Task(fl.request.form)
+    new_transaction = fm.Create_Transaction(fl.request.form)
     if fl.request.method == 'GET':
-        t = ml.Tasks.query.get(id)
-        form.nickname.data = t.nickname
-        form.date_start.data = t.date_start
-        form.date_end.data = t.date_end
-        form.who_assigned.data = t.who_assigned
-        form.dataset_owner.data = t.dataset_owner
-        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t)
+        t_db = ml.Tasks.query.get(id)
+        form.nickname.data = t_db.nickname
+        form.date_start.data = t_db.date_start
+        form.date_end.data = t_db.date_end
+        form.who_assigned.data = t_db.who_assigned
+        form.dataset_owner.data = t_db.dataset_owner
+        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
+        trans=new_transaction)
 
     else:
+        fl.flash('form = '+str(form.task_submitted.data)+'; transaction = '+str(new_transaction.trans_submitted.data), 'error')
         #process the form
-        if form.validate_on_submit():
+        t_db = ml.Tasks.query.get(id)
+        # RECALL: transactions are many-to-one so fopr every stage_rel id, we
+        # can have multiple id's related to transactions and this means we will
+        # be CREATING a new transaction here!
+        if form.task_submitted.data and new_transaction.trans_submitted.data:
+            if form.validate_on_submit():
+                #get the vars
+                nickname = fl.request.form['nickname']
+                search_term = fl.request.form['search_term']
+                # date_start = fl.request.form['date_start']
+                # date_end = fl.request.form['date_end']
+                # who_assigned = fl.request.form['who_assigned']
 
+                t_db.nickname = nickname
+                # t_db.date_start = date_start
+                # t_db.date_end = date_end
+                # t_db.who_assigned = who_assigned
+                t_db.search_term = search_term
+
+
+                # trans = ml.Transactions()
+                # # get vars from transaction/s
+                # t_name = fl.request.form['entity_name']
+                # t_rumour_date = fl.request.form['rumour_date']
+                # t_announcement_date = fl.request.form['annoucement_date']
+
+                # update relations
+                # stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id)
+                # stage_rel_id = stage_rel.id # get the id
+                # stage_rel.trans_id.append(trans.id)
+                # db.db_session.add(t_db)
+
+            elif new_transaction.validate_on_submit():
+                pass
+            else:
+                fl.flash("Failed", 'error')
+        if form.validate_on_submit() and form.task_submitted.data:
             #get the vars
             nickname = fl.request.form['nickname']
             search_term = fl.request.form['search_term']
@@ -388,7 +426,6 @@ def edit_task(id):
             # date_end = fl.request.form['date_end']
             # who_assigned = fl.request.form['who_assigned']
 
-            t_db = ml.Tasks.query.get(id)
             t_db.nickname = nickname
             # t_db.date_start = date_start
             # t_db.date_end = date_end
@@ -398,9 +435,17 @@ def edit_task(id):
             db.db_session.add(t_db)
             db.db_session.commit()
             fl.flash("Updated task", "success")
+
+        elif new_transaction.validate_on_submit() and new_transaction.trans_submitted.data:
+                fl.flash("DEBUG", 'error')
+                # process the new transaction here and ensure it is bound
+                # to the stage_rels table mapping.
+                name = fl.request.form['name']
         else:
             fl.flash("Failed to update task", "error")
-        return fl.render_template('leadanalyst/task/index.html', form=form, t=t_db)
+            fl.flash(str(form.errors), 'error')
+        return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
+        trans=new_transaction)
 
 # delete a ds.
 def delete_dataset(id):

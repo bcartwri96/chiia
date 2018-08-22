@@ -4,7 +4,8 @@
 
 import flask_wtf as wtf
 import models as ml
-from wtforms import StringField, IntegerField, SelectField, DateField, FloatField, HiddenField, BooleanField
+from wtforms import StringField, IntegerField, SelectField, DateField, \
+FloatField, HiddenField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Required, NumberRange
 
 class Settings_Search(wtf.FlaskForm):
@@ -32,7 +33,13 @@ class Edit_Dataset(wtf.FlaskForm):
 
 class Create_Transaction(wtf.FlaskForm):
     name = StringField('name', [DataRequired()])
-    amount = FloatField('amount', [DataRequired()])
+    amount = FloatField('amount')
+
+    # creating Transactions
+    anouncement_date = DateField('annoucement', format='%d-%m-%Y', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
+    entity_name = StringField('entity_name', validators=[DataRequired(message="You need to enter an entity name")])
+    rumour_date = DateField('rumour', format='%d-%m-%Y', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
+    mandarin = BooleanField('mandarin')
 
     #prefill this with the filled value of the current user
     who_assigned = IntegerField('who_assigned', [DataRequired()])
@@ -42,6 +49,9 @@ class Create_Transaction(wtf.FlaskForm):
     dataset_id = HiddenField('ds_id')
     task_id = HiddenField('t_id')
 
+    # check which form was submitted
+    trans_submitted = SubmitField('Trans')
+
 class Edit_Task(wtf.FlaskForm):
     nickname = StringField('nickname', validators=[DataRequired("Please ensure you've entered a name")])
     date_start = DateField('date_start', format='%Y', validators=[DataRequired("This date cannot be empty")])
@@ -50,15 +60,10 @@ class Edit_Task(wtf.FlaskForm):
     search_term = StringField('search_term', validators=[DataRequired()])
     dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
 
-    # creating Transactions
-    entity_name = StringField('entity_name', validators=[DataRequired()])
-    rumour_date = DateField('rumour', validators=[DataRequired()])
-    anouncement_date = DateField('annoucement', validators=[DataRequired()])
-    mandarin_next = BooleanField('mandarin')
-    
+    task_submitted = SubmitField('Task')
 
 
-# chin_inv_file_no = FloatField('chin_inv_file_no', \
-# validators=[NumberRange(0, 99999999, "Invalid file number")])
-# counterpart_file_no = FloatField('counterpart_file_no', \
-# validators=[NumberRange(0, 99999999, "Invalid file number")])
+    # chin_inv_file_no = FloatField('chin_inv_file_no', \
+    # validators=[NumberRange(0, 99999999, "Invalid file number")])
+    # counterpart_file_no = FloatField('counterpart_file_no', \
+    # validators=[NumberRange(0, 99999999, "Invalid file number")])

@@ -3,6 +3,9 @@
   <h4 class="display-4">Create a Transaction</h4>
   <!-- TODO: add in the placeholders and get that working via the frontend.
        IT'S TOO LATE FOR THIS JUNK!! -->
+       <!-- NOTE: there have been changes here so this form will no longer
+        compile. Why? It's been depreciated BECAUSE the create trans form
+      is being filled inside the main task form. -->
   <form action="{{ url_for('create_transaction') }}" method="POST">
     <div class="form-group">
       <label for="exampleFormControlInput1">Name</label>
