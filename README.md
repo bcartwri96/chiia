@@ -1,3 +1,10 @@
+**IMPORTANT NEW THINGS TO DO!**
+1. Github is now where our code is being pulled and pushed from; add it as a
+   remote branch `git remote add HTTPS/SSH link here`
+2. Download the Zenhub extension and then ensure it works by checking the
+   Zenhub tab in our new Github repo
+3. Let Ben know if you run into _any_ trouble :) 
+
 DEV Docs
 =========
 1) **REALLY IMPORTANT FIRST STEP: checkout the dev_master branch of the project (explained below); for the git noobs (like me...): `git checkout dev_master`**
