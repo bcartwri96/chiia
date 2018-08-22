@@ -145,3 +145,5 @@ def load_user(user_id):
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
+
+## testing
