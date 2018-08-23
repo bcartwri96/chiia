@@ -1,0 +1,23 @@
+{% include "header.html" %}
+<div class="container">
+  <h4 class="display-4">Stage2</h4>
+    <body>
+    <form action="{{ url_for('stage2') }}" method="POST">
+      <div class="form-group">
+        <label for="exampleFormControlInput1">S2 reviews </label>
+        {{ form.csrf_token }}
+        {{ form.S2_reviews(class_="form-control") }}
+        <label for="exampleFormControlInput1">S2 date</label>
+        {{ form.S2_date(class="form-control") }}
+        <label for="exampleFormControlInput1">Chinese investor file no.</label>
+        {{ form.chin_inv_file_no(class="form-control") }}
+        <label for="exampleFormControlInput1">Counterpart investor file no.</label>
+        {{ form.counterpart_file_no(class="form-control") }}
+        
+
+        {{ form.task_submitted(class_="btn btn-outline-primary") }}
+
+
+      </div>
+    </form>
+    </body>

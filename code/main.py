@@ -131,6 +131,16 @@ def manage_ind_trans(id):
 def create_transaction():
     return con.create_transaction()
 
+@app.route('/stage1', methods=['GET', 'POST'])
+@flog.login_required
+def stage1():
+    return con.stage1()
+
+@app.route('/stage2', methods=['GET', 'POST'])
+@flog.login_required
+def stage2():
+    return con.stage2()
+
 # required for login manager
 # ===========================
 @lm.user_loader

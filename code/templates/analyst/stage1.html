@@ -1,0 +1,27 @@
+{% include "header.html" %}
+<div class="container">
+  <h4 class="display-4">Stage1</h4>
+    <body>
+    <form action="{{ url_for('stage1') }}" method="POST">
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Analyst Name</label>
+        {{ form.csrf_token }}
+        {{ form.nickname(class_="form-control") }}
+        <label for="exampleFormControlInput1">Search Date</label>
+        {{ form.date_conducted(class="form-control") }}
+        <label for="exampleFormControlInput1">Date Start</label>
+        {{ form.date_start(class="form-control") }}
+        <label for="exampleFormControlInput1">Date End</label>
+        {{ form.date_end(class="form-control") }}
+        <label for="exampleFormControlInput1">Search Term Used</label>
+        {{ form.search_term(class="form-control") }}
+        <label for="exampleFormControlInput1">Total no. of results</label>
+        {{ form.total_no_of_result(class="form-control") }}
+        <label for="exampleFormControlInput1">No. results progressed to S2</label>
+        {{ form.no_of_result_to_s2(class="form-control") }}
+        {{ form.task_submitted(class_="btn btn-outline-primary") }}
+
+
+      </div>
+    </form>
+    </body>

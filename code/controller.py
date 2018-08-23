@@ -519,3 +519,20 @@ def create_transaction():
         # other auto vars to be stored
         # dataset_id =
         pass
+
+
+def stage1():
+# just defining get method as of now. Need to work on post and predefined columns
+#  after task assignment part is completed
+# Also need to add add_transaction part here
+    form = fm.stage1(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('analyst/stage1.html', form=form)
+
+def stage2():
+# just defining get method as of now. Need to work on post and predefined columns
+#  after task assignment part is completed
+# Also need to add workflow option as soon as new user is defined
+    form = fm.stage2(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('analyst/stage2.html', form=form)

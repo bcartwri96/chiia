@@ -113,7 +113,12 @@ class Tasks(db.Base):
     date_start = sa.Column(sa.DateTime, nullable=False)
     date_end = sa.Column(sa.DateTime, nullable=False)
 
+ # adding these 3 columns as mentioned by document shared by Susan (Stage interior list)
     date_conducted = sa.Column(sa.DateTime)
+    total_no_of_result = sa.Column(sa.Integer)
+    no_of_result_to_s2 = sa.Column(sa.Integer)
+
+
     search_term = sa.Column(sa.String)
 
     # describes the current state with reference
