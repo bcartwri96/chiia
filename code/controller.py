@@ -7,6 +7,7 @@ from passlib.hash import sha512_crypt
 import forms as fm
 from proj_types import State
 import flask_wtf as wtf
+import sqlalchemy as sa
 
 lm = flog.LoginManager() # initialise the login lib
 
@@ -380,10 +381,10 @@ def edit_task(id):
         trans=new_transaction)
 
     else:
+        # process form/s
         fl.flash('form = '+str(form.task_submitted.data)+'; transaction = '+str(new_transaction.trans_submitted.data), 'error')
-        #process the form
         t_db = ml.Tasks.query.get(id)
-        # RECALL: transactions are many-to-one so fopr every stage_rel id, we
+        # RECALL: transactions are many-to-one so for every stage_rel id, we
         # can have multiple id's related to transactions and this means we will
         # be CREATING a new transaction here!
         if form.task_submitted.data and new_transaction.trans_submitted.data:
@@ -402,17 +403,30 @@ def edit_task(id):
                 t_db.search_term = search_term
 
 
-                # trans = ml.Transactions()
-                # # get vars from transaction/s
-                # t_name = fl.request.form['entity_name']
-                # t_rumour_date = fl.request.form['rumour_date']
-                # t_announcement_date = fl.request.form['annoucement_date']
+                trans = ml.Transactions()
+                # get vars from transaction/s
+                t_name = fl.request.form['entity_name']
+                t_rumour_date = fl.request.form['rumour_date']
+                t_announcement_date = fl.request.form['annoucement_date']
+                # get the max id and then increment
+                max_id = db.db_session.query(sa.func.max(ml.Transactions.s_id)).scalar()
+                trans.id = max_id+1
+                trans.entity_name = t_name
+                trans.rumour_date = t_rumour_date
+                trans.annoucement_date = t_announcement_date
+                trans.state = 1
 
                 # update relations
-                # stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id)
-                # stage_rel_id = stage_rel.id # get the id
-                # stage_rel.trans_id.append(trans.id)
-                # db.db_session.add(t_db)
+                # create a stage_rel mapping between the trans and the task
+                stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id)
+                stage_rel_id = stage_rel.id # get the id itself from the object
+
+                trans.trans_id = stage_rel_id
+                # submit this
+                db.db_session.add(trans)
+
+                stage_rel.trans_id.append(trans.id)
+                db.db_session.add(t_db)
 
             elif new_transaction.validate_on_submit():
                 pass

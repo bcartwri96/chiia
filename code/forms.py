@@ -50,7 +50,7 @@ class Create_Transaction(wtf.FlaskForm):
     task_id = HiddenField('t_id')
 
     # check which form was submitted
-    trans_submitted = SubmitField('Trans')
+    trans_submitted = SubmitField('Submit Transaction')
 
 class Edit_Task(wtf.FlaskForm):
     nickname = StringField('nickname', validators=[DataRequired("Please ensure you've entered a name")])
@@ -60,7 +60,7 @@ class Edit_Task(wtf.FlaskForm):
     search_term = StringField('search_term', validators=[DataRequired()])
     dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
 
-    task_submitted = SubmitField('Task')
+    task_submitted = SubmitField('Submit the Task')
 
 
     # chin_inv_file_no = FloatField('chin_inv_file_no', \

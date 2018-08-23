@@ -15,6 +15,8 @@
         {{ form.search_term(class="form-control") }}
         <label for="exampleFormControlInput1">Who owns the dataset?</label>
         {{ form.dataset_owner(class_="form-control") }}
+        {{ form.task_submitted(class_="btn btn-outline-primary") }}
+
         <br>
         <h5 class="display-5">Transactions</h5><a href="someJSWhichPopsUpANewForm()"><i class="material-icons"
           style="font-size: 36px">add_box</i></a><br>
@@ -31,8 +33,10 @@
         {{ trans.amount(class_="form-control") }}
         <label for="exampleFormControlInput1">Manually allocate users?</label>
         {{ trans.who_assigned(class_="form-control") }}
+        {{ trans.trans_submitted(class_="btn btn-outline-primary") }}
       </div>
 
-      <button class="btn btn-outline-primary" type="submit">Edit task</button>
+
+      <!-- <button class="" type="submit">Edit task</button> -->
     </form>
     </body>
