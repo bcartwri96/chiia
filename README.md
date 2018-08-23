@@ -74,7 +74,7 @@ The basics are:
 Got the basics? Cool :)
 
 But where does Heroku come in?
-==============================
+===================================
 Another good question! Heroku is the Paas (platform as a service) we'll use to host the production code and manage our database/web server. We don't actually
 have to interact with Heroku too much, but when we do it'll be important that we do it right! Most of the time you'll notice it because we
 ``git push heroku dev_master`` instead of just `git push` because Heroku is set up as a 'git remote' which means when we push we need to tell it where to go
@@ -84,7 +84,7 @@ That's really it. Heroku is our web server, essentially. We'll also be asking Su
 it's on a hobby plan) which is fine for what we're currently doing, but I don't think Susan will want to wait ~20 seconds for her webpage to load normally!
 After a little while of inactivity on a heroku hobby plan, the webserver dyno (remember a dyno is an abstraction of a web service like an apache server etc.)
 will simply go to sleep and when a user interupts that with a request, it can take some time to get started again!
-=======
+
 # CHIIA-DB
 
 ## CHIIA DATABASE WORKFORCE STRUCTURE
