@@ -132,7 +132,7 @@ def edit_user(id):
                     user.email = email
             if not lang == "":
                 if not lang == user.language:
-                    user.language == lang
+                    user.language = lang
             # only run this last part if you're an admin
             if 'admin' in fl.session:
                 if not admin == user.admin:
@@ -150,6 +150,57 @@ def edit_user(id):
             next = fl.request.args.get('next')
             fl.flash(user.fname + "'s details updated", 'success')
             return fl.redirect(fl.url_for('manage'))
+    elif 'admin' not in fl.session:
+        user = ml.User.query.get(id)
+        if fl.request.method == 'GET':
+            if id == fl.session['logged_in']:
+                return fl.render_template('edit-user.html', user=user)
+            else:
+                return fl.abort(404)
+        else:
+            # get the form dets
+            fname = fl.request.form['fname']
+            lname = fl.request.form['lname']
+            email = fl.request.form['email']
+            lang = fl.request.form['language']
+            pw_raw = fl.request.form['pw_raw']
+
+
+            # encrypt
+            pw_hashed = sha512_crypt.encrypt(pw_raw)
+
+            # convert to bool
+            if lang == '1':
+                lang = False
+            elif lang == '2':
+                lang = True
+
+
+
+            # check whether they are the same as before
+            if not fname == "":
+                if not fname == user.fname:
+                    user.fname = fname
+            if not lname == "":
+                if not lname == user.lname:
+                    user.lname = lname
+            if not email == "":
+                if not email == user.email:
+                    user.email = email
+            if not lang == "":
+                if not lang == user.language:
+                    user.language = lang
+
+            if not pw_raw == "":
+                if not pw_hashed == user.pw_hashed:
+                    user.pw_hashed = pw_hashed
+
+
+            db.db_session.commit()
+            next = fl.request.args.get('next')
+            fl.flash(user.fname + "'s details updated", 'success')
+            return fl.redirect(fl.url_for('manage'))
+
     else:
         fl.abort(403)
 
