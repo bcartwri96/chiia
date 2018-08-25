@@ -1,6 +1,6 @@
 **IMPORTANT NEW THINGS TO DO!**
 1. Github is now where our code is being pulled and pushed from; add it as a
-   remote branch `git remote add HTTPS/SSH link here`
+   remote branch `git remote add origin HTTPS/SSH link here`
 2. Then remove the default branch (heroku's git system) like so: `git remote remove herkou`
 2. Make a small change to commit (on Linux/mac machines you can run `touch new.file` and then `commit` and `git push origin` that)
 2. Download the Zenhub extension and then ensure it works by checking the
