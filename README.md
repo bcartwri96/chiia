@@ -5,7 +5,7 @@
 2. Make a small change to commit (on Linux/mac machines you can run `touch new.file` and then `commit` and `git push origin` that)
 2. Download the Zenhub extension and then ensure it works by checking the
    Zenhub tab in our new Github repo
-3. Let Ben know if you run into _any_ trouble :) 
+3. Let Ben know if you run into _any_ trouble :)
 
 DEV Docs
 =========
@@ -86,6 +86,32 @@ That's really it. Heroku is our web server, essentially. We'll also be asking Su
 it's on a hobby plan) which is fine for what we're currently doing, but I don't think Susan will want to wait ~20 seconds for her webpage to load normally!
 After a little while of inactivity on a heroku hobby plan, the webserver dyno (remember a dyno is an abstraction of a web service like an apache server etc.)
 will simply go to sleep and when a user interupts that with a request, it can take some time to get started again!
+
+
+# Policies
+
+## What might we do if people are sick or otherwise occupied and can't work?
+1. Confirm the member is _in fact_ unable to work.
+2. If true, then we reassess our MVP. Tasks which are not critical are
+   removed from the queue for this coming week; tasks which have other
+   dependencies that the occupied member was doing are prioritised
+   immediately to another person, while unnecessary tasks are left to
+   future weeks.
+3. Priority is to ensure that the MVP is complete, so we reduce the
+   amount of time other members spend on those tasks which aren't
+   required while important tasks are scheduled earlier to _reduce_
+   *risk*.
+4. Client informed to ensure they're onboard with the changes to the
+   project because in the end it's them who suffer from changes to
+   what we can fit in!
+
+
+## What about a lack of work?
+1. Chat to the person who is not working and ask them how to fix it/
+   what we can be doing to help
+2. Encourage them to think carefully about what they can and cannot
+   handle
+3. If unresponsive to further prompting, then bring up with tutor.
 
 # CHIIA-DB
 
