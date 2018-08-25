@@ -78,12 +78,30 @@ class stage2(wtf.FlaskForm):
 
     S2_date = DateField('S2_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
     S2_reviews = IntegerField('S2_reviews', validators=[DataRequired("This column cannot be empty")])
-    S2_date = DateField('S2_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
 
 
 
+#    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+    task_submitted = SubmitField('Submit the Task')
+
+class stage3(wtf.FlaskForm):
+
+    S3_date = DateField('S3_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    S3_reviews = IntegerField('S3_reviews', validators=[DataRequired("This column cannot be empty")])
+    dataset_type = StringField('dataset_type', validators=[DataRequired("Please select dataset type")])
+#    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+    task_submitted = SubmitField('Submit the Task')
+
+
+class stage4(wtf.FlaskForm):
+
+    S4_date = DateField('S4_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    S4_reviews = IntegerField('S4_reviews', validators=[DataRequired("This column cannot be empty")])
+
+    chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
+    counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
     task_submitted = SubmitField('Submit the Task')
 

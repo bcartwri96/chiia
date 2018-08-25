@@ -244,7 +244,8 @@ class Stage_3(Base_Stage_Task):
 
     reviews = sa.Column(sa.Integer,nullable=False)
     date_assigned = sa.Column(sa.Integer, nullable=False)
-    type_search = sa.Column(sa.Integer, nullable=False)
+    #type_search = sa.Column(sa.Integer, nullable=False)   # Not required
+    dataset_type = sa.Column(sa.String) # Only one of two values  main or supplementary 
 
     # workflow options below
     correspondence_req = sa.Column(sa.Boolean)

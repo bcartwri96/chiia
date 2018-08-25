@@ -536,3 +536,19 @@ def stage2():
     form = fm.stage2(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('analyst/stage2.html', form=form)
+
+
+def stage3():
+# just defining get method as of now. Need to work on post and predefined columns
+#  after task assignment part is completed
+# Also need to add workflow option as soon as new user is defined
+    form = fm.stage3(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('analyst/stage3.html', form=form)
+
+
+def stage4():
+
+    form = fm.stage4(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('analyst/stage4.html', form=form)
