@@ -68,6 +68,6 @@ body {
   /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
 
-  /* Support for IE. */
+  /* Support for IE. (LOL) */
   font-feature-settings: 'liga';
 }
