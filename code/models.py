@@ -113,7 +113,8 @@ class Tasks(db.Base):
     date_start = sa.Column(sa.DateTime, nullable=False)
     date_end = sa.Column(sa.DateTime, nullable=False)
 
- # adding these 3 columns as mentioned by document shared by Susan (Stage interior list)
+    # adding these 3 columns as mentioned by document shared by Susan
+    # (Stage interior list)
     date_conducted = sa.Column(sa.DateTime)
     total_no_of_result = sa.Column(sa.Integer)
     no_of_result_to_s2 = sa.Column(sa.Integer)
@@ -183,7 +184,7 @@ class Transactions(Base_Stage_Task):
     # date_end = sa.Column(sa.DateTime, nullable=False)
 
     # stage = sa.Column(sa.Integer, nullable=False)
-    amount = sa.Column(sa.Float, nullable=False)
+    amount = sa.Column(sa.Float)
     who_previous_stages = sa.Column(sa.PickleType)
 
     dataset_id = sa.Column(sa.Integer, nullable=False)
@@ -245,7 +246,7 @@ class Stage_3(Base_Stage_Task):
     reviews = sa.Column(sa.Integer,nullable=False)
     date_assigned = sa.Column(sa.Integer, nullable=False)
     #type_search = sa.Column(sa.Integer, nullable=False)   # Not required
-    dataset_type = sa.Column(sa.String) # Only one of two values  main or supplementary 
+    dataset_type = sa.Column(sa.String) # Only one of two values  main or supplementary
 
     # workflow options below
     correspondence_req = sa.Column(sa.Boolean)

@@ -32,13 +32,13 @@ class Edit_Dataset(wtf.FlaskForm):
     access = IntegerField('access_id')
 
 class Create_Transaction(wtf.FlaskForm):
-    name = StringField('name', [DataRequired()])
+    # name = StringField('name', [DataRequired()])
     amount = FloatField('amount')
 
     # creating Transactions
-    anouncement_date = DateField('annoucement', format='%d-%m-%Y', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
+    anouncement_date = DateField('annoucement', format='%Y-%m-%d', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
     entity_name = StringField('entity_name', validators=[DataRequired(message="You need to enter an entity name")])
-    rumour_date = DateField('rumour', format='%d-%m-%Y', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
+    rumour_date = DateField('rumour', format='%Y-%m-%d', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
     mandarin = BooleanField('mandarin')
 
     #prefill this with the filled value of the current user
