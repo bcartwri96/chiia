@@ -434,7 +434,7 @@ def edit_task(id):
 
     else:
         # process form/s
-        fl.flash('form = '+str(form.task_submitted.data)+'; transaction = '+str(new_transaction.trans_submitted.data), 'error')
+        # fl.flash('form = '+str(form.task_submitted.data)+'; transaction = '+str(new_transaction.trans_submitted.data), 'error')
         t_db = ml.Tasks.query.get(id)
         # RECALL: transactions are many-to-one so for every stage_rel id, we
         # can have multiple id's related to transactions and this means we will
@@ -500,7 +500,6 @@ def edit_task(id):
             fl.flash("Updated task", "success")
 
         elif new_transaction.validate_on_submit() and new_transaction.trans_submitted.data:
-                fl.flash("DEBUG", 'error')
                 # process the new transaction here and ensure it is bound
                 # to the stage_rels table mapping.
 
@@ -553,6 +552,8 @@ def edit_task(id):
                 db.db_session.add(stage_rel)
 
                 db.db_session.commit()
+                fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
+
 
         else:
             fl.flash("Failed to update task", "error")
