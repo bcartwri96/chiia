@@ -429,8 +429,11 @@ def edit_task(id):
         form.search_term.data = t_db.search_term
         form.who_assigned.data = t_db.who_assigned
         form.dataset_owner.data = t_db.dataset_owner
+
+        # get all the related transactions to this task
+        all = t_db.trans
         return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
-        trans=new_transaction)
+        trans=new_transaction, related_trans=all)
 
     else:
         # process form/s

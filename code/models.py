@@ -130,8 +130,9 @@ class Tasks(db.Base):
     num_inv_found = sa.Column(sa.Integer, nullable=False)
     num_inv_progressing = sa.Column(sa.Integer, nullable=False)
 
-    task_id = sao.relationship("Stage_Rels")
+    trans = sao.relationship("Transactions", backref="Tasks", cascade="all, delete-orphan")
     state = sa.Column(sa.Enum(State), nullable=False)
+
     # How will state work? It can be three possible points: Pending, Accept,
     # Rejected and Working. It describes the relationship between the LA and the analyst.
     # There are some defined states which let the user in question know whether
@@ -202,8 +203,7 @@ class Transactions(Base_Stage_Task):
     # can be done, need a redo or archived.
     state = sa.Column(sa.Integer, nullable=False)
 
-    trans_id = sao.relationship("Stage_Rels")
-
+    tasks = sa.Column(sa.Integer, sa.ForeignKey('tasks.id'))
 
 class Stage_2(Base_Stage_Task):
     __tablename__ = 'stage_2'
@@ -290,9 +290,10 @@ class Stage_4(Base_Stage_Task):
 class Stage_Rels(db.Base):
     __tablename__ = 'stage_rels'
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    trans_id = sa.Column(sa.Integer, sa.ForeignKey('transactions.s_id'))
+    trans_id = sa.Column(sa.Integer, sa.ForeignKey('transactions.s_id'), primary_key=True)
     stage_2_id = sa.Column(sa.Integer, sa.ForeignKey('stage_2.s_id'))
     stage_3_id = sa.Column(sa.Integer, sa.ForeignKey('stage_3.s_id'))
     stage_4_id = sa.Column(sa.Integer, sa.ForeignKey('stage_4.s_id'))
-    tasks_id = sa.Column(sa.Integer, sa.ForeignKey('tasks.id'))
+
+    # trans = sao.relationship(Transactions, backref=sao.backref("stage_rels", cascade="all"))
+    # tasks = sao.relationship(Tasks, backref=sao.backref("stage_rels", cascade="all"))
