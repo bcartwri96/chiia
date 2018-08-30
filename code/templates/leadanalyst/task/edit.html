@@ -43,6 +43,7 @@
          <thead class="thead-dark">
           <tr>
             <th scope="col">#</th>
+            <th scope="col">Entity Name</th>
             <!-- <th scope="col"></th>
             <th scope="col">Last</th>
             <th scope="col">Email</th>
@@ -53,16 +54,10 @@
           </tr>
         </thead>
         <tbody>
-        {% for trans in all %}
+        {% for trans in related_trans %}
           <tr>
             <th scope="row">{{ trans.s_id }}</th>
-            <!-- <td>{{ user.fname }}</td>
-            <td>{{ user.lname }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.language }}</td>
-            <td>{{ user.admin }}</td>
-            <td><a href="{{ url_for('edit_user', id=user.id) }}" type="button"> Edit User?</a></td>
-            <td><a onclick="checkDelete({{user.id}})" href="javascript:;" type="button">Delete?</></td> -->
+            <th scope="row">{{ trans.entity_name }}</th>
           </tr>
         {% endfor %}
         </tbody>

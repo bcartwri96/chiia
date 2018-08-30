@@ -421,8 +421,9 @@ def edit_task(id):
     a task."""
     form = fm.Edit_Task(fl.request.form)
     new_transaction = fm.Create_Transaction(fl.request.form)
+    t_db = ml.Tasks.query.get(id)
+    all_trans = t_db.trans
     if fl.request.method == 'GET':
-        t_db = ml.Tasks.query.get(id)
         form.nickname.data = t_db.nickname
         form.date_start.data = t_db.date_start
         form.date_end.data = t_db.date_end
@@ -431,14 +432,12 @@ def edit_task(id):
         form.dataset_owner.data = t_db.dataset_owner
 
         # get all the related transactions to this task
-        all = t_db.trans
         return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
-        trans=new_transaction, related_trans=all)
+        trans=new_transaction, related_trans=all_trans)
 
     else:
         # process form/s
         # fl.flash('form = '+str(form.task_submitted.data)+'; transaction = '+str(new_transaction.trans_submitted.data), 'error')
-        t_db = ml.Tasks.query.get(id)
         # RECALL: transactions are many-to-one so for every stage_rel id, we
         # can have multiple id's related to transactions and this means we will
         # be CREATING a new transaction here!
@@ -518,6 +517,7 @@ def edit_task(id):
                     trans.id = max_id+1
                 else:
                     trans.id = 1
+
                 trans.entity_name = t_name
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
@@ -525,34 +525,35 @@ def edit_task(id):
 
                 # update relations
                 # create a stage_rel mapping between the trans and the task
-                stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id).scalar()
-                if stage_rel == None:
-                    stage_rel = ml.Stage_Rels()
-                    # get max from stage_rels
-                    sr_max = db.db_session.query(sa.func.max(ml.Stage_Rels.id)).scalar()
-                    if not sr_max == None: # when table empty, returns none
-                        stage_rel.id = sr_max+1 # set to max in table +1
-                        trans.trans_id.append(stage_rel) # save ForeignKey of sr to trans
-                    else:
-                        stage_rel.id = 1 # no entries into table yet, so start
-                        trans.trans_id.append(stage_rel) #save ForeignKey of stage rel to trans
-                else:
-                    # if there is an existing record
-                    stage_rel.trans_id = trans.id
-                    stage_rel_id = stage_rel.id # get the id itself from the object
-                    trans.trans_id.append(stage_rel) # link the tranaction to the stage_rel
+                t_db.trans.append(trans)
+                # stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id).scalar()
+                # if stage_rel == None:
+                #     stage_rel = ml.Stage_Rels()
+                #     # get max from stage_rels
+                #     sr_max = db.db_session.query(sa.func.max(ml.Stage_Rels.id)).scalar()
+                #     if not sr_max == None: # when table empty, returns none
+                #         stage_rel.id = sr_max+1 # set to max in table +1
+                #         trans.trans_id.append(stage_rel) # save ForeignKey of sr to trans
+                #     else:
+                #         stage_rel.id = 1 # no entries into table yet, so start
+                #         trans.trans_id.append(stage_rel) #save ForeignKey of stage rel to trans
+                # else:
+                #     # if there is an existing record
+                #     stage_rel.trans_id = trans.id
+                #     stage_rel_id = stage_rel.id # get the id itself from the object
+                #     trans.trans_id.append(stage_rel) # link the tranaction to the stage_rel
 
                 # now relate the stage rel to the task (which definitely exists
                 # because we're editing it!)
-                stage_rel.tasks_id = id
-                t_db.task_id.append(stage_rel)
+                # stage_rel.tasks_id = id
+                # t_db.task_id.append(stage_rel)
 
                 # submit this
                 trans.amount = 100
                 trans.dataset_id = 1
                 db.db_session.add(trans)
                 db.db_session.add(t_db)
-                db.db_session.add(stage_rel)
+                # db.db_session.add(stage_rel)
 
                 db.db_session.commit()
                 fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
@@ -564,7 +565,7 @@ def edit_task(id):
             fl.flash(str(new_transaction.errors), 'error')
 
         return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
-        trans=new_transaction)
+        trans=new_transaction, related_trans=all_trans)
 
 # delete a ds.
 def delete_dataset(id):
