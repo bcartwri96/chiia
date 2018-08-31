@@ -19,6 +19,26 @@
         {{ form.dataset_owner(class_="form-control") }}
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
 
+        {{ form.csrf_token }}
+        {% if form.nickname.errors %}
+          {{ form.nickname.errors[0] }}
+        {% endif %}
+        {% if form.date_start.errors %}
+          {{ form.date_start.errors[0] }}
+        {% endif %}
+        {% if form.date_end.errors %}
+          {{ form.date_end.errors[0] }}
+        {% endif %}
+        {% if form.search_term.errors %}
+          {{ form.search_term.errors[0] }}
+        {% endif %}
+        {% if form.who_assigned.errors %}
+          {{ form.who_assigned.errors[0] }}
+        {% endif %}
+        {% if form.dataset_owner.errors %}
+          {{ form.dataset_owner.errors[0] }}
+        {% endif %}
+
         <br>
         <h5 class="display-5">Transactions</h5><a href="someJSWhichPopsUpANewForm()"><i class="material-icons"
           style="font-size: 36px">add_box</i></a><br>
