@@ -45,6 +45,7 @@ class User(db.Base):
         else:
             return False
 
+
 # Dataset related classes
 # =======================
 
@@ -112,6 +113,7 @@ class Tasks(db.Base):
     dataset_owner = sa.Column(sa.Integer, nullable=False)
     date_start = sa.Column(sa.DateTime, nullable=False)
     date_end = sa.Column(sa.DateTime, nullable=False)
+    date_modified =sa.Column(sa.DateTime, nullable=False)
 
     # adding these 3 columns as mentioned by document shared by Susan
     # (Stage interior list)

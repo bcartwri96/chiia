@@ -106,12 +106,12 @@ def manage_tasks():
 def edit_task(id):
     return con.edit_task(id)
 
-@app.route('/tasks/accept_task/<int:id>', methods=['POST'])
+@app.route('/tasks/accept_task/<int:id>', methods=['GET'])
 @flog.login_required
 def accept_task(id):
     return con.accept_task(id)
 
-@app.route('/tasks/reject_task/<int:id>', methods=['POST'])
+@app.route('/tasks/reject_task/<int:id>', methods=['GET'])
 @flog.login_required
 def reject_task(id):
     return con.reject_task(id)

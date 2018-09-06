@@ -76,7 +76,6 @@ def get_env_variable(name):
         message = "Expected environment variable '{}' not set.".format(name)
         raise Exception(message)
 
-
 #############################################################
 # setup - run python; import database; database.resetdb() to reset db
 #############################################################

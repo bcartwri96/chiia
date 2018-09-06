@@ -2,7 +2,7 @@ import flask as fl
 import database as db
 import models as ml
 import flask_login as flog
-import datetime
+import datetime as dt
 from passlib.hash import sha512_crypt
 import forms as fm
 from proj_types import State
@@ -17,7 +17,7 @@ def index():
 
 def login():
     if fl.request.method == 'GET':
-        current = datetime.datetime.now()
+        current = dt.datetime.now()
         if 'logged_in' in fl.session:
             return fl.redirect(fl.url_for('index'))
         return fl.render_template('/login.html', current=current)
@@ -289,8 +289,7 @@ def manage_datasets():
         fl.abort(404)
 
 # ds creation.
-def create_dataset():
-    import datetime as dt
+def create_dataset(**kwargs):
     from sqlalchemy import func, asc
     form = fm.Create_Dataset(fl.request.form)
     if fl.request.method == 'GET':
@@ -306,7 +305,7 @@ def create_dataset():
             owner=user, freq=int(form.freq.data))
             ds_auth_owner = ml.Dataset_Authd(access=user)
             ds_auth = ml.Dataset_Authd(access=form.access.data)
-            time_created = datetime.datetime.now()
+            time_created = dt.datetime.now()
             ds.time_created = time_created
             ds.access.append(ds_auth)
             ds.access.append(ds_auth_owner)
@@ -334,6 +333,7 @@ def create_dataset():
                 t_cur.num_inv_found = 0
                 t_cur.num_inv_progressing = 0
                 t_cur.state = State.Working
+                t_cur.date_modified = dt.datetime.now()
                 db.db_session.add(t_cur)
 
             db.db_session.commit()
@@ -487,15 +487,16 @@ def edit_task(id):
             #get the vars
             nickname = fl.request.form['nickname']
             search_term = fl.request.form['search_term']
-            # date_start = fl.request.form['date_start']
-            # date_end = fl.request.form['date_end']
-            # who_assigned = fl.request.form['who_assigned']
+            date_start = fl.request.form['date_start']
+            date_end = fl.request.form['date_end']
+            who_assigned = fl.request.form['who_assigned']
 
             t_db.nickname = nickname
-            # t_db.date_start = date_start
-            # t_db.date_end = date_end
-            # t_db.who_assigned = who_assigned
+            t_db.date_start = dt.datetime.strptime(date_start, '%Y')
+            t_db.date_end = dt.datetime.strptime(date_end, '%Y')
+            t_db.who_assigned = who_assigned
             t_db.search_term = search_term
+            t_db.date_modified = dt.datetime.now()
 
             db.db_session.add(t_db)
             db.db_session.commit()
@@ -551,6 +552,12 @@ def edit_task(id):
                 # submit this
                 trans.amount = 100
                 trans.dataset_id = 1
+
+                # recall that changing a transaction means modifying the task,
+                # so change the task too.
+                t_db.date_modified = dt.datetime.now()
+                fl.flash("date adjusted to "+str(dt.datetime.now()), 'success')
+
                 db.db_session.add(trans)
                 db.db_session.add(t_db)
                 # db.db_session.add(stage_rel)
@@ -566,6 +573,31 @@ def edit_task(id):
 
         return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
         trans=new_transaction, related_trans=all_trans)
+
+# accepting a task at the current stage involves moving it to the next
+# stage and it also involves notifying the person responsible for it
+def accept_task(id):
+    cur_task = ml.Tasks.query.get(id)
+
+    # now take task and increment the stage
+    cur_task.stage = cur_task.stage + 1
+    # now update the state
+    cur_task.state = State.Accepted
+
+    db.db_session.add(cur_task)
+    db.db_session.commit()
+    return fl.redirect(fl.url_for("manage_tasks"))
+
+# same but for rejection
+def reject_task(id):
+    cur_task = ml.Tasks.query.get(id)
+
+    # change the state to rejected but then don't do anything
+    cur_task.state = State.Rejected
+
+    db.db_session.add(cur_task)
+    db.db_session.commit()
+    return fl.redirect(fl.url_for('manage_tasks'))
 
 # delete a ds.
 def delete_dataset(id):
@@ -583,22 +615,34 @@ def manage_tasks():
     if fl.request.method == 'GET':
         if fl.session['admin']:
             t = ml.Tasks.query.all()
-            weeks = []
-            # week calculation
-            for cur in t:
-                ds = cur.date_start
-                de = cur.date_end
-                time_delta = ds-de
-                # time_delta = time_delta(days=time_delta)
-                weeks.append(time_delta)
+            # get weeks
+            weeks = weekCalc(t)
+
+            # get recent, too
+            d = dt.datetime.now() - dt.timedelta(days=1)
+            rec = ml.Tasks.query.filter(ml.Tasks.date_modified >= d).limit(50).all()
+            rec_weeks = weekCalc(rec)
 
             return fl.render_template('leadanalyst/task/manage.html',
-            all=zip(t,weeks))
+            all=zip(t,weeks), recent=zip(rec, rec_weeks))
+
         else:
             current_user = fl.session['logged_in']
             # not LA, so only get tasks allocated to them
             t = ml.Tasks.query.filter(ml.Tasks.who_assigned == current_user).all()
             return fl.render_template('analyst/task/manage.html', tasks=t)
+
+def weekCalc(tasks):
+    weeks = []
+    # perform week calculation
+    for cur in tasks:
+        ds = cur.date_start
+        de = cur.date_end
+        time_delta = de-ds
+        # time_delta = time_delta(days=time_delta)
+        weeks.append(time_delta)
+    return weeks
+
 
 # get all transactions if admin and get all transactions
 # relevant to an analyst
