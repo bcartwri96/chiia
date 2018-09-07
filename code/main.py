@@ -123,8 +123,8 @@ def manage_transactions():
 
 @app.route('/transaction/<int:id>', methods=['GET', 'POST'])
 @flog.login_required
-def manage_ind_trans(id):
-    return con.manage_ind_trans(id)
+def edit_transaction(id):
+    return con.edit_transaction(id)
 
 @app.route('/transaction/create', methods=['GET', 'POST'])
 @flog.login_required

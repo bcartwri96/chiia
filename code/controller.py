@@ -437,53 +437,11 @@ def edit_task(id):
 
     else:
         # process form/s
-        # fl.flash('form = '+str(form.task_submitted.data)+'; transaction = '+str(new_transaction.trans_submitted.data), 'error')
+
         # RECALL: transactions are many-to-one so for every stage_rel id, we
         # can have multiple id's related to transactions and this means we will
         # be CREATING a new transaction here!
-        if form.task_submitted.data and new_transaction.trans_submitted.data:
-            if form.validate_on_submit() and new_transaction.validate_on_submit():
-                #get the vars
-                nickname = fl.request.form['nickname']
-                search_term = fl.request.form['search_term']
-                # date_start = fl.request.form['date_start']
-                # date_end = fl.request.form['date_end']
-                # who_assigned = fl.request.form['who_assigned']
-
-                t_db.nickname = nickname
-                # t_db.date_start = date_start
-                # t_db.date_end = date_end
-                # t_db.who_assigned = who_assigned
-                t_db.search_term = search_term
-
-
-                trans = ml.Transactions()
-                # get vars from transaction/s
-                t_name = fl.request.form['entity_name']
-                t_rumour_date = fl.request.form['rumour_date']
-                t_announcement_date = fl.request.form['annoucement_date']
-                # get the max id and then increment
-                max_id = db.db_session.query(sa.func.max(ml.Transactions.s_id)).scalar()
-                trans.id = max_id+1
-                trans.entity_name = t_name
-                trans.rumour_date = t_rumour_date
-                trans.annoucement_date = t_announcement_date
-                trans.state = 1
-
-                # update relations
-                # create a stage_rel mapping between the trans and the task
-                stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id)
-                stage_rel_id = stage_rel.id # get the id itself from the object
-
-                trans.trans_id = stage_rel_id
-                # submit this
-                db.db_session.add(trans)
-
-                stage_rel.trans_id.append(trans.id)
-                db.db_session.add(t_db)
-            else:
-                fl.flash("Failed", 'error')
-        elif form.validate_on_submit() and form.task_submitted.data:
+        if form.validate_on_submit() and form.task_submitted.data:
             #get the vars
             nickname = fl.request.form['nickname']
             search_term = fl.request.form['search_term']
@@ -499,10 +457,14 @@ def edit_task(id):
             t_db.date_modified = dt.datetime.now()
 
             db.db_session.add(t_db)
-            db.db_session.commit()
-            fl.flash("Updated task", "success")
+            try:
+                db.db_session.commit()
+                fl.flash("Updated task", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to update task", "failed")
 
-        elif new_transaction.validate_on_submit() and new_transaction.trans_submitted.data:
+        elif new_transaction.validate_on_submit() and \
+        new_transaction.trans_submitted.data:
                 # process the new transaction here and ensure it is bound
                 # to the stage_rels table mapping.
 
@@ -527,22 +489,6 @@ def edit_task(id):
                 # update relations
                 # create a stage_rel mapping between the trans and the task
                 t_db.trans.append(trans)
-                # stage_rel = ml.Stage_Rels.query.filter(ml.Stage_Rels.tasks_id == id).scalar()
-                # if stage_rel == None:
-                #     stage_rel = ml.Stage_Rels()
-                #     # get max from stage_rels
-                #     sr_max = db.db_session.query(sa.func.max(ml.Stage_Rels.id)).scalar()
-                #     if not sr_max == None: # when table empty, returns none
-                #         stage_rel.id = sr_max+1 # set to max in table +1
-                #         trans.trans_id.append(stage_rel) # save ForeignKey of sr to trans
-                #     else:
-                #         stage_rel.id = 1 # no entries into table yet, so start
-                #         trans.trans_id.append(stage_rel) #save ForeignKey of stage rel to trans
-                # else:
-                #     # if there is an existing record
-                #     stage_rel.trans_id = trans.id
-                #     stage_rel_id = stage_rel.id # get the id itself from the object
-                #     trans.trans_id.append(stage_rel) # link the tranaction to the stage_rel
 
                 # now relate the stage rel to the task (which definitely exists
                 # because we're editing it!)
@@ -562,12 +508,14 @@ def edit_task(id):
                 db.db_session.add(t_db)
                 # db.db_session.add(stage_rel)
 
-                db.db_session.commit()
-                fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
-
+                try:
+                    db.db_session.commit()
+                    fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
+                except sa.exc.InvalidRequestError():
+                    fl.flash("Failed to create transaction", "failed")
 
         else:
-            fl.flash("Failed to update task", "error")
+            fl.flash("Failed to update", "error")
             fl.flash(str(form.errors), 'error')
             fl.flash(str(new_transaction.errors), 'error')
 
@@ -657,6 +605,13 @@ def manage_transactions():
             tasks=tasks)
         else:
             fl.abort(404)
+    else:
+        fl.abort(404)
+
+def edit_transaction(id):
+    trans = ml.Transactions.query.filter(ml.Transactions.s_id == id).all()[0]
+    if trans:
+        return fl.render_template('edit_transaction.html', t=trans)
     else:
         fl.abort(404)
 

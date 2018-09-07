@@ -64,6 +64,7 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">Entity Name</th>
+            <th scope="col">Edit</th>
             <!-- <th scope="col"></th>
             <th scope="col">Last</th>
             <th scope="col">Email</th>
@@ -76,8 +77,9 @@
         <tbody>
         {% for trans in related_trans %}
           <tr>
-            <th scope="row">{{ trans.s_id }}</th>
-            <th scope="row">{{ trans.entity_name }}</th>
+            <td scope="row">{{ trans.s_id }}</th>
+            <td scope="row">{{ trans.entity_name }}</th>
+            <td scope="row"><a role="button" href="{{ url_for('edit_transaction', id=trans.s_id)}}">Edit</a></td>
           </tr>
         {% endfor %}
         </tbody>
