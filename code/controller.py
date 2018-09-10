@@ -561,7 +561,12 @@ def delete_dataset(id):
 def manage_tasks():
     """This will present the page which let's LA see all current transactions"""
     if fl.request.method == 'GET':
-        if fl.session['admin']:
+        if 'admin' not in fl.session:
+            current_user = fl.session['logged_in']
+            # not LA, so only get tasks allocated to them
+            t = ml.Tasks.query.filter(ml.Tasks.who_assigned == current_user).all()
+            return fl.render_template('analyst/manage_task.html', tasks=t)
+        elif fl.session['admin']:
             t = ml.Tasks.query.all()
             # get weeks
             weeks = weekCalc(t)
@@ -574,11 +579,6 @@ def manage_tasks():
             return fl.render_template('leadanalyst/task/manage.html',
             all=zip(t,weeks), recent=zip(rec, rec_weeks))
 
-        else:
-            current_user = fl.session['logged_in']
-            # not LA, so only get tasks allocated to them
-            t = ml.Tasks.query.filter(ml.Tasks.who_assigned == current_user).all()
-            return fl.render_template('analyst/task/manage.html', tasks=t)
 
 def weekCalc(tasks):
     weeks = []
