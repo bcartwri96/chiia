@@ -131,10 +131,10 @@ def edit_transaction(id):
 def create_transaction():
     return con.create_transaction()
 
-@app.route('/stage1', methods=['GET', 'POST'])
+@app.route('/stage1/<int:id>', methods=['GET', 'POST'])
 @flog.login_required
-def stage1():
-    return con.stage1()
+def stage1(id):
+    return con.stage1(id)
 
 @app.route('/stage2', methods=['GET', 'POST'])
 @flog.login_required

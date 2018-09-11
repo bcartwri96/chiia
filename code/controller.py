@@ -626,13 +626,121 @@ def create_transaction():
         pass
 
 
-def stage1():
+def stage1(id):
 # just defining get method as of now. Need to work on post and predefined columns
 #  after task assignment part is completed
 # Also need to add add_transaction part here
+    import datetime as dt
     form = fm.stage1(fl.request.form)
+    new_transaction = fm.Create_Transaction(fl.request.form)
+    t_db = ml.Tasks.query.get(id)
+    all_trans = t_db.trans
     if fl.request.method == 'GET':
-        return fl.render_template('analyst/stage1.html', form=form)
+        form.nickname.data = t_db.nickname
+        form.date_conducted.data = dt.datetime.now()
+        form.date_start.data = t_db.date_start
+        form.date_end.data = t_db.date_end
+
+        # get all the related transactions to this task
+        return fl.render_template('analyst/stage1.html', form=form, t=t_db, trans=new_transaction, related_trans=all_trans)
+
+    else:
+        # process form/s
+
+        # RECALL: transactions are many-to-one so for every stage_rel id, we
+        # can have multiple id's related to transactions and this means we will
+        # be CREATING a new transaction here!
+        if form.validate_on_submit() and form.task_submitted.data:
+            #get the vars
+            nickname = fl.request.form['nickname']
+            search_term = fl.request.form['search_term']
+            date_start = fl.request.form['date_start']
+            date_end = fl.request.form['date_end']
+            date_conducted = fl.request.form['date_conducted']
+            no_of_result_to_s2 = fl.request.form['no_of_result_to_s2']
+            total_no_of_result = fl.request.form['total_no_of_result']
+            #who_assigned = fl.request.form['who_assigned']
+
+            t_db.nickname = nickname
+            t_db.date_start = date_start
+            t_db.date_end = date_end
+            #t_db.who_assigned = who_assigned
+            t_db.search_term = search_term
+
+            #t_db.date_modified = dt.datetime.now()
+            t_db.date_conducted = date_conducted
+            t_db.no_of_result_to_s2 = no_of_result_to_s2
+            t_db.total_no_of_result = total_no_of_result
+
+            db.db_session.add(t_db)
+            try:
+                db.db_session.commit()
+                fl.flash("Updated task", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to update task", "failed")
+
+        elif new_transaction.validate_on_submit() and \
+        new_transaction.trans_submitted.data:
+                # process the new transaction here and ensure it is bound
+                # to the stage_rels table mapping.
+
+                trans = ml.Transactions()
+                # get vars from transaction/s
+                t_name = fl.request.form['entity_name']
+                t_rumour_date = fl.request.form['rumour_date']
+                t_announcement_date = fl.request.form['anouncement_date']
+
+                # get the max id and then increment
+                max_id = db.db_session.query(sa.func.max(ml.Transactions.s_id)).scalar()
+                if not max_id == None:
+                    # initially, none in db so NoneType returned
+                    trans.id = max_id+1
+                else:
+                    trans.id = 1
+
+                trans.entity_name = t_name
+                trans.rumour_date = t_rumour_date
+                trans.annoucement_date = t_announcement_date
+                trans.who_assigned = 2
+                trans.state = 1
+
+                # update relations
+                # create a stage_rel mapping between the trans and the task
+                t_db.trans.append(trans)
+
+                # now relate the stage rel to the task (which definitely exists
+                # because we're editing it!)
+                # stage_rel.tasks_id = id
+                # t_db.task_id.append(stage_rel)
+
+                # submit this
+                trans.amount = 100
+                trans.dataset_id = 1
+
+                # recall that changing a transaction means modifying the task,
+                # so change the task too.
+                t_db.date_modified = dt.datetime.now()
+                fl.flash("date adjusted to "+str(dt.datetime.now()), 'success')
+
+                db.db_session.add(trans)
+                db.db_session.add(t_db)
+                # db.db_session.add(stage_rel)
+
+                try:
+                    db.db_session.commit()
+                    fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
+                except sa.exc.InvalidRequestError():
+                    fl.flash("Failed to create transaction", "failed")
+
+        else:
+            fl.flash("Failed to update", "error")
+            fl.flash(str(form.errors), 'error')
+            fl.flash(str(new_transaction.errors), 'error')
+
+        return fl.render_template('analyst/stage1.html', form=form, t=t_db,
+        trans=new_transaction, related_trans=all_trans)
+
+
 
 def stage2():
 # just defining get method as of now. Need to work on post and predefined columns

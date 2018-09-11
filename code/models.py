@@ -129,8 +129,6 @@ class Tasks(db.Base):
     stage = sa.Column(sa.Integer, nullable=False)
 
     who_assigned = sa.Column(sa.Integer, nullable=False)
-    num_inv_found = sa.Column(sa.Integer, nullable=False)
-    num_inv_progressing = sa.Column(sa.Integer, nullable=False)
 
     trans = sao.relationship("Transactions", backref="Tasks", cascade="all, delete-orphan")
     state = sa.Column(sa.Enum(State), nullable=False)
