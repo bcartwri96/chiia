@@ -151,6 +151,13 @@ def stage3():
 def stage4():
     return con.stage4()
 
+@app.route('/roster', methods=['GET', 'POST'])
+@flog.login_required
+def roster():
+    return con.roster()
+
+
+
 # required for login manager
 # ===========================
 @lm.user_loader

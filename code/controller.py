@@ -701,7 +701,11 @@ def stage1(id):
                 trans.entity_name = t_name
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
+
+                # need to check for this
                 trans.who_assigned = 2
+
+
                 trans.state = 1
 
                 # update relations
@@ -765,3 +769,34 @@ def stage4():
     form = fm.stage4(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('analyst/stage4.html', form=form)
+
+def roster():
+
+#to store no of hours available per week for analyst
+# need some validation check 
+    form = fm.roster(fl.request.form)
+    if fl.request.method == 'GET':
+
+        #Get today date and set defaukt start date as next week monday and end date as next week sunday
+        from datetime import datetime, timedelta
+        today = datetime.now().date()
+        start_this_week = today - timedelta(days=today.weekday())
+        start = start_this_week + timedelta(days=7)
+        end = start + timedelta(days=6)
+        form.start_date.data = start
+        form.end_date.data = end
+        return fl.render_template('analyst/roster.html', form=form)
+    else:
+        r = ml.Roster()
+        user_id = fl.session['logged_in']
+        start_date = fl.request.form['start_date']
+        end_date = fl.request.form['end_date']
+        no_of_hours = fl.request.form['no_of_hours']
+        r.user_id = user_id
+        r.start_date = start_date
+        r.end_date = end_date
+        r.no_of_hours = no_of_hours
+        db.db_session.add(r)
+        db.db_session.commit()
+        fl.flash("Updated roster", "success")
+        return fl.render_template('analyst/roster.html', form=form)
