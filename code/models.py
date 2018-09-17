@@ -129,8 +129,6 @@ class Tasks(db.Base):
     stage = sa.Column(sa.Integer, nullable=False)
 
     who_assigned = sa.Column(sa.Integer, nullable=False)
-    num_inv_found = sa.Column(sa.Integer, nullable=False)
-    num_inv_progressing = sa.Column(sa.Integer, nullable=False)
 
     trans = sao.relationship("Transactions", backref="Tasks", cascade="all, delete-orphan")
     state = sa.Column(sa.Enum(State), nullable=False)
@@ -299,3 +297,19 @@ class Stage_Rels(db.Base):
 
     # trans = sao.relationship(Transactions, backref=sao.backref("stage_rels", cascade="all"))
     # tasks = sao.relationship(Tasks, backref=sao.backref("stage_rels", cascade="all"))
+
+class Frequencies(db.Base):
+    __tablename__ = 'frequencies'
+    __table_args__ = {'extend_existing': True}
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String, nullable=False)
+    days_in_freq = sa.Column(sa.Integer, nullable=False)
+
+class Roster(db.Base):
+    __tablename__ = 'roster'
+
+    user_id = sa.Column(sa.Integer,nullable=False, primary_key=True)
+    start_date = sa.Column(sa.DateTime, nullable=False, primary_key=True)
+    end_date = sa.Column(sa.DateTime, nullable=False, primary_key=True)
+    no_of_hours = sa.Column(sa.Integer, nullable=False)

@@ -1,0 +1,27 @@
+{% include "header.html" %}
+<div class="container">
+  <h4 class="display-4">Roster</h4>
+    <body>
+    <form action="{{ url_for('roster') }}" method="POST">
+      <div class="form-group">
+
+        <table>
+          <tr>
+            <th>Start_Date</th>
+            <th>End_Date</th>
+            <th>No OF Hours Avaialble</th>
+          </tr>
+          <tr>
+            <td>{{ form.start_date(class='datepicker') }}</td>
+            <td>{{ form.end_date(class='datepicker') }}</td>
+            <td>{{ form.no_of_hours(class="form-control") }}</td>
+          </tr>
+
+        </table>
+
+        {{ form.task_submitted(class_="btn btn-outline-primary") }}
+
+      </div>
+    </form>
+    </body>
+  </div>

@@ -7,6 +7,7 @@ import models as ml
 from wtforms import StringField, IntegerField, SelectField, DateField, \
 FloatField, HiddenField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Required, NumberRange
+from wtforms.fields.html5 import DateField
 
 class Settings_Search(wtf.FlaskForm):
     search_name = StringField('name', validators=[DataRequired()])
@@ -63,11 +64,11 @@ class Edit_Task(wtf.FlaskForm):
     task_submitted = SubmitField('Submit the Task')
 
 class stage1(wtf.FlaskForm):
-    date_conducted = DateField('date_conducted', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    date_conducted = DateField('date_conducted', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     nickname = StringField('nickname', validators=[DataRequired("Please ensure you've entered a name")])
     search_term = StringField('search_term', validators=[DataRequired()])
-    date_start = DateField('date_start', format='%Y', validators=[DataRequired("This date cannot be empty")])
-    date_end = DateField('date_end', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    date_start = DateField('date_start', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
+    date_end = DateField('date_end', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     no_of_result_to_s2 = IntegerField('no_of_result_to_s2', validators=[DataRequired("This column cannot be empty")])
     total_no_of_result = IntegerField('total_no_of_result', validators=[DataRequired("This  column cannot be empty")])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
@@ -104,6 +105,14 @@ class stage4(wtf.FlaskForm):
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
     task_submitted = SubmitField('Submit the Task')
+
+class roster(wtf.FlaskForm):
+    
+    start_date = DateField('start_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
+    end_date = DateField('end_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
+    no_of_hours = IntegerField('no_of_hours', validators=[DataRequired("This column cannot be empty")])
+    task_submitted = SubmitField('Submit the roster')
+
 
 
 

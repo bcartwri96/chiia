@@ -2,7 +2,7 @@
 <div class="container">
   <h4 class="display-4">Stage1</h4>
     <body>
-    <form action="{{ url_for('stage1') }}" method="POST">
+    <form action="{{ url_for('stage1', id=t.id) }}" method="POST">
       <div class="form-group">
         <label for="exampleFormControlInput1">Analyst Name</label>
         {{ form.csrf_token }}
@@ -21,7 +21,86 @@
         {{ form.no_of_result_to_s2(class="form-control") }}
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
 
-
       </div>
+
+      <input  type="checkbox" name="correspondence_req" id = "idk" onclick = "showHide()" />
+        <label class="exampleFormControlInput1">
+        New Transactions
+      </label>
+      <div class="hidden">
+      <br>
+      <h5>
+      <label>Transactions</label>
+    </h5>
+      <br>
+      <div class="form-group">
+      <label for="exampleFormControlInput1">What's the entity name?</label>
+      {{ trans.csrf_token }}
+      {{ trans.entity_name(class_="form-control") }}
+      <label for="exampleFormControlInput1">What was the rumour date?</label>
+      {{ trans.rumour_date(class_="form-control") }}
+      <label for="exampleFormControlInput1">What was the annoucement date?</label>
+      {{ trans.anouncement_date(class_="form-control") }}
+      <label for="exampleFormControlInput1">Mandarin skills required?</label>
+      {{ trans.mandarin(class_="form-control") }}
+<br>
+
+      {{ trans.trans_submitted(class_="btn btn-outline-primary") }}
+      <br>
+    </div>
+          <br>
+        </div>
+
+        <h5 class="display-5">Related Transactions</h5>
+        <table class="table table-hover">
+           <thead class="thead-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Entity Name</th>
+              <th scope="col">Edit</th>
+              <!-- <th scope="col"></th>
+              <th scope="col">Last</th>
+              <th scope="col">Email</th>
+              <th scope="col">Mandarin Skills?</th>
+              <th scope="col">Admin?</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Delete</th> -->
+            </tr>
+          </thead>
+          <tbody>
+          {% for trans in related_trans %}
+            <tr>
+              <td scope="row">{{ trans.s_id }}</th>
+              <td scope="row">{{ trans.entity_name }}</th>
+              <td scope="row"><a role="button" href="{{ url_for('edit_transaction', id=trans.s_id)}}">Edit</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
     </form>
     </body>
+
+
+
+    <style>
+        .hidden{
+          display: none;
+        }
+    </style>
+
+    <script type= "text/javascript">
+     function showHide(){
+        var checkbox = document.getElementById("idk");
+        var hiddeninputs = document.getElementsByClassName("hidden");
+
+        for (var i = 0; i != hiddeninputs.length; i++){
+            if(checkbox.checked){
+                hiddeninputs[i].style.display = "block";
+              }
+              else {
+                hiddeninputs[i].style.display = "none";
+
+              }
+            }
+     }
+     </script>
