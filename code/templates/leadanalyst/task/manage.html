@@ -59,7 +59,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for t,w in all %}
+      {% for t,w in all|sort(attribute='0.stage') %}
         <tr>
           <th scope="row">{{ t.id }}</th>
           <td scope="row">{{ t.nickname }}</td>

@@ -591,7 +591,6 @@ def weekCalc(tasks):
         weeks.append(time_delta)
     return weeks
 
-
 # get all transactions if admin and get all transactions
 # relevant to an analyst
 def manage_transactions():
