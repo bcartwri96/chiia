@@ -210,10 +210,10 @@ class Stage_2(Base_Stage_Task):
     # __table_args__ = {'extend_existing' : True}
 
     # num times assigned to an analyst
-    reviews = sa.Column(sa.Integer, nullable=False)
+    reviews = sa.Column(sa.Integer)
     # date originally assigned
-    date_assigned = sa.Column(sa.DateTime, nullable=False)
-    chin_inv_file_no = sa.Column(sa.Float, nullable=False)
+    date_assigned = sa.Column(sa.DateTime)
+    chin_inv_file_no = sa.Column(sa.Float)
     counterpart_file_no = sa.Column(sa.Float)
 
     # workflow options below

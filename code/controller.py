@@ -429,9 +429,10 @@ def edit_task(id):
         form.nickname.data = t_db.nickname
         form.date_start.data = t_db.date_start
         form.date_end.data = t_db.date_end
-        form.search_term.data = t_db.search_term
+        # form.search_term.data = t_db.search_term
         form.who_assigned.data = u.fname + " "+ u.lname
         form.dataset_owner.data = t_db.dataset_owner
+        form.who_assigned_real.data = t_db.who_assigned
 
         # get all the related transactions to this task
         return fl.render_template('leadanalyst/task/edit.html', form=form, t=t_db,
@@ -446,16 +447,16 @@ def edit_task(id):
         if form.validate_on_submit() and form.task_submitted.data:
             #get the vars
             nickname = fl.request.form['nickname']
-            search_term = fl.request.form['search_term']
+            # search_term = fl.request.form['search_term']
             date_start = fl.request.form['date_start']
             date_end = fl.request.form['date_end']
             who_assigned = fl.request.form['who_assigned_real']
 
             t_db.nickname = nickname
-            t_db.date_start = dt.datetime.strptime(date_start, '%Y')
-            t_db.date_end = dt.datetime.strptime(date_end, '%Y')
+            t_db.date_start = date_start
+            t_db.date_end = date_end
             t_db.who_assigned = who_assigned
-            t_db.search_term = search_term
+            # t_db.search_term = search_term
             t_db.date_modified = dt.datetime.now()
 
             db.db_session.add(t_db)
@@ -657,7 +658,6 @@ def stage1(id):
             date_start = fl.request.form['date_start']
             date_end = fl.request.form['date_end']
             date_conducted = fl.request.form['date_conducted']
-            no_of_result_to_s2 = fl.request.form['no_of_result_to_s2']
             total_no_of_result = fl.request.form['total_no_of_result']
             #who_assigned = fl.request.form['who_assigned']
 
@@ -669,7 +669,6 @@ def stage1(id):
 
             #t_db.date_modified = dt.datetime.now()
             t_db.date_conducted = date_conducted
-            t_db.no_of_result_to_s2 = no_of_result_to_s2
             t_db.total_no_of_result = total_no_of_result
 
             db.db_session.add(t_db)
@@ -728,10 +727,14 @@ def stage1(id):
 
                 db.db_session.add(trans)
 
+                # new transaction means add 1 to the no_progressed to stg2 var in
+                # tasks
+                t_db.no_of_result_to_s2 = t_db.no_of_result_to_s2+1
+
                 # create complimentry stage2
                 # ...
                 s2 = ml.Stage2()
-                
+
 
                 db.db_session.add(t_db)
                 # db.db_session.add(stage_rel)

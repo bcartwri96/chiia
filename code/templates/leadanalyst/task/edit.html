@@ -12,8 +12,6 @@
         {{ form.date_start(class="form-control") }}
         <label for="exampleFormControlInput1">Date End</label>
         {{ form.date_end(class="form-control") }}
-        <label for="exampleFormControlInput1">Search Term Used</label>
-        {{ form.search_term(class="form-control") }}
         <label for="exampleFormControlInput1">Who is assigned?</label>
         {{ form.who_assigned(class="form-control") }}
         <p>Note: this table will present a number of options, and the selected option
@@ -23,6 +21,8 @@
         {{ form.dataset_owner(class_="form-control") }}
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
         {{ form.who_assigned_real() }}
+
+        
         {{ form.csrf_token }}
         {% if form.nickname.errors %}
           {{ form.nickname.errors[0] }}
@@ -33,9 +33,6 @@
         {% if form.date_end.errors %}
           {{ form.date_end.errors[0] }}
         {% endif %}
-        {% if form.search_term.errors %}
-          {{ form.search_term.errors[0] }}
-        {% endif %}
         {% if form.who_assigned.errors %}
           {{ form.who_assigned.errors[0] }}
         {% endif %}
@@ -44,7 +41,7 @@
         {% endif %}
 
         <br>
-        <h5 class="display-5">Transactions</h5><a href="someJSWhichPopsUpANewForm()"><i class="material-icons"
+        <!-- <h5 class="display-5">Transactions</h5><a href="someJSWhichPopsUpANewForm()"><i class="material-icons"
           style="font-size: 36px">add_box</i></a><br>
         <label for="exampleFormControlInput1">What's the entity name?</label>
         {{ trans.csrf_token }}
@@ -60,7 +57,7 @@
         <label for="exampleFormControlInput1">Manually allocate users?</label>
         {{ trans.who_assigned(id_="search_user", class_="form-control") }}
         {{ trans.trans_submitted(class_="btn btn-outline-primary") }}
-      </div>
+      </div> -->
 
       <h5 class="display-5">Related Transactions</h5>
       <table class="table table-hover">
