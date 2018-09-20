@@ -627,9 +627,9 @@ def create_transaction():
         pass
 
 def stage1(id):
-# just defining get method as of now. Need to work on post and predefined columns
-#  after task assignment part is completed
-# Also need to add add_transaction part here
+    # just defining get method as of now. Need to work on post and predefined columns
+    #  after task assignment part is completed
+    # Also need to add add_transaction part here
     import datetime as dt
     form = fm.stage1(fl.request.form)
     new_transaction = fm.Create_Transaction(fl.request.form)
@@ -727,6 +727,12 @@ def stage1(id):
                 fl.flash("date adjusted to "+str(dt.datetime.now()), 'success')
 
                 db.db_session.add(trans)
+
+                # create complimentry stage2
+                # ...
+                s2 = ml.Stage2()
+                
+
                 db.db_session.add(t_db)
                 # db.db_session.add(stage_rel)
 
