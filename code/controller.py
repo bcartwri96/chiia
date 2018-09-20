@@ -791,7 +791,7 @@ def roster():
     form = fm.roster(fl.request.form)
     from datetime import datetime
     if fl.request.method == 'GET':
-
+        update_calendar()
         return fl.render_template('analyst/roster.html', form=form)
     else:
         r = ml.Roster()
@@ -834,7 +834,7 @@ def search_username(query):
 # to insert into calendar
 # need to figure out where its should be called
 def update_calendar():
-    r = ml.Calendar()
+
     from datetime import datetime, timedelta
     from dateutil.relativedelta import relativedelta
 
@@ -846,11 +846,13 @@ def update_calendar():
         weekNumber = today.isocalendar()[1]
         y = today.year
         today = today + timedelta(days=7)
-        r.id = int(str(y) + str(weekNumber));
-        r.start_date = start
-        r.end_date = start + timedelta(days=6)
-        
-        db.db_session.add(r)
+        id = int(str(y) + str(weekNumber));
+        start_date = start
+        end_date = start + timedelta(days=6)
+        wid = ml.Calendar.query.filter_by(id=id).first()
 
+        if(wid is None):
+            cal = ml.Calendar(start_date=start_date, end_date=end_date, id=id)
+            db.db_session.add(cal)
     db.db_session.commit()
     pass
