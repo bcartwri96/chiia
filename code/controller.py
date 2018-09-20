@@ -786,33 +786,35 @@ def stage4():
 def roster():
 
 #to store no of hours available per week for analyst
-# need some validation check
+
+
     form = fm.roster(fl.request.form)
+    from datetime import datetime
     if fl.request.method == 'GET':
 
-        #Get today date and set defaukt start date as next week monday and end date as next week sunday
-        from datetime import datetime, timedelta
-        today = datetime.now().date()
-        start_this_week = today - timedelta(days=today.weekday())
-        start = start_this_week + timedelta(days=7)
-        end = start + timedelta(days=6)
-        form.start_date.data = start
-        form.end_date.data = end
         return fl.render_template('analyst/roster.html', form=form)
     else:
         r = ml.Roster()
         user_id = fl.session['logged_in']
         start_date = fl.request.form['start_date']
+        start_time = '00:00:00'
+        start = start_date +' '+ start_time
+        start1 = datetime.strptime(start, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
+
         end_date = fl.request.form['end_date']
         no_of_hours = fl.request.form['no_of_hours']
+        #wid = ml.Calendar.query.get(start_date)
+        wid = ml.Calendar.query.filter_by(start_date=start1).first()
         r.user_id = user_id
-        r.start_date = start_date
-        r.end_date = end_date
+        r.week_id = wid.id
         r.no_of_hours = no_of_hours
         db.db_session.add(r)
         db.db_session.commit()
         fl.flash("Updated roster", "success")
         return fl.render_template('analyst/roster.html', form=form)
+
+
+
 
 # implementation of the search-for-id and return id, name function
 def search_id(id):
@@ -823,8 +825,32 @@ def search_id(id):
 
 # implementation of the searching for a username with some query function
 def search_username(query):
-    res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
+    rres = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
     ret = []
     for r in res:
         ret.append([r.id, r.fname, r.lname])
     return fl.jsonify(ret)
+
+# to insert into calendar
+# need to figure out where its should be called
+def update_calendar():
+    r = ml.Calendar()
+    from datetime import datetime, timedelta
+    from dateutil.relativedelta import relativedelta
+
+    today = datetime.now().date()
+    six_months = today + relativedelta(months=+6)
+    while (today <= six_months):
+        start_this_week = today - timedelta(days=today.weekday())
+        start = start_this_week + timedelta(days=7)
+        weekNumber = today.isocalendar()[1]
+        y = today.year
+        today = today + timedelta(days=7)
+        r.id = int(str(y) + str(weekNumber));
+        r.start_date = start
+        r.end_date = start + timedelta(days=6)
+        
+        db.db_session.add(r)
+
+    db.db_session.commit()
+    pass

@@ -107,12 +107,18 @@ class stage4(wtf.FlaskForm):
     task_submitted = SubmitField('Submit the Task')
 
 class roster(wtf.FlaskForm):
+    from datetime import datetime, timedelta
+    today = datetime.now().date()
+    start_this_week = today - timedelta(days=today.weekday())
+    start = start_this_week + timedelta(days=7)
+    end = start + timedelta(days=6)
 
-    start_date = DateField('start_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
-    end_date = DateField('end_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
+    #start_date = DateField('start_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
+    #end_date = DateField('end_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
+    start_date = SelectField('start_date', choices=[(start, start), (start + timedelta(days=7), start + timedelta(days=7))])
+    end_date = SelectField('end_date', choices=[(end, end), (end + timedelta(days=7), end + timedelta(days=7))])
     no_of_hours = IntegerField('no_of_hours', validators=[DataRequired("This column cannot be empty")])
     task_submitted = SubmitField('Submit the roster')
-
 
 
 
