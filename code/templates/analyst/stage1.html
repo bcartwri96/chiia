@@ -4,7 +4,7 @@
     <body>
     <form action="{{ url_for('stage1', id=t.id) }}" method="POST">
       <div class="form-group">
-        <label for="exampleFormControlInput1">Analyst Name</label>
+        <label for="exampleFormControlInput1">Name</label>
         {{ form.csrf_token }}
         {{ form.nickname(class_="form-control") }}
         <label for="exampleFormControlInput1">Search Date</label>
@@ -17,15 +17,13 @@
         {{ form.search_term(class="form-control") }}
         <label for="exampleFormControlInput1">Total no. of results</label>
         {{ form.total_no_of_result(class="form-control") }}
-        
+
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
 
       </div>
 
-      <input  type="checkbox" name="correspondence_req" id = "idk" onclick = "showHide()" />
-        <label class="exampleFormControlInput1">
-        New Transactions
-      </label>
+      <input  type="checkbox" name="correspondence_req" id="idk" onclick="showHide()" />
+      <label class="exampleFormControlInput1">New Transactions</label>
       <div class="hidden">
       <br>
       <h5>

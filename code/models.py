@@ -169,7 +169,6 @@ class Base_Stage_Task(db.Base):
     # what the transaction is which we're referring to
     entity_name = sa.Column(sa.String, nullable=False)
     who_assigned = sa.Column(sa.Integer)
-    # LA_accept = sa.Column(sa.Boolean)
 
 # transactions (stage 1)
 # =============
@@ -178,13 +177,6 @@ class Transactions(Base_Stage_Task):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing' : True}
 
-    # id = sa.Column(sa.Integer, primary_key=True)
-    # name = sa.Column(sa.String, nullable=False)
-
-    # date_start = sa.Column(sa.DateTime, nullable=False)
-    # date_end = sa.Column(sa.DateTime, nullable=False)
-
-    # stage = sa.Column(sa.Integer, nullable=False)
     amount = sa.Column(sa.Float)
     who_previous_stages = sa.Column(sa.PickleType)
 

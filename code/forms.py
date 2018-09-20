@@ -43,7 +43,7 @@ class Create_Transaction(wtf.FlaskForm):
     mandarin = BooleanField('mandarin')
 
     #prefill this with the filled value of the current user
-    who_assigned = IntegerField('who_assigned', [DataRequired()])
+    who_assigned = IntegerField('who_assigned')
     who_previous_stages = StringField('who_previous_stages')
 
     # hiddens

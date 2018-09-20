@@ -447,7 +447,6 @@ def edit_task(id):
         if form.validate_on_submit() and form.task_submitted.data:
             #get the vars
             nickname = fl.request.form['nickname']
-            # search_term = fl.request.form['search_term']
             date_start = fl.request.form['date_start']
             date_end = fl.request.form['date_end']
             who_assigned = fl.request.form['who_assigned_real']
@@ -643,7 +642,8 @@ def stage1(id):
         form.date_end.data = t_db.date_end
 
         # get all the related transactions to this task
-        return fl.render_template('analyst/stage1.html', form=form, t=t_db, trans=new_transaction, related_trans=all_trans)
+        return fl.render_template('analyst/stage1.html', form=form, t=t_db, \
+        trans=new_transaction, related_trans=all_trans)
 
     else:
         # process form/s
@@ -729,11 +729,15 @@ def stage1(id):
 
                 # new transaction means add 1 to the no_progressed to stg2 var in
                 # tasks
-                t_db.no_of_result_to_s2 = t_db.no_of_result_to_s2+1
+                if t_db.no_of_result_to_s2 != None:
+                    t_db.no_of_result_to_s2 = t_db.no_of_result_to_s2+1
+                else:
+                    t_db.no_of_result_to_s2 = 1
 
                 # create complimentry stage2
                 # ...
-                s2 = ml.Stage2()
+                s2 = ml.Stage_2(s_id=1, entity_name="Ben")
+                db.db_session.add(s2)
 
 
                 db.db_session.add(t_db)
@@ -742,7 +746,7 @@ def stage1(id):
                 try:
                     db.db_session.commit()
                     fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
-                except sa.exc.InvalidRequestError():
+                except sa.exc.InvalidRequestError:
                     fl.flash("Failed to create transaction", "failed")
 
         else:
