@@ -800,13 +800,14 @@ def roster():
         fl.flash("Updated roster", "success")
         return fl.render_template('analyst/roster.html', form=form)
 
-# implementation of the get username function
+# implementation of the search-for-id and return id, name function
 def search_id(id):
     id = str(id)
     res = ml.User.query.get(id)
-    return js.dumps([res.fname, res.lname])
+    return js.dumps([res.id, res.fname, res.lname])
 
 
+# implementation of the searching for a username with some query function
 def search_username(query):
     res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
     ret = []
