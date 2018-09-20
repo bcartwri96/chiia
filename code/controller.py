@@ -425,11 +425,12 @@ def edit_task(id):
     t_db = ml.Tasks.query.get(id)
     all_trans = t_db.trans
     if fl.request.method == 'GET':
+        u = ml.User.query.get(int(t_db.who_assigned))
         form.nickname.data = t_db.nickname
         form.date_start.data = t_db.date_start
         form.date_end.data = t_db.date_end
         form.search_term.data = t_db.search_term
-        form.who_assigned.data = t_db.who_assigned
+        form.who_assigned.data = u.fname + " "+ u.lname
         form.dataset_owner.data = t_db.dataset_owner
 
         # get all the related transactions to this task
@@ -448,7 +449,7 @@ def edit_task(id):
             search_term = fl.request.form['search_term']
             date_start = fl.request.form['date_start']
             date_end = fl.request.form['date_end']
-            who_assigned = fl.request.form['who_assigned']
+            who_assigned = fl.request.form['who_assigned_real']
 
             t_db.nickname = nickname
             t_db.date_start = dt.datetime.strptime(date_start, '%Y')
@@ -812,5 +813,5 @@ def search_username(query):
     res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
     ret = []
     for r in res:
-        ret.append([r.fname, r.lname])
-    return js.dumps(ret)
+        ret.append([r.id, r.fname, r.lname])
+    return fl.jsonify(ret)

@@ -60,7 +60,7 @@ class Edit_Task(wtf.FlaskForm):
     who_assigned = IntegerField('who_assigned')
     search_term = StringField('search_term', validators=[DataRequired()])
     dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
-
+    who_assigned_real = HiddenField()
     task_submitted = SubmitField('Submit the Task')
 
 class stage1(wtf.FlaskForm):
@@ -107,7 +107,7 @@ class stage4(wtf.FlaskForm):
     task_submitted = SubmitField('Submit the Task')
 
 class roster(wtf.FlaskForm):
-    
+
     start_date = DateField('start_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     end_date = DateField('end_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     no_of_hours = IntegerField('no_of_hours', validators=[DataRequired("This column cannot be empty")])

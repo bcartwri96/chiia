@@ -1,4 +1,5 @@
 {% include "header.html" %}
+
 <div class="container">
   <h4 class="display-4">Edit a Task</h4>
     <body>
@@ -15,10 +16,13 @@
         {{ form.search_term(class="form-control") }}
         <label for="exampleFormControlInput1">Who is assigned?</label>
         {{ form.who_assigned(class="form-control") }}
+        <p>Note: this table will present a number of options, and the selected option
+          is the top one is selected by default.</p>
+        <table id="users"></table>
         <label for="exampleFormControlInput1">Who owns the dataset?</label>
         {{ form.dataset_owner(class_="form-control") }}
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
-
+        {{ form.who_assigned_real() }}
         {{ form.csrf_token }}
         {% if form.nickname.errors %}
           {{ form.nickname.errors[0] }}
@@ -54,7 +58,7 @@
         <label for="exampleFormControlInput1">Amount?</label>
         {{ trans.amount(class_="form-control") }}
         <label for="exampleFormControlInput1">Manually allocate users?</label>
-        {{ trans.who_assigned(class_="form-control") }}
+        {{ trans.who_assigned(id_="search_user", class_="form-control") }}
         {{ trans.trans_submitted(class_="btn btn-outline-primary") }}
       </div>
 
@@ -84,8 +88,29 @@
         {% endfor %}
         </tbody>
       </table>
-
-
-      <!-- <button class="" type="submit">Edit task</button> -->
     </form>
     </body>
+
+    <script type="text/javascript">
+    $(function() {
+      $("#who_assigned").on('input', function() {
+        $.getJSON( "/search-username/q="+$('input[name="who_assigned"]').val())
+          .done(function( json ) {
+            console.log( "JSON Data: " + json[0] );
+            var users = $('#users');
+            users.html("");
+            // place the first one in the hidden field
+            $('#who_assigned_real').val(json[0][0]);
+            for (var i=0; i<json.length; i++) {
+              users.append("<tr>");
+              users.append($("<td></td>").html(json[i][1]));
+              users.append($("<td></td>").html(json[i][2]));
+              users.append("</tr>");
+            }
+          })
+          .fail(function( jqxhr, textStatus, error ) {
+            users.append("No option selected; left blank.");
+        });
+      })
+    });
+    </script>
