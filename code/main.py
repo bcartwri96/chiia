@@ -157,6 +157,21 @@ def roster():
     return con.roster()
 
 
+# API
+# ==========================
+
+# get the name of users based on their ID
+@app.route('/search-id/<int:id>', methods=['GET', 'POST'])
+@flog.login_required
+def search_id(id):
+    return con.search_id(id)
+
+# return array of id's based on name
+@app.route('/search-username/q=<string:query>', methods=['GET', 'POST'])
+@flog.login_required
+def search_username(query):
+    return con.search_username(query)
+
 
 # required for login manager
 # ===========================
@@ -168,7 +183,7 @@ def load_user(user_id):
     else:
         return None
 
-# tear down the session iff the app shuts down
+# destroy the session iff the app shuts down
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()

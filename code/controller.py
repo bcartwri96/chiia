@@ -8,6 +8,7 @@ import forms as fm
 from proj_types import State
 import flask_wtf as wtf
 import sqlalchemy as sa
+import json as js
 
 lm = flog.LoginManager() # initialise the login lib
 
@@ -624,7 +625,6 @@ def create_transaction():
         # dataset_id =
         pass
 
-
 def stage1(id):
 # just defining get method as of now. Need to work on post and predefined columns
 #  after task assignment part is completed
@@ -772,7 +772,7 @@ def stage4():
 def roster():
 
 #to store no of hours available per week for analyst
-# need some validation check 
+# need some validation check
     form = fm.roster(fl.request.form)
     if fl.request.method == 'GET':
 
@@ -799,3 +799,17 @@ def roster():
         db.db_session.commit()
         fl.flash("Updated roster", "success")
         return fl.render_template('analyst/roster.html', form=form)
+
+# implementation of the get username function
+def search_id(id):
+    id = str(id)
+    res = ml.User.query.get(id)
+    return js.dumps([res.fname, res.lname])
+
+
+def search_username(query):
+    res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
+    ret = []
+    for r in res:
+        ret.append([r.fname, r.lname])
+    return js.dumps(ret)
