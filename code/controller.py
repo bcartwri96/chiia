@@ -781,20 +781,24 @@ def stage4():
 
     form = fm.stage4(fl.request.form)
     if fl.request.method == 'GET':
+
         return fl.render_template('analyst/stage4.html', form=form)
 
 def roster():
-
 #to store no of hours available per week for analyst
-
-
     form = fm.roster(fl.request.form)
-    from datetime import datetime
+    from datetime import datetime, timedelta
+    today = datetime.now().date()
+    start_this_week = today - timedelta(days=today.weekday())
+    start = start_this_week + timedelta(days=7)
     if fl.request.method == 'GET':
         update_calendar()
+
+        form.end_date.choices = [(cal.end_date,cal.end_date.strftime('%Y-%m-%d')) for cal in ml.Calendar.query.filter_by(start_date=start).all()]
         return fl.render_template('analyst/roster.html', form=form)
     else:
         r = ml.Roster()
+        form.end_date.choices = [(cal.end_date,cal.end_date.strftime('%Y-%m-%d')) for cal in ml.Calendar.query.filter_by(start_date=start).all()]
         user_id = fl.session['logged_in']
         start_date = fl.request.form['start_date']
         start_time = '00:00:00'
@@ -831,8 +835,25 @@ def search_username(query):
         ret.append([r.id, r.fname, r.lname])
     return fl.jsonify(ret)
 
+# implememt for getting week end date when passed week current date
+def search_enddate(start_date):
+    #cities = City.query.filter_by(state=state).all()
+
+    end_date = ml.Calendar.query.filter_by(start_date=start_date).all()
+
+    endArray = []
+
+    for end in end_date:
+        endObj = {}
+        endObj['id'] = end.end_date.strftime('%Y-%m-%d %H:%M:%S')
+        endObj['end_date'] = end.end_date.strftime('%Y-%m-%d')
+        endArray.append(endObj)
+
+    return fl.jsonify({'End_Date' : endArray})
+
 # to insert into calendar
 # need to figure out where its should be called
+# presently called in roster (get method)
 def update_calendar():
 
     from datetime import datetime, timedelta

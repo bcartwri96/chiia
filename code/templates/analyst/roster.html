@@ -12,8 +12,8 @@
             <th>No OF Hours Avaialble</th>
           </tr>
           <tr>
-            <td>{{ form.start_date(class='datepicker') }}</td>
-            <td>{{ form.end_date(class='datepicker') }}</td>
+            <td>{{ form.start_date }}</td>
+            <td>{{ form.end_date }}</td>
             <td>{{ form.no_of_hours(class="form-control") }}</td>
           </tr>
 
@@ -25,3 +25,23 @@
     </form>
     </body>
   </div>
+
+  <script>
+          var start_date_select = document.getElementById("start_date");
+          var end_date_select = document.getElementById("end_date");
+          start_date_select.onchange = function()  {
+
+              start_date = start_date_select.value;
+
+              fetch('/search-end_date/' + start_date).then(function(response) {
+              response.json().then(function(data) {
+                var optionHTML = '';
+                 for (var end of data.End_Date) {
+                   optionHTML += '<option value="' + end.id + '">' + end.end_date + '</option>';
+                 }
+                 end_date_select.innerHTML = optionHTML;
+              })
+
+              });
+          }
+      </script>

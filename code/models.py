@@ -303,7 +303,7 @@ class Roster(db.Base):
     __table_args__ = {'extend_existing': True}
 
     user_id = sa.Column(sa.Integer,nullable=False, primary_key=True)
-    week_id = sa.Column(sa.Integer, nullable=False)
+    week_id = sa.Column(sa.Integer, nullable=False, primary_key=True)
     no_of_hours = sa.Column(sa.Integer, nullable=False)
 
 class Calendar(db.Base):

@@ -174,6 +174,12 @@ def search_id(id):
 def search_username(query):
     return con.search_username(query)
 
+# return array of id's based on name
+@app.route('/search-end_date/<start_date>', methods=['GET', 'POST'])
+@flog.login_required
+def search_enddate(start_date):
+    return con.search_enddate(start_date)
+
 
 # required for login manager
 # ===========================
