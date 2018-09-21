@@ -726,7 +726,7 @@ def stage1(id):
                 fl.flash("date adjusted to "+str(dt.datetime.now()), 'success')
 
                 db.db_session.add(trans)
-
+                db.db_session.commit()
                 # new transaction means add 1 to the no_progressed to stg2 var in
                 # tasks
                 if t_db.no_of_result_to_s2 != None:
@@ -736,12 +736,23 @@ def stage1(id):
 
                 # create complimentry stage2
                 # ...
-                s2 = ml.Stage_2(s_id=1, entity_name="Ben")
+                # get current max id
+                s2_max = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
+                if s2_max:
+                    s2_max+=1
+                else:
+                    s2_max=1
+
+                s2 = ml.Stage_2(s_id=s2_max, entity_name="")
+                # NOTE: entity name is not nullable but we fill it on the stage2
+                # page, not this one.
                 db.db_session.add(s2)
 
+                # now join it to the sr table with the new trans
+                sr = ml.Stage_Rels(trans_id=trans.id, stage_2_id=s2.s_id)
 
                 db.db_session.add(t_db)
-                # db.db_session.add(stage_rel)
+                db.db_session.add(sr)
 
                 try:
                     db.db_session.commit()
