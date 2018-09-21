@@ -300,8 +300,16 @@ class Frequencies(db.Base):
 
 class Roster(db.Base):
     __tablename__ = 'roster'
+    __table_args__ = {'extend_existing': True}
 
     user_id = sa.Column(sa.Integer,nullable=False, primary_key=True)
-    start_date = sa.Column(sa.DateTime, nullable=False, primary_key=True)
-    end_date = sa.Column(sa.DateTime, nullable=False, primary_key=True)
+    week_id = sa.Column(sa.Integer, nullable=False, primary_key=True)
     no_of_hours = sa.Column(sa.Integer, nullable=False)
+
+class Calendar(db.Base):
+    __tablename__ = 'calendar'
+    __table_args__ = {'extend_existing': True}
+
+    id = sa.Column(sa.Integer, nullable=False, primary_key=True)
+    start_date = sa.Column(sa.DateTime, nullable=False)
+    end_date = sa.Column(sa.DateTime, nullable=False)
