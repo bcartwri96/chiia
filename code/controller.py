@@ -802,21 +802,31 @@ def roster():
         return fl.render_template('analyst/roster.html', form=form)
     else:
         r = ml.Roster()
-        form.end_date.choices = [(cal.end_date,cal.end_date.strftime('%Y-%m-%d')) for cal in ml.Calendar.query.filter_by(start_date=start).all()]
+
         user_id = fl.session['logged_in']
         start_date = fl.request.form['start_date']
         start_time = '00:00:00'
         start = start_date +' '+ start_time
         start1 = datetime.strptime(start, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
+        form.end_date.choices = [(cal.end_date,cal.end_date.strftime('%Y-%m-%d')) for cal in ml.Calendar.query.filter_by(start_date=start).all()]
 
-        end_date = fl.request.form['end_date']
+        #end_date = fl.request.form['end_date']
         no_of_hours = fl.request.form['no_of_hours']
         #wid = ml.Calendar.query.get(start_date)
         wid = ml.Calendar.query.filter_by(start_date=start1).first()
         r.user_id = user_id
         r.week_id = wid.id
         r.no_of_hours = no_of_hours
-        db.db_session.add(r)
+        cid = ml.Roster.query.filter_by(user_id=user_id,week_id = wid.id ).first()
+        #if condition to insert new entry
+        if(cid is None):
+            db.db_session.add(r)
+        else:
+        # if its an existing r=entry update record by deleting and re entring the record
+            updated_week_id = wid.id
+            rost = ml.Roster.query.filter_by(user_id=user_id,week_id = wid.id ).first()
+            db.db_session.delete(rost)
+            db.db_session.add(r)
         db.db_session.commit()
         fl.flash("Updated roster", "success")
         return fl.render_template('analyst/roster.html', form=form)
@@ -906,7 +916,7 @@ def allocate_tasks_analysts(d_id):
     # presumes that there should be one week which uniquely matches constraints
 
     # NOTE: next figure out both the next week AND two weeks away!
-    
+
     # old code for calculating the two week mark
     # cur_wk = ml.Calendar.query.filter(two_weeks_away > ml.Calendar.start_date & \
     #  cur_date <= ml.Calendar.end_date).all()[0].id # presumes only one which
@@ -940,7 +950,7 @@ def allocate_tasks_analysts(d_id):
                 db.db_session.add(tasks[current_task_ct])
                 current_task_ct += 1
                 num_hours -= attc
-                if !(current_task_ct <= tasks.length):
+                if (current_task_ct <= tasks.length):
                     tasks_remain = False
 
     db.db_session.commit()
