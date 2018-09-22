@@ -704,17 +704,11 @@ def stage1(id):
                 # need to check for this
                 trans.who_assigned = 2
 
-
                 trans.state = 1
 
                 # update relations
                 # create a stage_rel mapping between the trans and the task
                 t_db.trans.append(trans)
-
-                # now relate the stage rel to the task (which definitely exists
-                # because we're editing it!)
-                # stage_rel.tasks_id = id
-                # t_db.task_id.append(stage_rel)
 
                 # submit this
                 trans.amount = 100
@@ -735,7 +729,6 @@ def stage1(id):
                     t_db.no_of_result_to_s2 = 1
 
                 # create complimentry stage2
-                # ...
                 # get current max id
                 s2_max = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
                 if s2_max:
@@ -888,3 +881,17 @@ def update_calendar():
             db.db_session.add(cal)
     db.db_session.commit()
     pass
+
+# ================
+# allocation logic
+
+# dataset & tasks created, so we need to allocate analysts to the tasks
+# inputs: analyst availability, time delta of the dataset, frequency
+# output: modified database where each task is allocated to exactly 1 task
+def allocate_tasks_analysts():
+    return None
+
+# when moving from stage 1 to stage 2, we ask whether the next person
+# needs to speak mando to do the task, so this is run if that's true.
+def reallocate_task_mandarin():
+    return None
