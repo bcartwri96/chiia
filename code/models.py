@@ -20,6 +20,7 @@ class User(db.Base):
     pw_hashed = sa.Column(sa.String, nullable=False)
     admin = sa.Column(sa.Boolean)
     confirmed = sa.Column(sa.Boolean, default=False)
+    avg_time_to_complete = sa.Column(sa.Float, default=2)
 
     def __repr__(self):
         return '<Details {fname}, {lname}, {email}, with language skills: {language} where account conf = {conf}>'.format(fname=self.fname,
@@ -65,6 +66,7 @@ class Dataset(db.Base):
     owner = sa.Column(sa.Integer, nullable=False)
     access = sao.relationship("Dataset_Authd", backref='dataset', lazy=True)
 
+# class maps the dataset access privs to the related ds
 class Dataset_Authd(db.Base):
     __tablename__ = 'dataset-authd'
     __table_args__ = {'extend_existing' : True}

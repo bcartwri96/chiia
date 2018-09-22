@@ -886,10 +886,64 @@ def update_calendar():
 # allocation logic
 
 # dataset & tasks created, so we need to allocate analysts to the tasks
-# inputs: analyst availability, time delta of the dataset, frequency
+# inputs: dataset id, analyst availability, time delta of the
+        # dataset, frequency
 # output: modified database where each task is allocated to exactly 1 task
-def allocate_tasks_analysts():
-    return None
+def allocate_tasks_analysts(d_id):
+    # get all the tasks related to this dataset
+    tasks = ml.Tasks.query.filter(ml.Tasks.dataset_owner == d_id).all()
+    # now get the dataset
+    ds = ml.Dataset.query.get(d_id)
+
+    # get current week id
+    cur_date = dt.datetime.now() # today's date
+    two_weeks_away = cur_date + dt.timedelta(weeks=2)
+    three_weeks_away = cur_date + dt.timedelta(weeks=3)
+
+    # get the analyst availability for the next two weeks
+    aa = ml.Roster.query.filter(ml.Calendar.start_date >two_weeks_away & \
+    ml.Calendar.end_date < three_weeks_away).all()
+    # presumes that there should be one week which uniquely matches constraints
+
+    # NOTE: next figure out both the next week AND two weeks away!
+    
+    # old code for calculating the two week mark
+    # cur_wk = ml.Calendar.query.filter(two_weeks_away > ml.Calendar.start_date & \
+    #  cur_date <= ml.Calendar.end_date).all()[0].id # presumes only one which
+    #  # will satisfy this criteria
+    #
+    # # analyst availability for next 2 weeks
+    # aa = ml.Roster.query.filter(ml.Roster.week_id == cur_wk+1 || \
+    #  ml.Roster.week_id == cur_wk+2).all()
+
+    # go through each user and allocate as many hours as they can take
+    # while there are still tasks remaining that they can do
+    # get users who are avilable during this time
+    users = []
+    for entry in aa:
+        users.append([entry.user_id, entry.no_of_hours])
+
+    # now allocate as much work as we can for every user
+    current_task_ct = 0
+    for user in users:
+        if tasks_remain:
+            # get user
+            u = ml.User.query.get(user[0])
+            # get user avg_time_to_complete. presumes only one will be returned
+            attc = u.avg_time_to_complete
+            # get num hours available
+            num_hours = user[1]
+            if num_hours >= attc:
+                # allocate the user their weekly amount of tasks
+                # their number of hours available - task attc for every one
+                tasks[current_task_ct].who_assigned = u.id
+                db.db_session.add(tasks[current_task_ct])
+                current_task_ct += 1
+                num_hours -= attc
+                if !(current_task_ct <= tasks.length):
+                    tasks_remain = False
+
+    db.db_session.commit()
 
 # when moving from stage 1 to stage 2, we ask whether the next person
 # needs to speak mando to do the task, so this is run if that's true.
