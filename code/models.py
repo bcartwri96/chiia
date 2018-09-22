@@ -292,13 +292,6 @@ class Stage_Rels(db.Base):
     # trans = sao.relationship(Transactions, backref=sao.backref("stage_rels", cascade="all"))
     # tasks = sao.relationship(Tasks, backref=sao.backref("stage_rels", cascade="all"))
 
-class Frequencies(db.Base):
-    __tablename__ = 'frequencies'
-    __table_args__ = {'extend_existing': True}
-
-    id = sa.Column(sa.Integer, primary_key=True)
-    name = sa.Column(sa.String, nullable=False)
-    days_in_freq = sa.Column(sa.Integer, nullable=False)
 
 class Roster(db.Base):
     __tablename__ = 'roster'
