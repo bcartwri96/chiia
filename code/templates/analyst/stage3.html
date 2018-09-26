@@ -22,10 +22,72 @@
           </div>
         </div>
 
+        <style>
+        .hidden{
+          display: none;
+        }
+        .hidden_counter{
+          display:none;
+        }
+        </style>
+
+        <input  type="checkbox" name="correspondence_req" id="idk" onclick="showHide()" />
+        <label class="exampleFormControlInput1">Correspondence required</label>
+        <div class="hidden">
+        <br>
+        <h5>
+        <label>Correspondence required</label>
+      </h5>
+        <br>
+        <div class="form-group">
+        <label for="exampleFormControlInput1">Select Type of correspondence</label>
+        <div class="row">
+          <div class="col">
+            <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 5px;" value="1" checked>
+              <label class="form-check-label" style="padding-left: 25px;">
+                Primary Source
+              </label>
+            <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 30px;" value="2">
+              <label class="form-check-label" style="padding-left: 50px;">
+                ASIC Report
+              </label>
+              <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 30px;" value="2">
+                <label class="form-check-label" style="padding-left: 50px;">
+                  Property Record
+                </label>
+                <br>
+                <label for="exampleFormControlInput1">What information do we need from correspondence?</label>
+                  {{ form.correspondence_info(class_="form-control") }} <br>
+                <label for="exampleFormControlInput1">What have you done already to find this information?</label>
+                  {{ form.correspondence_done(class_="form-control") }}<br>
+
+          </div>
+
+          <script type= "text/javascript">
+           function showHide(){
+              var checkbox = document.getElementById("idk");
+              var hiddeninputs = document.getElementsByClassName("hidden");
+
+              for (var i = 0; i != hiddeninputs.length; i++){
+                  if(checkbox.checked){
+                      hiddeninputs[i].style.display = "block";
+                    }
+                    else {
+                      hiddeninputs[i].style.display = "none";
+
+                    }
+                  }
+           }
+           </script>
+        </div>
+
+      </div>
+      </div>
+</form>
 
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
 
 
-      </div>
-    </form>
+
+
     </body>
