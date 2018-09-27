@@ -843,7 +843,7 @@ def search_id(id):
 
 # implementation of the searching for a username with some query function
 def search_username(query):
-    rres = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
+    res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
     ret = []
     for r in res:
         ret.append([r.id, r.fname, r.lname])
@@ -907,24 +907,14 @@ def allocate_tasks_analysts(d_id):
 
     # get current week id
     cur_date = dt.datetime.now() # today's date
-    two_weeks_away = cur_date + dt.timedelta(weeks=2)
-    three_weeks_away = cur_date + dt.timedelta(weeks=3)
 
     # get the analyst availability for the next two weeks
-    aa = ml.Roster.query.filter(ml.Calendar.start_date >two_weeks_away & \
-    ml.Calendar.end_date < three_weeks_away).all()
+    # 1. get the current week
+    # 2. get the next two week roster array
+    wk_id = get_week_id(cur_date) # gets the current week id
+
+    aa = ml.Roster.query.filter(sa.or_(ml.Roster.week_id == (wk_id+1), ml.Roster.week_id == (wk_id+2))).all()
     # presumes that there should be one week which uniquely matches constraints
-
-    # NOTE: next figure out both the next week AND two weeks away!
-
-    # old code for calculating the two week mark
-    # cur_wk = ml.Calendar.query.filter(two_weeks_away > ml.Calendar.start_date & \
-    #  cur_date <= ml.Calendar.end_date).all()[0].id # presumes only one which
-    #  # will satisfy this criteria
-    #
-    # # analyst availability for next 2 weeks
-    # aa = ml.Roster.query.filter(ml.Roster.week_id == cur_wk+1 || \
-    #  ml.Roster.week_id == cur_wk+2).all()
 
     # go through each user and allocate as many hours as they can take
     # while there are still tasks remaining that they can do
@@ -933,24 +923,30 @@ def allocate_tasks_analysts(d_id):
     for entry in aa:
         users.append([entry.user_id, entry.no_of_hours])
 
+    print(users)
     # now allocate as much work as we can for every user
     current_task_ct = 0
+    tasks_remain = True
     for user in users:
         if tasks_remain:
             # get user
             u = ml.User.query.get(user[0])
+            print("user: "+u.fname)
             # get user avg_time_to_complete. presumes only one will be returned
             attc = u.avg_time_to_complete
+            print("attc: "+str(attc))
             # get num hours available
             num_hours = user[1]
-            if num_hours >= attc:
+            print("num hours to complete: "+str(num_hours))
+            while (num_hours >= attc) & tasks_remain:
                 # allocate the user their weekly amount of tasks
                 # their number of hours available - task attc for every one
                 tasks[current_task_ct].who_assigned = u.id
                 db.db_session.add(tasks[current_task_ct])
+                print("changed db @ task " + str(current_task_ct))
                 current_task_ct += 1
                 num_hours -= attc
-                if (current_task_ct <= tasks.length):
+                if (current_task_ct >= len(tasks)):
                     tasks_remain = False
 
     db.db_session.commit()
@@ -959,3 +955,9 @@ def allocate_tasks_analysts(d_id):
 # needs to speak mando to do the task, so this is run if that's true.
 def reallocate_task_mandarin():
     return None
+
+
+def get_week_id(cur_date):
+    two_weeks_away = cur_date + dt.timedelta(weeks=2)
+    three_weeks_away = cur_date + dt.timedelta(weeks=3)
+    return 1
