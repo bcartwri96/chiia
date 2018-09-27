@@ -2,15 +2,15 @@
 
 <div class="container">
   <h4 class="display-4">Edit a Task</h4>
-    <body>
+    <body onload="dateformat()">
     <form action="{{ url_for('edit_task', id=t.id) }}" method="POST">
       <div class="form-group">
         <label for="exampleFormControlInput1">Nickname</label>
         {{ form.csrf_token }}
         {{ form.nickname(class_="form-control") }}
-        <label for="exampleFormControlInput1">Date Start</label>
+        <label for="datestart">Date Start</label><input id="datestart" type="text"/>
         {{ form.date_start(class="form-control") }}
-        <label for="exampleFormControlInput1">Date End</label>
+        <label for="dateend">Date End</label><input id="dateend" type="text"/>
         {{ form.date_end(class="form-control") }}
         <label for="exampleFormControlInput1">Who is assigned?</label>
         {{ form.who_assigned(class="form-control") }}
@@ -22,7 +22,6 @@
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
         {{ form.who_assigned_real() }}
 
-        
         {{ form.csrf_token }}
         {% if form.nickname.errors %}
           {{ form.nickname.errors[0] }}
@@ -110,4 +109,17 @@
         });
       })
     });
+    </script>
+
+    <script type="text/javascript">
+    $(function dateformat() {
+      var current_date = new date();
+      var y = 1900+date.getYear();
+      var m = "0"+(date.getMonth()+1);
+      var d = "0"+date.getDate();
+      return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length);
+    });
+
+      document.getElementById('datestart').value = dateformat();
+      document.getElementById('dateend').value = dateformat();
     </script>
