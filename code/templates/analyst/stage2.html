@@ -1,8 +1,67 @@
 {% include "header.html" %}
+<style>
+    .hidden{
+      display: none;
+    }
+    .hidden_counter{
+      display: none;
+    }
+    .hidden_cfr{
+      display: none;
+    }
+</style>
+
+<script type= "text/javascript">
+ function showHide(){
+    var checkbox = document.getElementById("idk");
+    var hiddeninputs = document.getElementsByClassName("hidden");
+
+    for (var i = 0; i != hiddeninputs.length; i++){
+        if(checkbox.checked){
+            hiddeninputs[i].style.display = "block";
+          }
+          else {
+            hiddeninputs[i].style.display = "none";
+
+          }
+        }
+ }
+
+ function showHide_counter(){
+    var checkbox = document.getElementById("idk1");
+    var hiddeninputs = document.getElementsByClassName("hidden_counter");
+
+    for (var i = 0; i != hiddeninputs.length; i++){
+        if(checkbox.checked){
+            hiddeninputs[i].style.display = "block";
+          }
+          else {
+            hiddeninputs[i].style.display = "none";
+
+          }
+        }
+ }
+
+ function showHide_cfr(){
+    var checkbox = document.getElementById("idk2");
+    var hiddeninputs = document.getElementsByClassName("hidden_cfr");
+
+    for (var i = 0; i != hiddeninputs.length; i++){
+        if(checkbox.checked){
+            hiddeninputs[i].style.display = "block";
+          }
+          else {
+            hiddeninputs[i].style.display = "none";
+
+          }
+        }
+ }
+ </script>
+
 <div class="container">
   <h4 class="display-4">Stage2</h4>
     <body>
-    <form action="{{ url_for('stage2') }}" method="POST">
+    <form action="{{ url_for('stage2', s_id =t.s_id) }}" method="POST">
       <div class="form-group">
         <label for="exampleFormControlInput1">S2 reviews </label>
         {{ form.csrf_token }}
@@ -13,11 +72,52 @@
         {{ form.chin_inv_file_no(class="form-control") }}
         <label for="exampleFormControlInput1">Counterpart investor file no.</label>
         {{ form.counterpart_file_no(class="form-control") }}
-        
+        <br>
+        <input  type="checkbox" name="correspondence_req" id = "idk" onclick = "showHide()" />
+          <label class="exampleFormControlInput1">
+          Correspondence  Required
+        </label>
+        <br>
+        <input  type="checkbox" name="Counterpart_req" id = "idk1" onclick = "showHide_counter()" />
+          <label class="exampleFormControlInput1">
+          	New Counterpart investor file required
+        </label>
+        <br>
+        <input  type="checkbox" name="Chinese_file_req" id = "idk2" onclick = "showHide_cfr()" />
+          <label class="exampleFormControlInput1">
+          	New Chinese  investor file required
+        </label>
+          </div>
+        <div class="hidden">
+        <br>
+        <label for="exampleFormControlInput1"  >type correspondence.</label>
+        {{ form.type_correspondence(class="form-control") }}
+        <label for="exampleFormControlInput1">Info Needed From Correspondence</label>
+        {{ form.info_from_correspondence(class="form-control") }}
+        <label for="exampleFormControlInput1">Info Already Found</label>
+        {{ form.info_already_found(class="form-control") }}
+            <br>
+          </div>
+          <div class="hidden_counter">
+          <br>
+          <label for="exampleFormControlInput1"  >type correspondence.</label>
+          {{ form.type_correspondence(class="form-control") }}
+          <label for="exampleFormControlInput1">Info Needed From Correspondence</label>
+          {{ form.info_from_correspondence(class="form-control") }}
+              <br>
+            </div>
+            <div class="hidden_cfr">
+              <br>
+              <label for="exampleFormControlInput1"  >type correspondence.</label>
+              {{ form.type_correspondence(class="form-control") }}
+              <label for="exampleFormControlInput1">Info Needed From Correspondence</label>
+              {{ form.info_from_correspondence(class="form-control") }}
+              <label for="exampleFormControlInput1">Info Already Found</label>
+              {{ form.info_already_found(class="form-control") }}
+                  <br>
+              </div>
 
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
 
-
-      </div>
     </form>
     </body>

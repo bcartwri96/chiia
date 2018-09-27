@@ -136,10 +136,10 @@ def create_transaction():
 def stage1(id):
     return con.stage1(id)
 
-@app.route('/stage2', methods=['GET', 'POST'])
+@app.route('/stage2/<int:s_id>', methods=['GET', 'POST'])
 @flog.login_required
-def stage2():
-    return con.stage2()
+def stage2(s_id):
+    return con.stage2(s_id)
 
 @app.route('/stage3', methods=['GET', 'POST'])
 @flog.login_required

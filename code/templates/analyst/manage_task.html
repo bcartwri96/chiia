@@ -22,7 +22,7 @@
           {% if t.stage == 1 %}
             <td scope="row"><a role="button" href="{{ url_for('stage1', id=t.id) }}">Edit</a></td>
           {% elif t.stage == 2 %}
-            <td scope="row"><a role="button" href="{{ url_for('stage2', id=t.id) }}">Edit</a></td>
+            <td scope="row"><a role="button" href="{{ url_for('stage2', s_id =t.id) }}">Edit</a></td>
           {% elif t.stage == 3 %}
             <td scope="row"><a role="button" href="{{ url_for('stage3', id=t.id) }}">Edit</a></td>
           {% elif t.stage == 4 %}

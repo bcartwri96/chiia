@@ -763,13 +763,14 @@ def stage1(id):
 
 
 
-def stage2():
+def stage2(s_id):
 # just defining get method as of now. Need to work on post and predefined columns
 #  after task assignment part is completed
 # Also need to add workflow option as soon as new user is defined
     form = fm.stage2(fl.request.form)
+    t_db = ml.Stage_2.query.get(s_id)
     if fl.request.method == 'GET':
-        return fl.render_template('analyst/stage2.html', form=form)
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db)
 
 
 def stage3():

@@ -81,6 +81,10 @@ class stage2(wtf.FlaskForm):
     S2_reviews = IntegerField('S2_reviews', validators=[DataRequired("This column cannot be empty")])
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
+    # Correspondence  workflow option
+    type_correspondence = StringField('type_correspondence', validators=[DataRequired()])
+    info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
+    info_already_found = StringField('info_already_found', validators=[DataRequired()])
 
 
 
