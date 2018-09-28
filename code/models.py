@@ -215,12 +215,14 @@ class Stage_2(Base_Stage_Task):
     # indicate whether Mandarin is required in the
     # next stage
     mandarin_req = sa.Column(sa.Boolean)
-    # if needs to be redone because of a langauge barrier
+    # if needs to be redone because of a langauge barrier (chinese speaker )
     redo_by_mandarin = sa.Column(sa.Boolean)
+    # if needs to be redone because of a langauge barrier (chinese speaker )
+    redo_by_non_mandarin = sa.Column(sa.Boolean)
     # IF they select that correspondence is required,
     # then we want to record the following:
     # TODO: add this to the options in the settings page
-    type_correspondence = sa.Column(sa.Integer)
+    type_correspondence = sa.Column(sa.String)
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
 

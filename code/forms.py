@@ -77,17 +77,28 @@ class stage1(wtf.FlaskForm):
 
 class stage2(wtf.FlaskForm):
 
-    S2_date = DateField('S2_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    S2_date = DateField('S2_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     S2_reviews = IntegerField('S2_reviews', validators=[DataRequired("This column cannot be empty")])
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
+
+    # chinese speaker required in next stage workflow option
+    mandarin_req  = BooleanField('mandarin_req')
+    # redo same stage with chinese speaker or without chinese speaker workflow option
+    redo_by_mandarin = BooleanField('redo_by_mandarin')
+    redo_by_non_mandarin = BooleanField('redo_by_non_mandarin')
     # Correspondence  workflow option
     type_correspondence = StringField('type_correspondence', validators=[DataRequired()])
     info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
     info_already_found = StringField('info_already_found', validators=[DataRequired()])
 
 
-
+    # IF they select a new file is created
+    pid = IntegerField('pid')
+    legal_name = StringField('legal_name')
+    linked_iid = IntegerField('linked_iid')
+    nickname_iid = StringField('nickname_iid')
+    file_checked_la  = BooleanField('file_checked_la')
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
     task_submitted = SubmitField('Submit the Task')
 
