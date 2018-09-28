@@ -115,12 +115,19 @@ class stage3(wtf.FlaskForm):
 
 class stage4(wtf.FlaskForm):
 
-    S4_date = DateField('S4_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    S4_date = DateField('S4_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     S4_reviews = IntegerField('S4_reviews', validators=[DataRequired("This column cannot be empty")])
 
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+
+    # IF they select a new file is created
+    pid = IntegerField('pid')
+    legal_name = StringField('legal_name')
+    linked_iid = IntegerField('linked_iid')
+    nickname_iid = StringField('nickname_iid')
+    file_checked_la  = BooleanField('file_checked_la')
     task_submitted = SubmitField('Submit the Task')
 
 class roster(wtf.FlaskForm):

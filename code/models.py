@@ -262,12 +262,12 @@ class Stage_3(Base_Stage_Task):
 class Stage_4(Base_Stage_Task):
     __tablename__ = 'stage_4'
 
-    reviews = sa.Column(sa.Integer, nullable=False)
-    date = sa.Column(sa.DateTime, nullable=False)
+    reviews = sa.Column(sa.Integer)
+    date = sa.Column(sa.DateTime)
     chin_inv_file_no = sa.Column(sa.Integer)
     counterpart_file_no = sa.Column(sa.Integer)
 
-    mandarin_req = sa.Column(sa.Boolean)
+    #mandarin_req = sa.Column(sa.Boolean)
 
     # IF they select a new file is created, then we need to
     # record the following:

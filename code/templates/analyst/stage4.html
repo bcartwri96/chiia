@@ -1,23 +1,108 @@
-{% include "header.html" %}
-<div class="container">
-  <h4 class="display-4">Stage4</h4>
-    <body>
-    <form action="{{ url_for('stage4') }}" method="POST">
-      <div class="form-group">
-        <label for="exampleFormControlInput1">S4 reviews </label>
-        {{ form.csrf_token }}
-        {{ form.S4_reviews(class_="form-control") }}
-        <label for="exampleFormControlInput1">S4 date</label>
-        {{ form.S4_date(class="form-control") }}
-        <label for="exampleFormControlInput1">Chinese investor file no.</label>
-        {{ form.chin_inv_file_no(class="form-control") }}
-        <label for="exampleFormControlInput1">Counterpart investor file no.</label>
-        {{ form.counterpart_file_no(class="form-control") }}
 
+    {% include "header.html" %}
+    <style>
 
-        {{ form.task_submitted(class_="btn btn-outline-primary") }}
+        .hidden_counter{
+          display: none;
+        }
+        .hidden_cfr{
+          display: none;
+        }
+    </style>
 
+    <script type= "text/javascript">
+     function showHide_counter(){
+        var checkbox = document.getElementById("idk1");
+        var hiddeninputs = document.getElementsByClassName("hidden_counter");
 
-      </div>
-    </form>
-    </body>
+        for (var i = 0; i != hiddeninputs.length; i++){
+            if(checkbox.checked){
+                hiddeninputs[i].style.display = "block";
+              }
+              else {
+                hiddeninputs[i].style.display = "none";
+              }
+            }
+     }
+     function showHide_cfr(){
+        var checkbox = document.getElementById("idk2");
+        var hiddeninputs = document.getElementsByClassName("hidden_cfr");
+
+        for (var i = 0; i != hiddeninputs.length; i++){
+            if(checkbox.checked){
+                hiddeninputs[i].style.display = "block";
+              }
+              else {
+                hiddeninputs[i].style.display = "none";
+
+              }
+            }
+     }
+     </script>
+    <div class="container">
+      <h4 class="display-4">Stage4</h4>
+        <body>
+        <form action="{{ url_for('stage4', s_id =t.s_id) }}" method="POST">
+          <div class="form-group">
+            <label for="exampleFormControlInput1">S4 reviews </label>
+            {{ form.csrf_token }}
+            {{ form.S4_reviews(class_="form-control") }}
+            <label for="exampleFormControlInput1">S4 date</label>
+            {{ form.S4_date(class="form-control") }}
+            <label for="exampleFormControlInput1">Chinese investor file no.</label>
+            {{ form.chin_inv_file_no(class="form-control") }}
+            <label for="exampleFormControlInput1">Counterpart investor file no.</label>
+            {{ form.counterpart_file_no(class="form-control") }}
+            <br>
+            <input  type="checkbox" name="Counterpart_req" id = "idk1" onclick = "showHide_counter()" />
+              <label class="exampleFormControlInput1">
+                New Counterpart investor file required
+            </label>
+            <br>
+            <input  type="checkbox" name="Chinese_file_req" id = "idk2" onclick = "showHide_cfr()" />
+              <label class="exampleFormControlInput1">
+                New Chinese  investor file required
+            </label>
+          </div>
+              <!-- New Counterpart investor file required  -->
+              <div class="hidden_counter">
+                <br>
+                <label for="exampleFormControlInput1"  >PID</label>
+                {{ form.pid(class="form-control") }}
+                <label for="exampleFormControlInput1">Operating legal entity name</label>
+                {{ form.legal_name(class="form-control") }}
+                <label for="exampleFormControlInput1">Related IID</label>
+                {{ form.linked_iid(class="form-control") }}
+                <label for="exampleFormControlInput1">Nickname of related IID</label>
+                {{ form.nickname_iid(class="form-control") }}
+                <br>
+              <input  type="checkbox" name="file_checked_la"  />
+                <label class="exampleFormControlInput1">
+                  Check status
+              </label>
+              <br>
+                </div>
+                <!-- New Chinese investor file required  -->
+                <div class="hidden_cfr">
+                  <br>
+                  <label for="exampleFormControlInput1"  >PID</label>
+                  {{ form.pid(class="form-control") }}
+                  <label for="exampleFormControlInput1">Operating legal entity name</label>
+                  {{ form.legal_name(class="form-control") }}
+                  <label for="exampleFormControlInput1">Related IID</label>
+                  {{ form.linked_iid(class="form-control") }}
+                  <label for="exampleFormControlInput1">Nickname of related IID</label>
+                  {{ form.nickname_iid(class="form-control") }}
+                  <br>
+                <input  type="checkbox" name="file_checked_la"  />
+                  <label class="exampleFormControlInput1">
+                    Check status
+                </label>
+                <br>
+
+                  </div>
+
+          {{ form.task_submitted(class_="btn btn-outline-primary") }}
+
+        </form>
+        </body>

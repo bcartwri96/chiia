@@ -850,12 +850,34 @@ def stage3():
         return fl.render_template('analyst/stage3.html', form=form)
 
 
-def stage4():
+def stage4(s_id):
 
     form = fm.stage4(fl.request.form)
-    if fl.request.method == 'GET':
+    t_db = ml.Stage_4.query.get(s_id)
+    import datetime as dt
 
-        return fl.render_template('analyst/stage4.html', form=form)
+    if fl.request.method == 'GET':
+        form.S4_date.data = dt.datetime.now()
+        if t_db.reviews:
+            form.S4_reviews.data = t_db.reviews + 1
+        else:
+            form.S4_reviews.data = 0
+        return fl.render_template('analyst/stage4.html', form=form, t=t_db)
+    else:
+        assigned_date = fl.request.form['S4_date']
+        no_of_reviews = fl.request.form['S4_reviews']
+        chin_inv_file_no = fl.request.form['chin_inv_file_no']
+        counterpart_file_no =  fl.request.form['counterpart_file_no']
+        t_db.reviews = no_of_reviews
+        t_db.date = assigned_date
+        t_db.chin_inv_file_no = chin_inv_file_no
+        t_db.counterpart_file_no = counterpart_file_no
+        db.db_session.add(t_db)
+        db.db_session.commit()
+        fl.flash("Updated stage4", "success")
+        return fl.render_template('analyst/stage4.html', form=form,t=t_db)
+
+
 
 def roster():
 #to store no of hours available per week for analyst
