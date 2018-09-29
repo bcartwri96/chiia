@@ -18,7 +18,10 @@
           <th scope="col">Time Created</th>
           <th scope="col"># with Access</th>
           <th scope="col">Edit?</th>
-          <th scope="col">Delete?</th>
+          {% if current_user.admin %}
+            <th scope="col">Schedule Manually?</th>
+            <th scope="col">Delete?</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -34,6 +37,8 @@
           <td>{{ access_id_num[set.id] }}</td>
           <td><a href="{{ url_for('edit_dataset', id=set.id) }}" type="button">Edit</a></td>
           {% if current_user.admin %}
+            <td><a href="{{ url_for('schedule_manual', id=set.id) }}">
+              <i class="material-icons" style="font-size: 18px">timer</i></a><td>
             <td><a onclick="checkDelete({{set.id}})" href="javascript:;" type="button">Delete</></td>
           {% endif %}
         </tr>
