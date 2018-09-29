@@ -769,8 +769,76 @@ def stage2(s_id):
 # Also need to add workflow option as soon as new user is defined
     form = fm.stage2(fl.request.form)
     t_db = ml.Stage_2.query.get(s_id)
+    import datetime as dt
+
     if fl.request.method == 'GET':
+        form.S2_date.data = dt.datetime.now()
+        if t_db.reviews:
+            form.S2_reviews.data = t_db.reviews + 1
+        else:
+            form.S2_reviews.data = 0
         return fl.render_template('analyst/stage2.html', form=form,t=t_db)
+    else:
+
+        mandarin_req = False
+        assigned_date = fl.request.form['S2_date']
+        no_of_reviews = fl.request.form['S2_reviews']
+        chin_inv_file_no = fl.request.form['chin_inv_file_no']
+        counterpart_file_no =  fl.request.form['counterpart_file_no']
+
+        # Correspondence  workflow option
+        type_correspondence =  fl.request.form['type_correspondence']
+        info_from_correspondence =  fl.request.form['info_from_correspondence']
+        info_already_found =  fl.request.form['info_already_found']
+
+
+
+        # Next Analyst should be chinese speaker
+        try:
+            mandarin_req = fl.request.form['mandarin_req']
+        except KeyError:
+            mandarin_req = None
+        if mandarin_req == 'on':
+            mandarin_req = True
+        else:
+            mandarin_req = False
+
+        #Redo this stage with chinese speaker
+
+        try:
+            redo_by_mandarin = fl.request.form['redo_by_mandarin']
+        except KeyError:
+            redo_by_mandarin = None
+        if redo_by_mandarin == 'on':
+            redo_by_mandarin = True
+        else:
+            redo_by_mandarin = False
+        #Redo this stage without chinese speaker
+
+        try:
+            redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
+        except KeyError:
+            redo_by_non_mandarin = None
+        if redo_by_non_mandarin == 'on':
+            redo_by_non_mandarin = True
+        else:
+            redo_by_non_mandarin = False
+
+        t_db.reviews = no_of_reviews
+        t_db.date_assigned = assigned_date
+        t_db.chin_inv_file_no = chin_inv_file_no
+        t_db.counterpart_file_no = counterpart_file_no
+        t_db.redo_by_mandarin = redo_by_mandarin
+        t_db.mandarin_req = mandarin_req
+        t_db.redo_by_non_mandarin = redo_by_non_mandarin
+        t_db.type_correspondence = type_correspondence
+        t_db.info_from_correspondence = info_from_correspondence
+        t_db.info_already_found = info_already_found
+        db.db_session.add(t_db)
+        db.db_session.commit()
+        fl.flash("Updated stage2", "success")
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db)
+
 
 
 def stage3():
@@ -782,12 +850,34 @@ def stage3():
         return fl.render_template('analyst/stage3.html', form=form)
 
 
-def stage4():
+def stage4(s_id):
 
     form = fm.stage4(fl.request.form)
-    if fl.request.method == 'GET':
+    t_db = ml.Stage_4.query.get(s_id)
+    import datetime as dt
 
-        return fl.render_template('analyst/stage4.html', form=form)
+    if fl.request.method == 'GET':
+        form.S4_date.data = dt.datetime.now()
+        if t_db.reviews:
+            form.S4_reviews.data = t_db.reviews + 1
+        else:
+            form.S4_reviews.data = 0
+        return fl.render_template('analyst/stage4.html', form=form, t=t_db)
+    else:
+        assigned_date = fl.request.form['S4_date']
+        no_of_reviews = fl.request.form['S4_reviews']
+        chin_inv_file_no = fl.request.form['chin_inv_file_no']
+        counterpart_file_no =  fl.request.form['counterpart_file_no']
+        t_db.reviews = no_of_reviews
+        t_db.date = assigned_date
+        t_db.chin_inv_file_no = chin_inv_file_no
+        t_db.counterpart_file_no = counterpart_file_no
+        db.db_session.add(t_db)
+        db.db_session.commit()
+        fl.flash("Updated stage4", "success")
+        return fl.render_template('analyst/stage4.html', form=form,t=t_db)
+
+
 
 def roster():
 #to store no of hours available per week for analyst
