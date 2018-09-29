@@ -914,7 +914,8 @@ def allocate_tasks_analysts(d_id):
     # 2. get the next two week roster array
     wk_id = get_week_id(cur_date) # gets the current week id
 
-    aa = ml.Roster.query.filter(sa.or_(ml.Roster.week_id == (wk_id+1), ml.Roster.week_id == (wk_id+2))).all()
+    aa = ml.Roster.query.filter(sa.or_(ml.Roster.week_id == (wk_id+1), \
+    ml.Roster.week_id == (wk_id+2))).all()
     # presumes that there should be one week which uniquely matches constraints
 
     # go through each user and allocate as many hours as they can take
@@ -922,7 +923,8 @@ def allocate_tasks_analysts(d_id):
     # get users who are avilable during this time
     users = []
     for entry in aa:
-        users.append([entry.user_id, entry.no_of_hours])
+        if not entry.already_allocated:
+            users.append([entry.user_id, entry.no_of_hours, entry.week_id])
 
     print(users)
     # now allocate as much work as we can for every user
@@ -937,7 +939,7 @@ def allocate_tasks_analysts(d_id):
             attc = u.avg_time_to_complete
             print("attc: "+str(attc))
             # get num hours available
-            num_hours = user[1]
+            num_hours = user[1] # no need to add in the hours
             print("num hours to complete: "+str(num_hours))
             while (num_hours >= attc) & tasks_remain:
                 # allocate the user their weekly amount of tasks
@@ -949,7 +951,13 @@ def allocate_tasks_analysts(d_id):
                 num_hours -= attc
                 if (current_task_ct >= len(tasks)):
                     tasks_remain = False
-
+            # allocation of user is done for this period
+            # to do so, fetch the right roster entry again...
+            u_adj = ml.Roster.query.filter(sa.and_(sa.and_(ml.Roster.user_id == u.id, \
+            ml.Roster.no_of_hours == user[1]), ml.Roster.week_id == user[2])).first()
+            print("user adjustment list: " + str(u_adj))
+            u_adj.already_allocated = True
+            db.db_session.add(u_adj)
     db.db_session.commit()
 
 # when moving from stage 1 to stage 2, we ask whether the next person

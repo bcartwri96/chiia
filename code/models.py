@@ -300,6 +300,8 @@ class Roster(db.Base):
     user_id = sa.Column(sa.Integer,nullable=False, primary_key=True)
     week_id = sa.Column(sa.Integer, nullable=False, primary_key=True)
     no_of_hours = sa.Column(sa.Integer, nullable=False)
+    already_allocated = sa.Column(sa.Boolean) #if true, then we've already
+    # allocated the users week to maximum hours (i.e so don't do that again!)
 
 class Calendar(db.Base):
     __tablename__ = 'calendar'
