@@ -991,6 +991,10 @@ def update_calendar():
         # dataset, frequency
 # output: modified database where each task is allocated to exactly 1 task
 def allocate_tasks_analysts(d_id):
+    if 'admin' not in fl.session:
+        fl.flash('This operation is restricted to lead analysts', 'error')
+        return fl.redirect(fl.url_for('index'))
+
     # get all the tasks related to this dataset
     tasks = ml.Tasks.query.filter(ml.Tasks.dataset_owner == d_id).all()
     # now get the dataset
@@ -1048,8 +1052,14 @@ def allocate_tasks_analysts(d_id):
             print("user adjustment list: " + str(u_adj))
             u_adj.already_allocated = True
             db.db_session.add(u_adj)
-    db.db_session.commit()
+    try:
+        db.db_session.commit()
+        fl.flash('Manually allocated for next two weeks', 'success')
+    except Exception as e:
+        fl.flash('Manual allocation failed with error: '+str(e), 'error')
+        db.db_session.flush()
 
+    return fl.redirect(fl.url_for('manage_datasets'))
 # when moving from stage 1 to stage 2, we ask whether the next person
 # needs to speak mando to do the task, so this is run if that's true.
 def reallocate_task_mandarin():

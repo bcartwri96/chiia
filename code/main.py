@@ -180,6 +180,10 @@ def search_username(query):
 def search_enddate(start_date):
     return con.search_enddate(start_date)
 
+@app.route('/schedule_manual/<int:id>', methods=['GET'])
+@flog.login_required
+def schedule_manual(id):
+    return con.allocate_tasks_analysts(id)
 
 # required for login manager
 # ===========================
