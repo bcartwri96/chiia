@@ -6,7 +6,6 @@ Django==2.0.4
 django-heroku==0.3.1
 docutils==0.14
 dominate==2.3.1
-enum34==1.1.6
 Flask==0.12.2
 Flask-Bootstrap==3.3.7.1
 Flask-Login==0.4.1
@@ -22,10 +21,12 @@ psycopg2==2.7.4
 psycopg2-binary==2.7.4
 pyasn1==0.4.2
 python-dateutil==2.7.3
+python-http-client==3.1.0
 pytz==2018.4
 PyYAML==3.12
 rsa==3.4.2
 s3transfer==0.1.13
+sendgrid==5.6.0
 six==1.11.0
 SQLAlchemy==1.2.6
 SQLAlchemy-Utils==0.33.2

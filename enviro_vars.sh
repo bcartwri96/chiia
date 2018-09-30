@@ -8,4 +8,5 @@ export POSTGRES_URL="127.0.0.1:5432"
 export POSTGRES_USER="postgres"
 export POSTGRES_PW="test1234"
 export POSTGRES_DB="chia-db"
+export SENDGRID_API_KEY='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'
 echo "Environment variables set."
