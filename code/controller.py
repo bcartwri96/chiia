@@ -9,6 +9,7 @@ from proj_types import State
 import flask_wtf as wtf
 import sqlalchemy as sa
 import json as js
+import send as s
 
 lm = flog.LoginManager() # initialise the login lib
 
@@ -1052,6 +1053,10 @@ def allocate_tasks_analysts(d_id):
             print("user adjustment list: " + str(u_adj))
             u_adj.already_allocated = True
             db.db_session.add(u_adj)
+            # send user an email
+            em = s.send_user(user[0], "CHIIA: New Task!", \
+            "Hi there "+u.fname+", \n You've been allocated a new task. \
+            Please check the website for details. Thanks!", False)
     try:
         db.db_session.commit()
         fl.flash('Manually allocated for next two weeks', 'success')

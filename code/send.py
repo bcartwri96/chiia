@@ -14,6 +14,22 @@ def basic(t, f):
     to_email = Email(t)
     return sg, from_email, to_email
 
+
+# send an email to a particular user programatically
+def send_user(u_id, subj, content, html):
+    u = ml.User.query.get(u_id)
+    sg, f, t = basic(str(u.email), "test@example.com")
+    content = Content("text/plain", content)
+    mail = Mail(f, subj, t, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+
+    return response.status_code
+
+
+# ==========================
+# testing functionality
+# ==========================
+
 def send_test():
     # using SendGrid's Python Library
     # https://github.com/sendgrid/sendgrid-python
@@ -28,13 +44,3 @@ def send_test():
     print(response.status_code)
     print(response.body)
     print(response.headers)
-
-
-def send_user(u_id, subj, content, html):
-    u = ml.User.query.get(u_id)
-    sg, f, t = basic(str(u.email), "test@example.com")
-    content = Content("text/plain", content)
-    mail = Mail(f, subj, t, content)
-    response = sg.client.mail.send.post(request_body=mail.get())
-
-    return response.status_code
