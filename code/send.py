@@ -3,21 +3,21 @@
 
 # import libs
 
-""" import sendgrid
+import sendgrid
 import models as ml
 import os
 from sendgrid.helpers.mail import *
-its not letting me push becasue of this
+
 # define basic functionality for all emails
 def basic(t, f):
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
     from_email = Email(f)
     to_email = Email(t)
     return sg, from_email, to_email
-"""
+
 
 # send an email to a particular user programatically
-"""def send_user(u_id, subj, content, html):
+def send_user(u_id, subj, content, html):
     u = ml.User.query.get(u_id)
     sg, f, t = basic(str(u.email), "test@example.com")
     content = Content("text/plain", content)
@@ -25,17 +25,17 @@ def basic(t, f):
     response = sg.client.mail.send.post(request_body=mail.get())
 
     return response.status_code
-"""
+
 
 # ==========================
 # testing functionality
 # ==========================
-"""
+
 def send_test():
     # using SendGrid's Python Library
     # https://github.com/sendgrid/sendgrid-python
 
-    'sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
     from_email = Email("test@example.com")
     to_email = Email("test@example.com")
     subject = "Sending with SendGrid is Fun"
@@ -45,4 +45,3 @@ def send_test():
     print(response.status_code)
     print(response.body)
     print(response.headers)
-"""
