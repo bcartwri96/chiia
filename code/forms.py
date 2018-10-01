@@ -88,7 +88,7 @@ class stage2(wtf.FlaskForm):
     redo_by_mandarin = BooleanField('redo_by_mandarin')
     redo_by_non_mandarin = BooleanField('redo_by_non_mandarin')
     # Correspondence  workflow option
-    type_correspondence = StringField('type_correspondence', validators=[DataRequired()])
+    type_correspondence = IntegerField('type_correspondence', validators=[DataRequired()])
     info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
     info_already_found = StringField('info_already_found', validators=[DataRequired()])
 
@@ -113,7 +113,7 @@ class stage3(wtf.FlaskForm):
     redo_by_mandarin = BooleanField('redo_by_mandarin')
     redo_by_non_mandarin = BooleanField('redo_by_non_mandarin')
     # Correspondence  workflow option
-    type_correspondence = StringField('type_correspondence', validators=[DataRequired()])
+    type_correspondence = IntegerField('type_correspondence', validators=[DataRequired()])
     info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
     info_already_found = StringField('info_already_found', validators=[DataRequired()])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])

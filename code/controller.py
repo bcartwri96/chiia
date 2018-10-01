@@ -920,7 +920,27 @@ def stage3(s_id):
         t_db.type_correspondence = type_correspondence
         t_db.info_from_correspondence = info_from_correspondence
         t_db.info_already_found = info_already_found
+
+        # create complimentry stage2
+        # get current max id
+        s4_max = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
+        if s4_max:
+            s4_max+=1
+        else:
+            s4_max=1
+
+        s4 = ml.Stage_4(s_id=s4_max, entity_name="")
+        # NOTE: Need to check whether entity name is required in stage 4
+        db.db_session.add(s4)
+
+        s = ml.Stage_Rels.query.filter_by(stage_3_id=s_id ).first()
+
+        # now join it to the sr table with the new trans
+        sr = ml.Stage_Rels.query.get(s.trans_id)
+        sr.stage_4_id = s4_max
+
         db.db_session.add(t_db)
+        db.db_session.add(sr)
         db.db_session.commit()
         fl.flash("Updated stage3", "success")
         return fl.render_template('analyst/stage3.html', form=form,t=t_db)
