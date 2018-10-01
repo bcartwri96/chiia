@@ -786,7 +786,18 @@ def stage2(s_id):
         counterpart_file_no =  fl.request.form['counterpart_file_no']
 
         # Correspondence  workflow option
-        type_correspondence =  fl.request.form['type_correspondence']
+        try:
+            type_correspondence = fl.request.form['type_correspondence']
+        except KeyError:
+            type_correspondence = None
+        if type_correspondence == '1':
+            type_correspondence = 'Primary Source'
+        elif type_correspondence == '2':
+            type_correspondence = 'ASIC Report'
+        elif type_correspondence == '3':
+            type_correspondence = 'Property Record'
+        else:
+            type_correspondence = ''
         info_from_correspondence =  fl.request.form['info_from_correspondence']
         info_already_found =  fl.request.form['info_already_found']
 
@@ -856,7 +867,18 @@ def stage3(s_id):
         assigned_date = fl.request.form['S3_date']
         no_of_reviews = fl.request.form['S3_reviews']
         # Correspondence  workflow option
-        type_correspondence =  fl.request.form['type_correspondence']
+        try:
+            type_correspondence = fl.request.form['type_correspondence']
+        except KeyError:
+            type_correspondence = None
+        if type_correspondence == '1':
+            type_correspondence = 'Primary Source'
+        elif type_correspondence == '2':
+            type_correspondence = 'ASIC Report'
+        elif type_correspondence == '3':
+            type_correspondence = 'Property Record'
+        else:
+            type_correspondence = ''
         info_from_correspondence =  fl.request.form['info_from_correspondence']
         info_already_found =  fl.request.form['info_already_found']
         # Next Analyst should be chinese speaker

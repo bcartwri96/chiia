@@ -256,7 +256,7 @@ class Stage_3(Base_Stage_Task):
     # IF they select that correspondence is required,
     # then we want to record the following:
     # TODO: add this to the options in the settings page
-    type_correspondence = sa.Column(sa.Integer)
+    type_correspondence = sa.Column(sa.String)
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
 
