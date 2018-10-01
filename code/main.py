@@ -141,10 +141,10 @@ def stage1(id):
 def stage2(s_id):
     return con.stage2(s_id)
 
-@app.route('/stage3', methods=['GET', 'POST'])
+@app.route('/stage3/<int:s_id>', methods=['GET', 'POST'])
 @flog.login_required
-def stage3():
-    return con.stage3()
+def stage3(s_id):
+    return con.stage3(s_id)
 
 @app.route('/stage4/<int:s_id>', methods=['GET', 'POST'])
 @flog.login_required
