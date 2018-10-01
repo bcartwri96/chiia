@@ -239,8 +239,8 @@ class Stage_2(Base_Stage_Task):
 class Stage_3(Base_Stage_Task):
     __tablename__ = 'stage_3'
 
-    reviews = sa.Column(sa.Integer,nullable=False)
-    date_assigned = sa.Column(sa.Integer, nullable=False)
+    reviews = sa.Column(sa.Integer)
+    date_assigned = sa.Column(sa.DateTime)
     #type_search = sa.Column(sa.Integer, nullable=False)   # Not required
     dataset_type = sa.Column(sa.String) # Only one of two values  main or supplementary
 
@@ -249,7 +249,10 @@ class Stage_3(Base_Stage_Task):
     # indicate whether Mandarin is required in the
     # next stage
     mandarin_req = sa.Column(sa.Boolean)
-
+    # if needs to be redone because of a langauge barrier (chinese speaker )
+    redo_by_mandarin = sa.Column(sa.Boolean)
+    # if needs to be redone because of a langauge barrier (chinese speaker )
+    redo_by_non_mandarin = sa.Column(sa.Boolean)
     # IF they select that correspondence is required,
     # then we want to record the following:
     # TODO: add this to the options in the settings page

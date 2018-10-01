@@ -104,11 +104,18 @@ class stage2(wtf.FlaskForm):
 
 class stage3(wtf.FlaskForm):
 
-    S3_date = DateField('S3_date', format='%Y', validators=[DataRequired("This date cannot be empty")])
+    S3_date = DateField('S3_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     S3_reviews = IntegerField('S3_reviews', validators=[DataRequired("This column cannot be empty")])
     dataset_type = StringField('dataset_type', validators=[DataRequired("Please select dataset type")])
-    correspondence_info=StringField('correspondence_info', validators=[DataRequired("Please Enter the Information from correspondence ")])
-    correspondence_done=StringField('correspondence_done', validators=[DataRequired("Please enter whats been done to acquire this information ")])
+    # chinese speaker required in next stage workflow option
+    mandarin_req  = BooleanField('mandarin_req')
+    # redo same stage with chinese speaker or without chinese speaker workflow option
+    redo_by_mandarin = BooleanField('redo_by_mandarin')
+    redo_by_non_mandarin = BooleanField('redo_by_non_mandarin')
+    # Correspondence  workflow option
+    type_correspondence = StringField('type_correspondence', validators=[DataRequired()])
+    info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
+    info_already_found = StringField('info_already_found', validators=[DataRequired()])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
     task_submitted = SubmitField('Submit the Task')
 

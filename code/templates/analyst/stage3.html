@@ -66,46 +66,38 @@
             Redo this stage and assign to a non-Chinese speaker
         </label>
         <br>
-        <input  type="checkbox" name="correspondence_req" id="idk" onclick="showHide()" />
-        <label class="exampleFormControlInput1">Correspondence required</label>
+        <input  type="checkbox" name="correspondence_req" id = "idk" onclick = "showHide()" />
+          <label class="exampleFormControlInput1">
+          Correspondence  Required
+        </label>
         <div class="hidden">
         <br>
         <label for="exampleFormControlInput1">Select Type of correspondence</label>
         <div class="row">
           <div class="col">
-            <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 5px;" value="1" checked>
+            <input class="form-check-input" type="radio" name="type_correspondence" style="margin-left: 5px;" value="1" checked>
               <label class="form-check-label" style="padding-left: 25px;">
                 Primary Source
               </label>
-            <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 30px;" value="2">
+            <input class="form-check-input" type="radio" name="type_correspondence" style="margin-left: 30px;" value="2">
               <label class="form-check-label" style="padding-left: 50px;">
                 ASIC Report
               </label>
-              <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 30px;" value="2">
+              <input class="form-check-input" type="radio" name="type_correspondence" style="margin-left: 30px;" value="3">
                 <label class="form-check-label" style="padding-left: 50px;">
                   Property Record
                 </label>
                 <br>
                 <label for="exampleFormControlInput1">What information do we need from correspondence?</label>
-                  {{ form.correspondence_info(class_="form-control") }} <br>
+                  {{ form.info_from_correspondence(class_="form-control") }} <br>
                 <label for="exampleFormControlInput1">What have you done already to find this information?</label>
-                  {{ form.correspondence_done(class_="form-control") }}<br>
+                  {{ form.info_already_found(class_="form-control") }}<br>
           </div>
           <br />
         </div>
       </div>
       <br />
-      <script>
-      $('input[type="checkbox"]').on('change', function() {
-    $('input[name="' + this.name + '"]').not(this).prop('checked', false);
-});
-</script>
-
 </form>
 <br />
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
-
-
-
-
     </body>
