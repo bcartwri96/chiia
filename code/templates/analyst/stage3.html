@@ -36,17 +36,16 @@
         </style>
 
         <input  type="checkbox" name="correspondence_req" id="idk" onclick="showHide()" />
+
         <label class="exampleFormControlInput1">Correspondence required</label>
         <div class="hidden">
-        <br>
-        <h5>
-        <label>Correspondence required</label>
-      </h5>
         <br>
         <div class="form-group">
         <label for="exampleFormControlInput1">Select Type of correspondence</label>
         <div class="row">
           <div class="col">
+
+
             <input class="form-check-input" type="radio" name="correspondence_type" style="margin-left: 5px;" value="1" checked>
               <label class="form-check-label" style="padding-left: 25px;">
                 Primary Source
@@ -92,32 +91,26 @@
 
       <div class="row">
         <div class="col">
-          <input class="form-check-input" type="radio" name="next_analyst_lang" style="margin-left: 5px;" value="1" checked>
-            <label class="form-check-label" style="padding-left: 25px;">
-              NEXT analyst MUST be a Chinese Speaker
-            </label>
-          <input class="form-check-input" type="radio" name="next_analyst_lang" style="margin-left: 30px;" value="2">
-            <label class="form-check-label" style="padding-left: 50px;">
-              NEXT analyst MUST-NOT be a Chinese Speaker
-            </label>
+          <input type="checkbox" name="next_analyst_lang" value="yes">  NEXT analyst MUST be a Chinese Speaker<br>
+          <input type="checkbox" name="next_analyst_lang" value="no" > NEXT analyst MUST-NOT be a Chinese Speaker <br>
+
         </div>
       </div>
       <br />
 
       <div class="row">
         <div class="col">
-          <input class="form-check-input" type="radio" name="redo_analyst_lang" style="margin-left: 5px;" value="1">
-            <label class="form-check-label" style="padding-left: 25px;">
-            REDO stage with Chinese speaker
-            </label>
-            <br />
-          <input class="form-check-input" type="radio" name="redo_analyst_lang" style="margin-left: 5px;" value="2">
-            <label class="form-check-label" style="padding-left: 25px;">
-            REDO stage with NON-Chinese speaker
-            </label>
-            <br />
+          <input type="checkbox" name="redo_analyst_lang" value="yes"> REDO stage with Chinese speaker<br>
+          <input type="checkbox" name="redo_analyst_lang" value="no" > REDO stage with NON-Chinese speaker <br>
+          
         </div>
       </div>
+      <script>
+      $('input[type="checkbox"]').on('change', function() {
+    $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+});
+</script>
+
 </form>
 <br />
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
