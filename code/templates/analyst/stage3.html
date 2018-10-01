@@ -1,6 +1,7 @@
 {% include "header.html" %}
 <div class="container">
   <h4 class="display-4">Stage3</h4>
+  <br />
     <body>
     <form action="{{ url_for('stage3') }}" method="POST">
       <div class="form-group">
@@ -9,6 +10,7 @@
         {{ form.S3_reviews(class_="form-control") }}
         <label for="exampleFormControlInput1">S3 date</label>
         {{ form.S3_date(class="form-control") }}
+        <br />
         <div class="row">
           <div class="col">
             <input class="form-check-input" type="radio" name="dataset_type" style="margin-left: 5px;" value="1" checked>
@@ -21,7 +23,7 @@
               </label>
           </div>
         </div>
-
+        <br />
 
 
         <style>
@@ -64,7 +66,7 @@
                   {{ form.correspondence_done(class_="form-control") }}<br>
 
           </div>
-
+          <br />
 
           <script type= "text/javascript">
            function showHide(){
@@ -86,6 +88,7 @@
 
       </div>
       </div>
+      <br />
 
       <div class="row">
         <div class="col">
@@ -99,6 +102,7 @@
             </label>
         </div>
       </div>
+      <br />
 
       <div class="row">
         <div class="col">
@@ -106,14 +110,16 @@
             <label class="form-check-label" style="padding-left: 25px;">
             REDO stage with Chinese speaker
             </label>
-          <input class="form-check-input" type="radio" name="redo_analyst_lang" style="margin-left: 30px;" value="2">
-            <label class="form-check-label" style="padding-left: 50px;">
-                REDO stage with NON-Chinese speaker
+            <br />
+          <input class="form-check-input" type="radio" name="redo_analyst_lang" style="margin-left: 5px;" value="2">
+            <label class="form-check-label" style="padding-left: 25px;">
+            REDO stage with NON-Chinese speaker
             </label>
+            <br />
         </div>
       </div>
 </form>
-
+<br />
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
 
 
