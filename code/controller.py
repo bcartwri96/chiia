@@ -579,7 +579,7 @@ def manage_tasks():
 
             # get recent, too
             d = dt.datetime.now() - dt.timedelta(days=1)
-            rec = ml.Tasks.query.filter(ml.Tasks.date_modified >= d).limit(50).all()
+            rec = ml.Tasks.query.filter(ml.Tasks.date_modified >= d).order_by(sa.desc(ml.Tasks.date_modified)).limit(15).all()
             rec_weeks = weekCalc(rec)
 
             return fl.render_template('leadanalyst/task/manage.html',
@@ -711,8 +711,9 @@ def stage1(id):
                 trans.who_assigned = 2
 
                 trans.state = 2
-                
+
                 t_db.state = State.Pending
+                t_db.date_modified = dt.datetime.now()
                 # NOTE: include here the code to send the email to
                 # the analyst
 
