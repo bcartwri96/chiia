@@ -4,7 +4,6 @@ import models as ml
 import flask_login as flog
 import datetime as dt
 from passlib.hash import sha512_crypt
-import forms as fm
 from proj_types import State
 import flask_wtf as wtf
 import sqlalchemy as sa
@@ -246,6 +245,7 @@ def manage_profile():
 
 # serve a form and then if it's a POST request we validate and submit
 def settings():
+    import forms as fm
     form = fm.Settings_Search(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('settings.html', form=form)
@@ -293,6 +293,7 @@ def manage_datasets():
 # ds creation.
 def create_dataset(**kwargs):
     from sqlalchemy import func, asc
+    import forms as fm
     form = fm.Create_Dataset(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('leadanalyst/dataset/create.html', form=form)
@@ -378,6 +379,7 @@ def get_time_list(initial, end, interval):
 
 
 def edit_dataset(id):
+    import forms as fm
     form = fm.Edit_Dataset(fl.request.form)
     if fl.request.method == 'GET':
         ds = ml.Dataset.query.get(id)
@@ -421,6 +423,7 @@ def edit_dataset(id):
 def edit_task(id):
     """take a task id and allow the user to edit who all the properties of
     a task."""
+    import forms as fm
     form = fm.Edit_Task(fl.request.form)
     new_transaction = fm.Create_Transaction(fl.request.form)
     t_db = ml.Tasks.query.get(id)
@@ -618,6 +621,7 @@ def edit_transaction(id):
         fl.abort(404)
 
 def create_transaction():
+    import forms as fm
     # get the current user's id and then submit that
     form = fm.Create_Transaction(fl.request.form)
     if fl.request.method == 'GET':
@@ -628,6 +632,7 @@ def create_transaction():
         pass
 
 def stage1(id):
+    import forms as fm
     # just defining get method as of now. Need to work on post and predefined columns
     #  after task assignment part is completed
     # Also need to add add_transaction part here
@@ -677,7 +682,7 @@ def stage1(id):
                 db.db_session.commit()
                 fl.flash("Updated task", "success")
             except sa.exc.InvalidRequestError():
-                fl.flash("Failed to update task", "failed")
+                fl.flash("Failed to update task", "error")
 
         elif new_transaction.validate_on_submit() and \
         new_transaction.trans_submitted.data:
@@ -705,7 +710,11 @@ def stage1(id):
                 # need to check for this
                 trans.who_assigned = 2
 
-                trans.state = 1
+                trans.state = 2
+                
+                t_db.state = State.Pending
+                # NOTE: include here the code to send the email to
+                # the analyst
 
                 # update relations
                 # create a stage_rel mapping between the trans and the task
@@ -721,6 +730,7 @@ def stage1(id):
                 fl.flash("date adjusted to "+str(dt.datetime.now()), 'success')
 
                 db.db_session.add(trans)
+                db.db_session.add(t_db)
                 db.db_session.commit()
                 # new transaction means add 1 to the no_progressed to stg2 var in
                 # tasks
@@ -752,7 +762,7 @@ def stage1(id):
                     db.db_session.commit()
                     fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
                 except sa.exc.InvalidRequestError:
-                    fl.flash("Failed to create transaction", "failed")
+                    fl.flash("Failed to create transaction", "error")
 
         else:
             fl.flash("Failed to update", "error")
@@ -765,9 +775,10 @@ def stage1(id):
 
 
 def stage2(s_id):
-# just defining get method as of now. Need to work on post and predefined columns
-#  after task assignment part is completed
-# Also need to add workflow option as soon as new user is defined
+    import forms as fm
+    # just defining get method as of now. Need to work on post and predefined columns
+    #  after task assignment part is completed
+    # Also need to add workflow option as soon as new user is defined
     form = fm.stage2(fl.request.form)
     t_db = ml.Stage_2.query.get(s_id)
     import datetime as dt
@@ -852,7 +863,7 @@ def stage2(s_id):
 
 
 def stage3(s_id):
-
+    import forms as fm
     form = fm.stage3(fl.request.form)
     t_db = ml.Stage_3.query.get(s_id)
     import datetime as dt
@@ -947,7 +958,7 @@ def stage3(s_id):
 
 
 def stage4(s_id):
-
+    import forms as fm
     form = fm.stage4(fl.request.form)
     t_db = ml.Stage_4.query.get(s_id)
     import datetime as dt
@@ -976,7 +987,8 @@ def stage4(s_id):
 
 
 def roster():
-#to store no of hours available per week for analyst
+    import forms as fm
+    #to store no of hours available per week for analyst
     form = fm.roster(fl.request.form)
     from datetime import datetime, timedelta
     today = datetime.now().date()
@@ -1077,7 +1089,6 @@ def update_calendar():
             cal = ml.Calendar(start_date=start_date, end_date=end_date, id=id)
             db.db_session.add(cal)
     db.db_session.commit()
-    pass
 
 # ================
 # allocation logic
@@ -1167,6 +1178,10 @@ def reallocate_task_mandarin():
 
 
 def get_week_id(cur_date):
-    two_weeks_away = cur_date + dt.timedelta(weeks=2)
-    three_weeks_away = cur_date + dt.timedelta(weeks=3)
-    return 1
+    from datetime import datetime, timedelta
+    from dateutil.relativedelta import relativedelta
+
+    cur = cur_date.date()
+    weekNumber = cur.isocalendar()[1]
+    y = cur.year
+    return int(str(y) + str(weekNumber))

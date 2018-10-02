@@ -36,6 +36,10 @@ def resetdb():
     create_tables()
 
 def create_tables():
+    from controller import update_calendar, get_week_id
+    from datetime import datetime as dt
+    from datetime import timedelta as timed
+
     """Works the models into the db in using the ORM"""
     print('Creating tables.')
     # import the models used to describe the tables we're creating (using the
@@ -66,6 +70,22 @@ def create_tables():
     week.days_in_freq = 7
     db_session.add(week)
     print("Adding weekly frequency")
+
+    db_session.commit()
+
+    # roster and calendar setup
+    update_calendar()
+
+    # add user 2 as rostered user
+    ds = dt.now()
+    next_week = ds+timed(weeks=1)
+    two_weeks = ds+timed(weeks=2)
+
+    # add to the roster with 10 hours each week
+    u2 = models.Roster(user_id=2, week_id=get_week_id(next_week), no_of_hours=10)
+    u2_2 = models.Roster(user_id=2, week_id=get_week_id(two_weeks), no_of_hours=10)
+    db_session.add(u2)
+    db_session.add(u2_2)
 
     db_session.commit()
 
