@@ -8,7 +8,7 @@
     <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col">Name</th>
+        <!-- <th scope="col">Name</th> -->
         <th scope="col">Stage</th>
         <th scope="col">Edit</th>
       </tr>
@@ -17,17 +17,37 @@
       {% for t in tasks %}
         <tr>
           <th scope="row">{{ t.id }}</th>
-          <td scope="row">{{ t.nickname }}</td>
-          <td scope="row">{{ t.stage }}</td>
-          {% if t.stage == 1 %}
-            <td scope="row"><a role="button" href="{{ url_for('stage1', id=t.id) }}">Edit</a></td>
-          {% elif t.stage == 2 %}
-            <td scope="row"><a role="button" href="{{ url_for('stage2', s_id =t.id) }}">Edit</a></td>
-          {% elif t.stage == 3 %}
-            <td scope="row"><a role="button" href="{{ url_for('stage3', s_id =t.id) }}">Edit</a></td>
-          {% elif t.stage == 4 %}
-            <td scope="row"><a role="button" href="{{ url_for('stage4', s_id =t.id) }}">Edit</a></td>
-          {% endif %}
+          <!-- <td scope="row">{{ t.nickname }}</td> -->
+          <td scope="row">1</td>
+          <td scope="row"><a role="button" href="{{ url_for('stage1', id=t.id) }}">Edit</a></td>
+
+        </tr>
+      {% endfor %}
+      {% for s2 in stage2 %}
+        <tr>
+          <th scope="row">{{ s2.s_id }}</th>
+
+          <td scope="row">2</td>
+          <td scope="row"><a role="button" href="{{ url_for('stage2', s_id=s2.s_id) }}">Edit</a></td>
+
+        </tr>
+      {% endfor %}
+      {% for s3 in stage3 %}
+        <tr>
+          <th scope="row">{{ s3.s_id }}</th>
+
+          <td scope="row">3</td>
+          <td scope="row"><a role="button" href="{{ url_for('stage3', s_id=s3.s_id) }}">Edit</a></td>
+
+        </tr>
+      {% endfor %}
+      {% for s4 in stage4 %}
+        <tr>
+          <th scope="row">{{ s4.s_id }}</th>
+
+          <td scope="row">4</td>
+          <td scope="row"><a role="button" href="{{ url_for('stage4', s_id=s4.s_id) }}">Edit</a></td>
+
         </tr>
       {% endfor %}
     </tbody>
