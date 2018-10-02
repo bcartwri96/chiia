@@ -123,17 +123,11 @@ class Tasks(db.Base):
     total_no_of_result = sa.Column(sa.Integer)
     no_of_result_to_s2 = sa.Column(sa.Integer)
 
-
     search_term = sa.Column(sa.String)
-
-    # describes the current state with reference
-    # to the transaction id
-    stage = sa.Column(sa.Integer, nullable=False)
 
     who_assigned = sa.Column(sa.Integer, nullable=False)
 
     trans = sao.relationship("Transactions", backref="Tasks", cascade="all, delete-orphan")
-    state = sa.Column(sa.Enum(State), nullable=False)
 
     # How will state work? It can be three possible points: Pending, Accept,
     # Rejected and Working. It describes the relationship between the LA and the analyst.
@@ -167,9 +161,7 @@ class Base_Stage_Task(db.Base):
 
     # unique identifier for each stage
     s_id = sa.Column(sa.Integer, primary_key=True)
-    # speaking of the transaction id, we need to know exactly
-    # what the transaction is which we're referring to
-    entity_name = sa.Column(sa.String, nullable=False)
+
     who_assigned = sa.Column(sa.Integer)
 
 # transactions (stage 1)
@@ -178,6 +170,10 @@ class Base_Stage_Task(db.Base):
 class Transactions(Base_Stage_Task):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing' : True}
+
+    # speaking of the transaction id, we need to know exactly
+    # what the transaction is which we're referring to
+    entity_name = sa.Column(sa.String)
 
     amount = sa.Column(sa.Float)
     who_previous_stages = sa.Column(sa.PickleType)
@@ -192,6 +188,10 @@ class Transactions(Base_Stage_Task):
     annoucement_date = sa.Column(sa.DateTime)
     rumour_date = sa.Column(sa.DateTime)
     mandarin = sa.Column(sa.Boolean)
+
+    # ==============================
+    # ======== admin area ==========
+    # ==============================
 
     # this is the state of each of the transactions.
     # can be done, need a redo or archived.
@@ -235,6 +235,9 @@ class Stage_2(Base_Stage_Task):
     file_checked_la = sa.Column(sa.Boolean)
 
     stage_2_id = sao.relationship("Stage_Rels")
+
+    state = sa.Column(sa.Enum(State))
+
 
 class Stage_3(Base_Stage_Task):
     __tablename__ = 'stage_3'
@@ -281,6 +284,8 @@ class Stage_4(Base_Stage_Task):
     file_checked_la = sa.Column(sa.Boolean)
 
     stage_4_id = sao.relationship("Stage_Rels")
+
+    state = sa.Column(sa.Enum(State))
 
 # Establish a table to store the relationships
 # between each of the different stages so we can see

@@ -332,10 +332,8 @@ def create_dataset(**kwargs):
                 t_cur.date_start = start[i]
                 t_cur.date_end = end[i]
                 t_cur.who_assigned = int(user)
-                t_cur.stage = 1
                 t_cur.num_inv_found = 0
                 t_cur.num_inv_progressing = 0
-                t_cur.state = State.Working
                 t_cur.date_modified = dt.datetime.now()
                 db.db_session.add(t_cur)
 
@@ -490,7 +488,6 @@ def edit_task(id):
                 trans.entity_name = t_name
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
-                trans.state = 1
 
                 # update relations
                 # create a stage_rel mapping between the trans and the task
@@ -707,13 +704,6 @@ def stage1(id):
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
 
-                # need to check for this
-                trans.who_assigned = 2
-
-                trans.state = 2
-
-                t_db.state = State.Pending
-                t_db.date_modified = dt.datetime.now()
                 # NOTE: include here the code to send the email to
                 # the analyst
 
@@ -748,9 +738,13 @@ def stage1(id):
                 else:
                     s2_max=1
 
-                s2 = ml.Stage_2(s_id=s2_max, entity_name="")
+                s2 = ml.Stage_2(s_id=s2_max)
                 # NOTE: entity name is not nullable but we fill it on the stage2
                 # page, not this one.
+
+                # NOTE: check here for whether the analyst says we need a
+                # mandarin reader to do this and then allocate to the next
+                # available, else we just reallocate to same user
                 db.db_session.add(s2)
 
                 # now join it to the sr table with the new trans
@@ -1147,6 +1141,13 @@ def allocate_tasks_analysts(d_id):
                 # allocate the user their weekly amount of tasks
                 # their number of hours available - task attc for every one
                 tasks[current_task_ct].who_assigned = u.id
+                # get the current task's transactions number
+                num_trans = len(tasks[current_task_ct].trans)
+                # if at stage 1, then expect no transactions yet
+                # SO allocate using traditioanl metric.
+                # BUT, if not, then we should have transactions and so we
+                # will subtract the number of transactions * the attc
+
                 db.db_session.add(tasks[current_task_ct])
                 print("changed db @ task " + str(current_task_ct))
                 current_task_ct += 1
@@ -1159,7 +1160,9 @@ def allocate_tasks_analysts(d_id):
             ml.Roster.no_of_hours == user[1]), ml.Roster.week_id == user[2])).first()
             print("user adjustment list: " + str(u_adj))
             u_adj.already_allocated = True
+
             db.db_session.add(u_adj)
+
             # send user an email
             em = s.send_user(user[0], "CHIIA: New Task!", \
             "Hi there "+u.fname+", \n You've been allocated a new task. \
@@ -1172,10 +1175,25 @@ def allocate_tasks_analysts(d_id):
         db.db_session.flush()
 
     return fl.redirect(fl.url_for('manage_datasets'))
+
+
 # when moving from stage 1 to stage 2, we ask whether the next person
 # needs to speak mando to do the task, so this is run if that's true.
 def reallocate_task_mandarin():
     return None
+
+
+# allocate on a user level i.e get trans_id then get the right stage then
+# allocate a stage/trans to the next person
+def allocate_user(transaction_id, mandarin):
+    pass
+
+
+def working_to_pending(id):
+    """get the transaction /stage and then the associated task.
+    write to the task it's not working but pending and then send an
+    email to the LA saying it needs approval"""
+    pass
 
 
 def get_week_id(cur_date):
