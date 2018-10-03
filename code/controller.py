@@ -704,9 +704,6 @@ def stage1(id):
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
 
-                # NOTE: include here the code to send the email to
-                # the analyst
-
                 # update relations
                 # create a stage_rel mapping between the trans and the task
                 t_db.trans.append(trans)
@@ -730,32 +727,18 @@ def stage1(id):
                 else:
                     t_db.no_of_result_to_s2 = 1
 
-                # create complimentry stage2
-                # get current max id
-                s2_max = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
-                if s2_max:
-                    s2_max+=1
-                else:
-                    s2_max=1
-
-                s2 = ml.Stage_2(s_id=s2_max)
-                # NOTE: entity name is not nullable but we fill it on the stage2
-                # page, not this one.
-
-                # NOTE: check here for whether the analyst says we need a
-                # mandarin reader to do this and then allocate to the next
-                # available, else we just reallocate to same user
-                db.db_session.add(s2)
-
-                # now join it to the sr table with the new trans
-                sr = ml.Stage_Rels(trans_id=trans.id, stage_2_id=s2.s_id)
-
+                # clean up db
                 db.db_session.add(t_db)
-                db.db_session.add(sr)
 
                 try:
                     db.db_session.commit()
                     fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
+
+                    # transistion into stage 2
+                    s2 = transistion_transaction(trans)
+                    if s2.state == 2: # if we created the s2 correctly
+                        return fl.redirect(fl.url_for('stage2', s2.s_id))
+
                 except sa.exc.InvalidRequestError:
                     fl.flash("Failed to create transaction", "error")
 
@@ -1186,7 +1169,9 @@ def reallocate_task_mandarin():
 # allocate on a user level i.e get trans_id then get the right stage then
 # allocate a stage/trans to the next person
 def allocate_user(transaction_id, mandarin):
-    pass
+    t = ml.Transaction.query.get(transaction_id).who_assigned
+    return t
+
 
 
 def working_to_pending(id):
@@ -1195,6 +1180,49 @@ def working_to_pending(id):
     email to the LA saying it needs approval"""
     pass
 
+def transistion_transaction(trans):
+    """take the current transaction and move the user between this stage and
+    the next"""
+    if trans.state == 1:
+        # moving into stage 2
+
+        # get new ID
+        s2_max = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
+        if s2_max:
+            s2_max+=1
+        else:
+            s2_max=1
+
+        s2 = ml.Stage_2(s_id=s2_max, state=2)
+
+        # NOTE: check here for whether the analyst says we need a
+        # mandarin reader to do this or else we reallocate.
+        db.db_session.add(s2)
+
+        # now join it to the sr table with the new trans
+        sr = ml.Stage_Rels(trans_id=trans.id, stage_2_id=s2.s_id)
+        db.db_session.add(sr)
+
+        try:
+            db.db_session.commit()
+            fl.flash("Successful transistion to stage two!", "success")
+        except sa.exc.InvalidRequestError:
+            fl.flash("Failed to transistion into stage two", "error")
+
+        # no email or approval required, so just allocate the next user
+        new = allocate_user(s2)
+        if new:
+            # email user that they have the task now
+            s.send_user(new)
+        else:
+            fl.flash("Unable to allocate user to transaction", "error")
+
+        return s2
+    elif trans.state == 2:
+        pass # we need to create a stage 3 here and follow the transistion
+        # rules
+    else:
+        return None
 
 def get_week_id(cur_date):
     from datetime import datetime, timedelta

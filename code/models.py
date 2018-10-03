@@ -179,10 +179,6 @@ class Transactions(Base_Stage_Task):
     who_previous_stages = sa.Column(sa.PickleType)
 
     dataset_id = sa.Column(sa.Integer, nullable=False)
-    task_id = sa.Column(sa.Integer)
-    # will a transaction have a link to the task?
-    # I don't think it needs to, but we'll include
-    # it for completeness
 
     # record the following
     annoucement_date = sa.Column(sa.DateTime)
