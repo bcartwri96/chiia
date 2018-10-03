@@ -728,6 +728,7 @@ def stage1(id):
                 #trans.amount = 100
                 trans.dataset_id = 1
 
+
                 # recall that changing a transaction means modifying the task,
                 # so change the task too.
                 t_db.date_modified = dt.datetime.now()
@@ -775,6 +776,7 @@ def stage2(s_id):
     #  after task assignment part is completed
     # Also need to add workflow option as soon as new user is defined
     form = fm.stage2(fl.request.form)
+    new_chinese_file  = fm.chinese_investor_file(fl.request.form)
     t_db = ml.Stage_2.query.get(s_id)
     import datetime as dt
 
@@ -785,88 +787,139 @@ def stage2(s_id):
             form.S2_reviews.data = t_db.reviews + 1
         else:
             form.S2_reviews.data = 0
-        return fl.render_template('analyst/stage2.html', form=form,t=t_db)
+        # get method for adding nnew chinese investor file
+        # getting the related IID(trans_id) from stage_rels
+        s = ml.Stage_Rels.query.filter_by(stage_2_id=s_id ).first()
+        # getting the related entity name from transactions
+        sr = ml.Transactions.query.get(s.trans_id)
+
+        new_chinese_file.linked_iid.data = s.trans_id
+        new_chinese_file.nickname_iid.data = sr.entity_name
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db, new_chinese_file=new_chinese_file)
     else:
-        assigned_date = fl.request.form['S2_date']
-        no_of_reviews = fl.request.form['S2_reviews']
-        chin_inv_file_no = fl.request.form['chin_inv_file_no']
-        counterpart_file_no =  fl.request.form['counterpart_file_no']
+        if form.validate_on_submit() and form.task_submitted.data:
 
-        # Correspondence  workflow option
-        # correspondence required
-        try:
-            correspondence_req = fl.request.form['correspondence_req']
-        except KeyError:
-            correspondence_req = None
-        if correspondence_req == 'on':
-            correspondence_req = True
+            assigned_date = fl.request.form['S2_date']
+            no_of_reviews = int(fl.request.form['S2_reviews'])
+            chin_inv_file_no = fl.request.form['chin_inv_file_no']
+            counterpart_file_no =  fl.request.form['counterpart_file_no']
+
+            # Correspondence  workflow option
+            # correspondence required
+            try:
+                correspondence_req = fl.request.form['correspondence_req']
+            except KeyError:
+                correspondence_req = None
+            if correspondence_req == 'on':
+                correspondence_req = True
+            else:
+                correspondence_req = False
+            try:
+                type_correspondence = fl.request.form['type_correspondence']
+            except KeyError:
+                type_correspondence = None
+            if type_correspondence == '1':
+                type_correspondence = 'Primary Source'
+            elif type_correspondence == '2':
+                type_correspondence = 'ASIC Report'
+            elif type_correspondence == '3':
+                type_correspondence = 'Property Record'
+            else:
+                type_correspondence = ''
+            info_from_correspondence =  fl.request.form['info_from_correspondence']
+            info_already_found =  fl.request.form['info_already_found']
+
+
+
+            # Next Analyst should be chinese speaker
+            try:
+                mandarin_req = fl.request.form['mandarin_req']
+            except KeyError:
+                mandarin_req = None
+            if mandarin_req == 'on':
+                mandarin_req = True
+            else:
+                mandarin_req = False
+
+            #Redo this stage with chinese speaker
+
+            try:
+                redo_by_mandarin = fl.request.form['redo_by_mandarin']
+            except KeyError:
+                redo_by_mandarin = None
+            if redo_by_mandarin == 'on':
+                redo_by_mandarin = True
+            else:
+                redo_by_mandarin = False
+            #Redo this stage without chinese speaker
+
+            try:
+                redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
+            except KeyError:
+                redo_by_non_mandarin = None
+            if redo_by_non_mandarin == 'on':
+                redo_by_non_mandarin = True
+            else:
+                redo_by_non_mandarin = False
+
+
+
+            t_db.reviews = no_of_reviews
+            t_db.date_assigned = assigned_date
+            t_db.chin_inv_file_no = chin_inv_file_no
+            t_db.counterpart_file_no = counterpart_file_no
+            t_db.redo_by_mandarin = redo_by_mandarin
+            t_db.mandarin_req = mandarin_req
+            t_db.redo_by_non_mandarin = redo_by_non_mandarin
+            t_db.correspondence_req = correspondence_req
+            t_db.type_correspondence = type_correspondence
+            t_db.info_from_correspondence = info_from_correspondence
+            t_db.info_already_found = info_already_found
+            db.db_session.add(t_db)
+            try:
+                db.db_session.commit()
+                fl.flash("Updated stage2", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to update stage2", "error")
+        elif new_chinese_file.validate_on_submit() and \
+        new_chinese_file.trans_submitted.data:
+            chinese_file = ml.Chinese_Investor_File()
+            # get the max id and then increment
+            max_id = db.db_session.query(sa.func.max(ml.Chinese_Investor_File.pid)).scalar()
+            if not max_id == None:
+                # initially, none in db so NoneType returned
+                pid = max_id + 1
+            else:
+                pid = 1
+            legal_name = fl.request.form['legal_name']
+            linked_iid = fl.request.form['linked_iid']
+            nickname_iid = fl.request.form['nickname_iid']
+            stage_added = 2
+            try:
+                file_checked_la = fl.request.form['file_checked_la']
+            except KeyError:
+                file_checked_la = None
+            if file_checked_la == 'on':
+                file_checked_la = True
+            else:
+                file_checked_la = False
+            chinese_file.pid = pid
+            chinese_file.legal_name = legal_name
+            chinese_file.linked_iid = linked_iid
+            chinese_file.nickname_iid = nickname_iid
+            chinese_file.stage_added = stage_added
+            chinese_file.file_checked_la = file_checked_la
+            db.db_session.add(chinese_file)
+            try:
+                db.db_session.commit()
+                fl.flash("create new chinese investor file", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to create new chinese investor file", "error")
         else:
-            correspondence_req = False
-        try:
-            type_correspondence = fl.request.form['type_correspondence']
-        except KeyError:
-            type_correspondence = None
-        if type_correspondence == '1':
-            type_correspondence = 'Primary Source'
-        elif type_correspondence == '2':
-            type_correspondence = 'ASIC Report'
-        elif type_correspondence == '3':
-            type_correspondence = 'Property Record'
-        else:
-            type_correspondence = ''
-        info_from_correspondence =  fl.request.form['info_from_correspondence']
-        info_already_found =  fl.request.form['info_already_found']
-
-
-
-        # Next Analyst should be chinese speaker
-        try:
-            mandarin_req = fl.request.form['mandarin_req']
-        except KeyError:
-            mandarin_req = None
-        if mandarin_req == 'on':
-            mandarin_req = True
-        else:
-            mandarin_req = False
-
-        #Redo this stage with chinese speaker
-
-        try:
-            redo_by_mandarin = fl.request.form['redo_by_mandarin']
-        except KeyError:
-            redo_by_mandarin = None
-        if redo_by_mandarin == 'on':
-            redo_by_mandarin = True
-        else:
-            redo_by_mandarin = False
-        #Redo this stage without chinese speaker
-
-        try:
-            redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
-        except KeyError:
-            redo_by_non_mandarin = None
-        if redo_by_non_mandarin == 'on':
-            redo_by_non_mandarin = True
-        else:
-            redo_by_non_mandarin = False
-
-
-
-        t_db.reviews = no_of_reviews
-        t_db.date_assigned = assigned_date
-        t_db.chin_inv_file_no = chin_inv_file_no
-        t_db.counterpart_file_no = counterpart_file_no
-        t_db.redo_by_mandarin = redo_by_mandarin
-        t_db.mandarin_req = mandarin_req
-        t_db.redo_by_non_mandarin = redo_by_non_mandarin
-        t_db.correspondence_req = correspondence_req
-        t_db.type_correspondence = type_correspondence
-        t_db.info_from_correspondence = info_from_correspondence
-        t_db.info_already_found = info_already_found
-        db.db_session.add(t_db)
-        db.db_session.commit()
-        fl.flash("Updated stage2", "success")
-        return fl.render_template('analyst/stage2.html', form=form,t=t_db)
+            fl.flash("Failed to update", "error")
+            fl.flash(str(form.errors), 'error')
+            fl.flash(str(new_chinese_file.errors), 'error')
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db, new_chinese_file= new_chinese_file)
 
 
 

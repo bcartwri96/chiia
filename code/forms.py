@@ -43,7 +43,7 @@ class Create_Transaction(wtf.FlaskForm):
     mandarin = BooleanField('mandarin')
 
     #prefill this with the filled value of the current user
-    who_assigned = IntegerField('who_assigned')
+    who_assigned = StringField('who_assigned')
     who_previous_stages = StringField('who_previous_stages')
 
     # hiddens
@@ -78,7 +78,7 @@ class stage1(wtf.FlaskForm):
 class stage2(wtf.FlaskForm):
 
     S2_date = DateField('S2_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
-    S2_reviews = IntegerField('S2_reviews', validators=[DataRequired("This column cannot be empty")])
+    S2_reviews = IntegerField('S2_reviews')
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
 
@@ -91,15 +91,15 @@ class stage2(wtf.FlaskForm):
 
     # Correspondence  workflow option
     correspondence_req = BooleanField('correspondence_req')
-    type_correspondence = IntegerField('type_correspondence', validators=[DataRequired()])
-    info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
-    info_already_found = StringField('info_already_found', validators=[DataRequired()])
+    type_correspondence = IntegerField('type_correspondence')
+    info_from_correspondence = StringField('info_from_correspondence')
+    info_already_found = StringField('info_already_found')
 
 
     # IF they select a new file is created
-    pid = IntegerField('pid')
+    pid = StringField('pid')
     legal_name = StringField('legal_name')
-    linked_iid = IntegerField('linked_iid')
+    linked_iid = StringField('linked_iid')
     nickname_iid = StringField('nickname_iid')
     file_checked_la  = BooleanField('file_checked_la')
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
@@ -153,6 +153,15 @@ class roster(wtf.FlaskForm):
     end_date = SelectField('end_date', choices=[])
     no_of_hours = IntegerField('no_of_hours', validators=[DataRequired("This column cannot be empty")])
     task_submitted = SubmitField('Submit the roster')
+
+class chinese_investor_file(wtf.FlaskForm):
+    pid = IntegerField('pid')
+    legal_name = StringField('legal_name',validators=[DataRequired("This legal_name cannot be empty")])
+    linked_iid = IntegerField('linked_iid', validators=[DataRequired("This linked_iid cannot be empty")])
+    nickname_iid = StringField('nickname_iid', validators=[DataRequired("This nickname_iid cannot be empty")])
+    stage_added = IntegerField('stage_added')
+    file_checked_la  = BooleanField('file_checked_la')
+    task_submitted = SubmitField('Submit the Task')
 
 
 

@@ -316,3 +316,14 @@ class Calendar(db.Base):
     id = sa.Column(sa.Integer, nullable=False, primary_key=True)
     start_date = sa.Column(sa.DateTime, nullable=False)
     end_date = sa.Column(sa.DateTime, nullable=False)
+
+class Chinese_Investor_File(db.Base):
+    __tablename__ = 'chinese_investor_file'
+    __table_args__ = {'extend_existing': True}
+
+    pid = sa.Column(sa.Integer, nullable=False, primary_key=True)
+    legal_name = sa.Column(sa.String, nullable=False)
+    linked_iid = sa.Column(sa.Integer, nullable=False)
+    nickname_iid = sa.Column(sa.String, nullable=False)
+    stage_added = sa.Column(sa.Integer, nullable=False)
+    file_checked_la = sa.Column(sa.Boolean)
