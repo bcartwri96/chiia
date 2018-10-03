@@ -87,7 +87,10 @@ class stage2(wtf.FlaskForm):
     # redo same stage with chinese speaker or without chinese speaker workflow option
     redo_by_mandarin = BooleanField('redo_by_mandarin')
     redo_by_non_mandarin = BooleanField('redo_by_non_mandarin')
+
+
     # Correspondence  workflow option
+    correspondence_req = BooleanField('correspondence_req')
     type_correspondence = IntegerField('type_correspondence', validators=[DataRequired()])
     info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
     info_already_found = StringField('info_already_found', validators=[DataRequired()])

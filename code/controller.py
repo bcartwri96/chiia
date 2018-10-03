@@ -780,7 +780,8 @@ def stage2(s_id):
 
     if fl.request.method == 'GET':
         form.S2_date.data = dt.datetime.now()
-        if t_db.reviews:
+        if not t_db.reviews == None:
+            # initially, none in db so NoneType returned
             form.S2_reviews.data = t_db.reviews + 1
         else:
             form.S2_reviews.data = 0
@@ -792,6 +793,15 @@ def stage2(s_id):
         counterpart_file_no =  fl.request.form['counterpart_file_no']
 
         # Correspondence  workflow option
+        # correspondence required
+        try:
+            correspondence_req = fl.request.form['correspondence_req']
+        except KeyError:
+            correspondence_req = None
+        if correspondence_req == 'on':
+            correspondence_req = True
+        else:
+            correspondence_req = False
         try:
             type_correspondence = fl.request.form['type_correspondence']
         except KeyError:
@@ -840,6 +850,8 @@ def stage2(s_id):
         else:
             redo_by_non_mandarin = False
 
+
+
         t_db.reviews = no_of_reviews
         t_db.date_assigned = assigned_date
         t_db.chin_inv_file_no = chin_inv_file_no
@@ -847,6 +859,7 @@ def stage2(s_id):
         t_db.redo_by_mandarin = redo_by_mandarin
         t_db.mandarin_req = mandarin_req
         t_db.redo_by_non_mandarin = redo_by_non_mandarin
+        t_db.correspondence_req = correspondence_req
         t_db.type_correspondence = type_correspondence
         t_db.info_from_correspondence = info_from_correspondence
         t_db.info_already_found = info_already_found

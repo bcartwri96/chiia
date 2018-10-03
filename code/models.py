@@ -175,7 +175,7 @@ class Transactions(Base_Stage_Task):
     # what the transaction is which we're referring to
     entity_name = sa.Column(sa.String)
 
-    amount = sa.Column(sa.Float)
+    #amount = sa.Column(sa.Float)
     who_previous_stages = sa.Column(sa.PickleType)
 
     dataset_id = sa.Column(sa.Integer, nullable=False)

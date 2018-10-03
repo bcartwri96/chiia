@@ -4,7 +4,7 @@
     <body>
     <form action="{{ url_for('stage1', id=t.id) }}" method="POST">
       <div class="form-group">
-        <label for="exampleFormControlInput1">Name</label>
+        <label for="exampleFormControlInput1">Analyst Name</label>
         {{ form.csrf_token }}
         {{ form.who_assigned(class_="form-control") }}
         <label for="exampleFormControlInput1">Search Date</label>
