@@ -707,7 +707,7 @@ def stage1(id):
                 trans.entity_name = t_name
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
-
+                trans.stage = 1
                 # update relations
                 # create a stage_rel mapping between the trans and the task
                 t_db.trans.append(trans)
@@ -740,8 +740,8 @@ def stage1(id):
 
                     # transistion into stage 2
                     s2 = transistion_transaction(trans)
-                    if s2.state == 2: # if we created the s2 correctly
-                        return fl.redirect(fl.url_for('stage2', s2.s_id))
+                    if s2: # if we created the s2 correctly
+                        return fl.redirect(fl.url_for('stage2', s_id=s2.s_id))
 
                 except sa.exc.InvalidRequestError:
                     fl.flash("Failed to create transaction", "error")
@@ -1172,10 +1172,15 @@ def reallocate_task_mandarin():
 
 # allocate on a user level i.e get trans_id then get the right stage then
 # allocate a stage/trans to the next person
-def allocate_user(transaction_id, mandarin):
-    t = ml.Transaction.query.get(transaction_id).who_assigned
-    return t
+def allocate_user(trans, mandarin):
+    t = ml.Transactions.query.get(trans.s_id)
 
+    # temp measure
+    t = ml.Tasks.query.get(t.tasks).who_assigned
+    if t == None:
+        return None
+    else:
+        return t
 
 
 def working_to_pending(id):
@@ -1187,7 +1192,7 @@ def working_to_pending(id):
 def transistion_transaction(trans):
     """take the current transaction and move the user between this stage and
     the next"""
-    if trans.state == 1:
+    if trans.stage == 1:
         # moving into stage 2
 
         # get new ID
@@ -1197,7 +1202,18 @@ def transistion_transaction(trans):
         else:
             s2_max=1
 
-        s2 = ml.Stage_2(s_id=s2_max, state=2)
+        s2 = ml.Stage_2(s_id=s2_max)
+
+        # no email or approval required, so just allocate the next user
+        new = allocate_user(s2, False)
+        if new:
+            s2.who_assigned = new
+            # email user that they have the task now
+            s.send_user(new, "New Transaction!",  "Hello, here is a new \
+            transaction for you __>here<__.", False)
+        else:
+            fl.flash("Unable to allocate user to transaction", "error")
+
 
         # NOTE: check here for whether the analyst says we need a
         # mandarin reader to do this or else we reallocate.
@@ -1212,14 +1228,6 @@ def transistion_transaction(trans):
             fl.flash("Successful transistion to stage two!", "success")
         except sa.exc.InvalidRequestError:
             fl.flash("Failed to transistion into stage two", "error")
-
-        # no email or approval required, so just allocate the next user
-        new = allocate_user(s2)
-        if new:
-            # email user that they have the task now
-            s.send_user(new)
-        else:
-            fl.flash("Unable to allocate user to transaction", "error")
 
         return s2
     elif trans.state == 2:

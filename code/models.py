@@ -191,7 +191,7 @@ class Transactions(Base_Stage_Task):
 
     # this is the state of each of the transactions.
     # can be done, need a redo or archived.
-    state = sa.Column(sa.Integer, nullable=False)
+    stage = sa.Column(sa.Integer, nullable=False)
 
     tasks = sa.Column(sa.Integer, sa.ForeignKey('tasks.id'))
 
