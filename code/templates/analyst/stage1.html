@@ -6,7 +6,7 @@
       <div class="form-group">
         <label for="exampleFormControlInput1">Name</label>
         {{ form.csrf_token }}
-        {{ form.nickname(class_="form-control") }}
+        {{ form.who_assigned(class_="form-control") }}
         <label for="exampleFormControlInput1">Search Date</label>
         {{ form.date_conducted(class="form-control") }}
         <label for="exampleFormControlInput1">Date Start</label>
@@ -38,8 +38,11 @@
       {{ trans.rumour_date(class_="form-control") }}
       <label for="exampleFormControlInput1">What was the annoucement date?</label>
       {{ trans.anouncement_date(class_="form-control") }}
-      <label for="exampleFormControlInput1">Mandarin skills required?</label>
-      {{ trans.mandarin(class_="form-control") }}
+      <input  type="checkbox" name="mandarin" />
+        <label class="exampleFormControlInput1">
+          Mandarin skills required?
+      </label>
+        <br>
 <br>
 
       {{ trans.trans_submitted(class_="btn btn-outline-primary") }}

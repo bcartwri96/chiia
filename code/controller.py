@@ -499,7 +499,7 @@ def edit_task(id):
                 # t_db.task_id.append(stage_rel)
 
                 # submit this
-                trans.amount = 100
+                #trans.amount = 100
                 trans.dataset_id = 1
 
                 # recall that changing a transaction means modifying the task,
@@ -643,7 +643,10 @@ def stage1(id):
     t_db = ml.Tasks.query.get(id)
     all_trans = t_db.trans
     if fl.request.method == 'GET':
-        form.nickname.data = t_db.nickname
+        uid = t_db.who_assigned
+        user = ml.User.query.filter_by(id=uid ).first()
+        user_name = user.fname +" "+ user.lname
+        form.who_assigned.data = user_name
         form.date_conducted.data = dt.datetime.now()
         form.date_start.data = t_db.date_start
         form.date_end.data = t_db.date_end
@@ -660,7 +663,7 @@ def stage1(id):
         # be CREATING a new transaction here!
         if form.validate_on_submit() and form.task_submitted.data:
             #get the vars
-            nickname = fl.request.form['nickname']
+            #who_assigned = fl.request.form['who_assigned']
             search_term = fl.request.form['search_term']
             date_start = fl.request.form['date_start']
             date_end = fl.request.form['date_end']
@@ -668,7 +671,7 @@ def stage1(id):
             total_no_of_result = fl.request.form['total_no_of_result']
             #who_assigned = fl.request.form['who_assigned']
 
-            t_db.nickname = nickname
+            #t_db.who_assigned = who_assigned
             t_db.date_start = date_start
             t_db.date_end = date_end
             #t_db.who_assigned = who_assigned
@@ -695,6 +698,14 @@ def stage1(id):
                 t_name = fl.request.form['entity_name']
                 t_rumour_date = fl.request.form['rumour_date']
                 t_announcement_date = fl.request.form['anouncement_date']
+                try:
+                    mandarin = fl.request.form['mandarin']
+                except KeyError:
+                    mandarin = None
+                if mandarin == 'on':
+                    mandarin = True
+                else:
+                    mandarin = False
 
                 # get the max id and then increment
                 max_id = db.db_session.query(sa.func.max(ml.Transactions.s_id)).scalar()
@@ -708,12 +719,13 @@ def stage1(id):
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
                 trans.stage = 1
+                trans.mandarin = mandarin
                 # update relations
                 # create a stage_rel mapping between the trans and the task
                 t_db.trans.append(trans)
 
                 # submit this
-                trans.amount = 100
+                #trans.amount = 100
                 trans.dataset_id = 1
 
                 # recall that changing a transaction means modifying the task,
@@ -740,8 +752,9 @@ def stage1(id):
 
                     # transistion into stage 2
                     s2 = transistion_transaction(trans)
-                    if s2: # if we created the s2 correctly
-                        return fl.redirect(fl.url_for('stage2', s_id=s2.s_id))
+                    # NOTE : Do we really need this as this wont allow us to add more transaction
+                    #if s2: # if we created the s2 correctly
+                        #return fl.redirect(fl.url_for('stage2', s_id=s2.s_id))
 
                 except sa.exc.InvalidRequestError:
                     fl.flash("Failed to create transaction", "error")
@@ -1209,8 +1222,9 @@ def transistion_transaction(trans):
         if new:
             s2.who_assigned = new
             # email user that they have the task now
-            s.send_user(new, "New Transaction!",  "Hello, here is a new \
-            transaction for you __>here<__.", False)
+            # NOTE : Commenting as of now as we dont have access
+            #s.send_user(new, "New Transaction!",  "Hello, here is a new \
+            #transaction for you __>here<__.", False)
         else:
             fl.flash("Unable to allocate user to transaction", "error")
 

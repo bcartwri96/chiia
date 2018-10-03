@@ -34,7 +34,7 @@ class Edit_Dataset(wtf.FlaskForm):
 
 class Create_Transaction(wtf.FlaskForm):
     # name = StringField('name', [DataRequired()])
-    amount = FloatField('amount')
+    #amount = FloatField('amount')
 
     # creating Transactions
     anouncement_date = DateField('annoucement', format='%Y-%m-%d', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
@@ -65,7 +65,7 @@ class Edit_Task(wtf.FlaskForm):
 
 class stage1(wtf.FlaskForm):
     date_conducted = DateField('date_conducted', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
-    nickname = StringField('nickname', validators=[DataRequired("Please ensure you've entered a name")])
+    who_assigned = StringField('who_assigned', validators=[DataRequired("Please ensure you've entered a name")])
     search_term = StringField('search_term', validators=[DataRequired()])
     date_start = DateField('date_start', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     date_end = DateField('date_end', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
