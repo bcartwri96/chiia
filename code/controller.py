@@ -568,7 +568,11 @@ def manage_tasks():
             current_user = fl.session['logged_in']
             # not LA, so only get tasks allocated to them
             t = ml.Tasks.query.filter(ml.Tasks.who_assigned == current_user).all()
-            return fl.render_template('analyst/manage_task.html', tasks=t)
+            s2 = ml.Stage_2.query.filter(ml.Stage_2.who_assigned == current_user).all()
+            s3 = ml.Stage_3.query.filter(ml.Stage_3.who_assigned == current_user).all()
+            s4 = ml.Stage_4.query.filter(ml.Stage_4.who_assigned == current_user).all()
+
+            return fl.render_template('analyst/manage_task.html', tasks=t,stage2=s2,stage3=s3,stage4=s4)
         elif fl.session['admin']:
             t = ml.Tasks.query.all()
             # get weeks
@@ -696,7 +700,7 @@ def stage1(id):
                 max_id = db.db_session.query(sa.func.max(ml.Transactions.s_id)).scalar()
                 if not max_id == None:
                     # initially, none in db so NoneType returned
-                    trans.id = max_id+1
+                    trans.id = max_id + 1
                 else:
                     trans.id = 1
 
