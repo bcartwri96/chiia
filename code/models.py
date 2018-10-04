@@ -84,6 +84,7 @@ class Admin(db.Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column(sa.Integer, primary_key=True)
+    prefer_all_stages = sa.Column(sa.Boolean)
     search_names = sao.relationship('Search_Names', backref='admin', lazy=True)
 
 class Search_Names(db.Base):
@@ -183,7 +184,7 @@ class Transactions(Base_Stage_Task):
     # record the following
     annoucement_date = sa.Column(sa.DateTime)
     rumour_date = sa.Column(sa.DateTime)
-    mandarin = sa.Column(sa.Boolean)
+    mandarin_req = sa.Column(sa.Boolean)
 
     # ==============================
     # ======== admin area ==========
@@ -306,8 +307,7 @@ class Roster(db.Base):
     user_id = sa.Column(sa.Integer,nullable=False, primary_key=True)
     week_id = sa.Column(sa.Integer, nullable=False, primary_key=True)
     no_of_hours = sa.Column(sa.Integer, nullable=False)
-    already_allocated = sa.Column(sa.Boolean) #if true, then we've already
-    # allocated the users week to maximum hours (i.e so don't do that again!)
+    already_allocated = sa.Column(sa.Float, default=0.0)
 
 class Calendar(db.Base):
     __tablename__ = 'calendar'

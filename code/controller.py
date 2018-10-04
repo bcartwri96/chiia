@@ -1075,6 +1075,81 @@ def update_calendar():
 # ================
 # allocation logic
 
+def allocate_transactions(dataset):
+    """take any dataset and allocate any unallocated transactions to
+    all the people"""
+    # if 'admin' not in fl.session():
+    #     fl.flash("You must be an admin to do this!")
+    #     return fl.redirect(fl.url_for('index'))
+
+    # get all the transactions which relate to the dataset
+    all_trans = []
+    transactions = ml.Transactions.query.filter(ml.Transactions.dataset_id == \
+    dataset).order_by(sa.desc(ml.Transactions.stage)).all()
+    for t in transactions:
+        all_trans.append(t)
+
+    for t in transactions:
+        c_sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == t.s_id).first()
+        if not c_sr.stage_2_id == None:
+            all_trans.append(ml.Stage_2.query.get(c_sr.stage_2_id))
+        elif not c_sr.stage_3_id == None:
+            all_trans.append(ml.Stage_3.query.get(c_sr.stage_3_id))
+        else:
+            pass
+
+    # get the roster for the next week
+    cur_week = get_week_id(dt.datetime.now())
+    roster = ml.Roster.query.filter(ml.Roster.week_id == cur_week+1).all()
+    users = []
+    u_count = 0 # user count
+    for r in roster:
+        users.append([r.user_id, r.no_of_hours])
+    # check the settings to figure out which method we'll use to process the
+    # queue.
+    print(all_trans)
+    if ml.Admin.query.filter(ml.Admin.prefer_all_stages).first() == None:
+        # preference is to get stages to stage 5 as soon as possible.
+        print("allocating!")
+        # allocate transactions first, then tasks
+        for t in all_trans:
+            ct_trans = 0 # count tasks
+            # trans in descending order; allocate
+            if not t.mandarin_req:
+                print("not mando")
+
+                if u_count < len(users):
+                    cur = users[u_count]
+                else:
+                    break
+
+                u = ml.User.query.get(cur[0])
+                tasks_remain = True
+                print("uattc = "+str(u.avg_time_to_complete)+" cur"+str(cur[1]))
+                while (cur[1] >= u.avg_time_to_complete) & tasks_remain:
+                    cur[1] -= u.avg_time_to_complete
+                    # get appropriate user
+                    t.who_assigned = u.id
+                    db.db_session.add(t)
+                    ct_trans += 1
+                    print("added "+u.fname+".")
+
+                    # now set the allocated var to true in the roster
+                    roster[u_count].already_allocated +=u.avg_time_to_complete
+                    db.db_session.add(roster[u_count])
+
+                    if ct_trans == len(transactions):
+                        # just make sure we have more trans before allocating
+                        break
+                u_count+=1
+
+            else:
+                pass # not allocating mandarin ones yet. To come
+        db.db_session.commit()
+    else:
+        pass
+
+
 # dataset & tasks created, so we need to allocate analysts to the tasks
 # inputs: dataset id, analyst availability, time delta of the
         # dataset, frequency
