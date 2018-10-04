@@ -1,10 +1,8 @@
 {% include "header.html" %}
 
-
-
 <div class="container-fluid">
   <h3 class="display-3">View Recent Tasks</h3>
-  <table class="table">
+  <table id= "recent_task" class="table">
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -69,5 +67,11 @@
       {% endfor %}
     </tbody>
   </table>
+
+  <script type="text/javascript">
+   $(document).ready(function() {
+      $("#recent_table").tablesorter(); 
+   });
+  </script>
   </div>
 </div>

@@ -146,26 +146,25 @@
           <br>
             </div>
             <!-- New Chinese investor file required  -->
-            <div class="hidden_cfr">
-              <br>
-              <label for="exampleFormControlInput1"  >PID</label>
-              {{ form.pid(class="form-control") }}
-              <label for="exampleFormControlInput1">Operating legal entity name</label>
-              {{ form.legal_name(class="form-control") }}
-              <label for="exampleFormControlInput1">Related IID</label>
-              {{ form.linked_iid(class="form-control") }}
-              <label for="exampleFormControlInput1">Nickname of related IID</label>
-              {{ form.nickname_iid(class="form-control") }}
-              <br>
-            <input  type="checkbox" name="file_checked_la"  />
-              <label class="exampleFormControlInput1">
-                Check status
-            </label>
-            <br>
-
-              </div>
 
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
+        <div class="hidden_cfr">
+          <br>
+          <label for="exampleFormControlInput1">Operating legal entity name</label>
+          {{ new_chinese_file.legal_name(class="form-control") }}
+          <label for="exampleFormControlInput1">Related IID</label>
+          {{ new_chinese_file.linked_iid(class="form-control") }}
+          <label for="exampleFormControlInput1">Nickname of related IID</label>
+          {{ new_chinese_file.nickname_iid(class="form-control") }}
+          <br>
+        <input  type="checkbox" name="file_checked_la"  />
+          <label class="exampleFormControlInput1">
+            Check status
+        </label>
+        <br>
+        {{ new_chinese_file.task_submitted(class_="btn btn-outline-primary") }}
+
+          </div>
 
     </form>
     </body>

@@ -499,7 +499,7 @@ def edit_task(id):
                 # t_db.task_id.append(stage_rel)
 
                 # submit this
-                trans.amount = 100
+                #trans.amount = 100
                 trans.dataset_id = 1
 
                 # recall that changing a transaction means modifying the task,
@@ -643,7 +643,10 @@ def stage1(id):
     t_db = ml.Tasks.query.get(id)
     all_trans = t_db.trans
     if fl.request.method == 'GET':
-        form.nickname.data = t_db.nickname
+        uid = t_db.who_assigned
+        user = ml.User.query.filter_by(id=uid ).first()
+        user_name = user.fname +" "+ user.lname
+        form.who_assigned.data = user_name
         form.date_conducted.data = dt.datetime.now()
         form.date_start.data = t_db.date_start
         form.date_end.data = t_db.date_end
@@ -660,7 +663,7 @@ def stage1(id):
         # be CREATING a new transaction here!
         if form.validate_on_submit() and form.task_submitted.data:
             #get the vars
-            nickname = fl.request.form['nickname']
+            #who_assigned = fl.request.form['who_assigned']
             search_term = fl.request.form['search_term']
             date_start = fl.request.form['date_start']
             date_end = fl.request.form['date_end']
@@ -668,7 +671,7 @@ def stage1(id):
             total_no_of_result = fl.request.form['total_no_of_result']
             #who_assigned = fl.request.form['who_assigned']
 
-            t_db.nickname = nickname
+            #t_db.who_assigned = who_assigned
             t_db.date_start = date_start
             t_db.date_end = date_end
             #t_db.who_assigned = who_assigned
@@ -695,6 +698,14 @@ def stage1(id):
                 t_name = fl.request.form['entity_name']
                 t_rumour_date = fl.request.form['rumour_date']
                 t_announcement_date = fl.request.form['anouncement_date']
+                try:
+                    mandarin = fl.request.form['mandarin']
+                except KeyError:
+                    mandarin = None
+                if mandarin == 'on':
+                    mandarin = True
+                else:
+                    mandarin = False
 
                 # get the max id and then increment
                 max_id = db.db_session.query(sa.func.max(ml.Transactions.s_id)).scalar()
@@ -708,13 +719,15 @@ def stage1(id):
                 trans.rumour_date = t_rumour_date
                 trans.annoucement_date = t_announcement_date
                 trans.stage = 1
+                trans.mandarin = mandarin
                 # update relations
                 # create a stage_rel mapping between the trans and the task
                 t_db.trans.append(trans)
 
                 # submit this
-                trans.amount = 100
+                #trans.amount = 100
                 trans.dataset_id = 1
+
 
                 # recall that changing a transaction means modifying the task,
                 # so change the task too.
@@ -740,8 +753,9 @@ def stage1(id):
 
                     # transistion into stage 2
                     s2 = transistion_transaction(trans)
-                    if s2: # if we created the s2 correctly
-                        return fl.redirect(fl.url_for('stage2', s_id=s2.s_id))
+                    # NOTE : Do we really need this as this wont allow us to add more transaction
+                    #if s2: # if we created the s2 correctly
+                        #return fl.redirect(fl.url_for('stage2', s_id=s2.s_id))
 
                 except sa.exc.InvalidRequestError:
                     fl.flash("Failed to create transaction", "error")
@@ -762,85 +776,150 @@ def stage2(s_id):
     #  after task assignment part is completed
     # Also need to add workflow option as soon as new user is defined
     form = fm.stage2(fl.request.form)
+    new_chinese_file  = fm.chinese_investor_file(fl.request.form)
     t_db = ml.Stage_2.query.get(s_id)
     import datetime as dt
 
     if fl.request.method == 'GET':
         form.S2_date.data = dt.datetime.now()
-        if t_db.reviews:
+        if not t_db.reviews == None:
+            # initially, none in db so NoneType returned
             form.S2_reviews.data = t_db.reviews + 1
         else:
             form.S2_reviews.data = 0
-        return fl.render_template('analyst/stage2.html', form=form,t=t_db)
+        # get method for adding nnew chinese investor file
+        # getting the related IID(trans_id) from stage_rels
+        s = ml.Stage_Rels.query.filter_by(stage_2_id=s_id ).first()
+        # getting the related entity name from transactions
+        sr = ml.Transactions.query.get(s.trans_id)
+
+        new_chinese_file.linked_iid.data = s.trans_id
+        new_chinese_file.nickname_iid.data = sr.entity_name
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db, new_chinese_file=new_chinese_file)
     else:
-        assigned_date = fl.request.form['S2_date']
-        no_of_reviews = fl.request.form['S2_reviews']
-        chin_inv_file_no = fl.request.form['chin_inv_file_no']
-        counterpart_file_no =  fl.request.form['counterpart_file_no']
+        if form.validate_on_submit() and form.task_submitted.data:
 
-        # Correspondence  workflow option
-        try:
-            type_correspondence = fl.request.form['type_correspondence']
-        except KeyError:
-            type_correspondence = None
-        if type_correspondence == '1':
-            type_correspondence = 'Primary Source'
-        elif type_correspondence == '2':
-            type_correspondence = 'ASIC Report'
-        elif type_correspondence == '3':
-            type_correspondence = 'Property Record'
+            assigned_date = fl.request.form['S2_date']
+            no_of_reviews = int(fl.request.form['S2_reviews'])
+            chin_inv_file_no = fl.request.form['chin_inv_file_no']
+            counterpart_file_no =  fl.request.form['counterpart_file_no']
+
+            # Correspondence  workflow option
+            # correspondence required
+            try:
+                correspondence_req = fl.request.form['correspondence_req']
+            except KeyError:
+                correspondence_req = None
+            if correspondence_req == 'on':
+                correspondence_req = True
+            else:
+                correspondence_req = False
+            try:
+                type_correspondence = fl.request.form['type_correspondence']
+            except KeyError:
+                type_correspondence = None
+            if type_correspondence == '1':
+                type_correspondence = 'Primary Source'
+            elif type_correspondence == '2':
+                type_correspondence = 'ASIC Report'
+            elif type_correspondence == '3':
+                type_correspondence = 'Property Record'
+            else:
+                type_correspondence = ''
+            info_from_correspondence =  fl.request.form['info_from_correspondence']
+            info_already_found =  fl.request.form['info_already_found']
+
+
+
+            # Next Analyst should be chinese speaker
+            try:
+                mandarin_req = fl.request.form['mandarin_req']
+            except KeyError:
+                mandarin_req = None
+            if mandarin_req == 'on':
+                mandarin_req = True
+            else:
+                mandarin_req = False
+
+            #Redo this stage with chinese speaker
+
+            try:
+                redo_by_mandarin = fl.request.form['redo_by_mandarin']
+            except KeyError:
+                redo_by_mandarin = None
+            if redo_by_mandarin == 'on':
+                redo_by_mandarin = True
+            else:
+                redo_by_mandarin = False
+            #Redo this stage without chinese speaker
+
+            try:
+                redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
+            except KeyError:
+                redo_by_non_mandarin = None
+            if redo_by_non_mandarin == 'on':
+                redo_by_non_mandarin = True
+            else:
+                redo_by_non_mandarin = False
+
+
+
+            t_db.reviews = no_of_reviews
+            t_db.date_assigned = assigned_date
+            t_db.chin_inv_file_no = chin_inv_file_no
+            t_db.counterpart_file_no = counterpart_file_no
+            t_db.redo_by_mandarin = redo_by_mandarin
+            t_db.mandarin_req = mandarin_req
+            t_db.redo_by_non_mandarin = redo_by_non_mandarin
+            t_db.correspondence_req = correspondence_req
+            t_db.type_correspondence = type_correspondence
+            t_db.info_from_correspondence = info_from_correspondence
+            t_db.info_already_found = info_already_found
+            db.db_session.add(t_db)
+            try:
+                db.db_session.commit()
+                fl.flash("Updated stage2", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to update stage2", "error")
+        elif new_chinese_file.validate_on_submit() and \
+        new_chinese_file.trans_submitted.data:
+            chinese_file = ml.Chinese_Investor_File()
+            # get the max id and then increment
+            max_id = db.db_session.query(sa.func.max(ml.Chinese_Investor_File.pid)).scalar()
+            if not max_id == None:
+                # initially, none in db so NoneType returned
+                pid = max_id + 1
+            else:
+                pid = 1
+            legal_name = fl.request.form['legal_name']
+            linked_iid = fl.request.form['linked_iid']
+            nickname_iid = fl.request.form['nickname_iid']
+            stage_added = 2
+            try:
+                file_checked_la = fl.request.form['file_checked_la']
+            except KeyError:
+                file_checked_la = None
+            if file_checked_la == 'on':
+                file_checked_la = True
+            else:
+                file_checked_la = False
+            chinese_file.pid = pid
+            chinese_file.legal_name = legal_name
+            chinese_file.linked_iid = linked_iid
+            chinese_file.nickname_iid = nickname_iid
+            chinese_file.stage_added = stage_added
+            chinese_file.file_checked_la = file_checked_la
+            db.db_session.add(chinese_file)
+            try:
+                db.db_session.commit()
+                fl.flash("create new chinese investor file", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to create new chinese investor file", "error")
         else:
-            type_correspondence = ''
-        info_from_correspondence =  fl.request.form['info_from_correspondence']
-        info_already_found =  fl.request.form['info_already_found']
-
-
-
-        # Next Analyst should be chinese speaker
-        try:
-            mandarin_req = fl.request.form['mandarin_req']
-        except KeyError:
-            mandarin_req = None
-        if mandarin_req == 'on':
-            mandarin_req = True
-        else:
-            mandarin_req = False
-
-        #Redo this stage with chinese speaker
-
-        try:
-            redo_by_mandarin = fl.request.form['redo_by_mandarin']
-        except KeyError:
-            redo_by_mandarin = None
-        if redo_by_mandarin == 'on':
-            redo_by_mandarin = True
-        else:
-            redo_by_mandarin = False
-        #Redo this stage without chinese speaker
-
-        try:
-            redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
-        except KeyError:
-            redo_by_non_mandarin = None
-        if redo_by_non_mandarin == 'on':
-            redo_by_non_mandarin = True
-        else:
-            redo_by_non_mandarin = False
-
-        t_db.reviews = no_of_reviews
-        t_db.date_assigned = assigned_date
-        t_db.chin_inv_file_no = chin_inv_file_no
-        t_db.counterpart_file_no = counterpart_file_no
-        t_db.redo_by_mandarin = redo_by_mandarin
-        t_db.mandarin_req = mandarin_req
-        t_db.redo_by_non_mandarin = redo_by_non_mandarin
-        t_db.type_correspondence = type_correspondence
-        t_db.info_from_correspondence = info_from_correspondence
-        t_db.info_already_found = info_already_found
-        db.db_session.add(t_db)
-        db.db_session.commit()
-        fl.flash("Updated stage2", "success")
-        return fl.render_template('analyst/stage2.html', form=form,t=t_db)
+            fl.flash("Failed to update", "error")
+            fl.flash(str(form.errors), 'error')
+            fl.flash(str(new_chinese_file.errors), 'error')
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db, new_chinese_file= new_chinese_file)
 
 
 
@@ -1284,8 +1363,9 @@ def transistion_transaction(trans):
         if new:
             s2.who_assigned = new
             # email user that they have the task now
-            s.send_user(new, "New Transaction!",  "Hello, here is a new \
-            transaction for you __>here<__.", False)
+            # NOTE : Commenting as of now as we dont have access
+            #s.send_user(new, "New Transaction!",  "Hello, here is a new \
+            #transaction for you __>here<__.", False)
         else:
             fl.flash("Unable to allocate user to transaction", "error")
 
