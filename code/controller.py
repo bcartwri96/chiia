@@ -966,7 +966,8 @@ def stage3(s_id):
     import datetime as dt
     if fl.request.method == 'GET':
         form.S3_date.data = dt.datetime.now()
-        if t_db.reviews:
+        if not t_db.reviews == None:
+            # initially, none in db so NoneType returned
             form.S3_reviews.data = t_db.reviews + 1
         else:
             form.S3_reviews.data = 0
@@ -974,7 +975,27 @@ def stage3(s_id):
     else:
         assigned_date = fl.request.form['S3_date']
         no_of_reviews = fl.request.form['S3_reviews']
+
+        try:
+            dataset_type = fl.request.form['dataset_type']
+        except KeyError:
+            dataset_type = None
+        if dataset_type == '1':
+            dataset_type = 'Main'
+        elif dataset_type == '2':
+            dataset_type = 'Supplementary'
+        else:
+            type_correspondence = ''
+
         # Correspondence  workflow option
+        try:
+            correspondence_req = fl.request.form['correspondence_req']
+        except KeyError:
+            correspondence_req = None
+        if correspondence_req == 'on':
+            correspondence_req = True
+        else:
+            correspondence_req = False
         try:
             type_correspondence = fl.request.form['type_correspondence']
         except KeyError:
@@ -1022,9 +1043,11 @@ def stage3(s_id):
 
         t_db.reviews = no_of_reviews
         t_db.date_assigned = assigned_date
+        t_db.dataset_type = dataset_type
         t_db.redo_by_mandarin = redo_by_mandarin
         t_db.mandarin_req = mandarin_req
         t_db.redo_by_non_mandarin = redo_by_non_mandarin
+        t_db.correspondence_req = correspondence_req
         t_db.type_correspondence = type_correspondence
         t_db.info_from_correspondence = info_from_correspondence
         t_db.info_already_found = info_already_found
@@ -1037,7 +1060,7 @@ def stage3(s_id):
         else:
             s4_max=1
 
-        s4 = ml.Stage_4(s_id=s4_max, entity_name="")
+        s4 = ml.Stage_4(s_id=s4_max)
         # NOTE: Need to check whether entity name is required in stage 4
         db.db_session.add(s4)
 
