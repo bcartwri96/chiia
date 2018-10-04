@@ -40,7 +40,7 @@ class Create_Transaction(wtf.FlaskForm):
     anouncement_date = DateField('annoucement', format='%Y-%m-%d', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
     entity_name = StringField('entity_name', validators=[DataRequired(message="You need to enter an entity name")])
     rumour_date = DateField('rumour', format='%Y-%m-%d', validators=[DataRequired(message='You need to enter a date of format d-m-y')],)
-    mandarin = BooleanField('mandarin')
+    mandarin_req = BooleanField('mandarin_req')
 
     #prefill this with the filled value of the current user
     who_assigned = StringField('who_assigned')
@@ -156,12 +156,21 @@ class roster(wtf.FlaskForm):
 
 class chinese_investor_file(wtf.FlaskForm):
     pid = IntegerField('pid')
-    legal_name = StringField('legal_name',validators=[DataRequired("This legal_name cannot be empty")])
-    linked_iid = IntegerField('linked_iid', validators=[DataRequired("This linked_iid cannot be empty")])
-    nickname_iid = StringField('nickname_iid', validators=[DataRequired("This nickname_iid cannot be empty")])
+    legal_name = StringField('legal_name')
+    linked_iid = IntegerField('linked_iid')
+    nickname_iid = StringField('nickname_iid')
     stage_added = IntegerField('stage_added')
     file_checked_la  = BooleanField('file_checked_la')
-    task_submitted = SubmitField('Submit the Task')
+    file_submitted = SubmitField('Submit the details of new chinese investor file')
+
+class counterpart_investor_file(wtf.FlaskForm):
+    counter_pid = IntegerField('counter_pid')
+    counter_legal_name = StringField('counter_legal_name')
+    counter_linked_iid = IntegerField('counter_linked_iid')
+    counter_nickname_iid = StringField('counter_nickname_iid')
+    counter_stage_added = IntegerField('counter_stage_added')
+    counter_file_checked_la  = BooleanField('counter_file_checked_la')
+    counter_file_submitted = SubmitField('Submit the details of new counterpart investor file')
 
 
 

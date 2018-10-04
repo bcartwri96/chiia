@@ -223,14 +223,6 @@ class Stage_2(Base_Stage_Task):
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
 
-    # IF they select a new file is created, then we need to
-    # record the following:
-    pid = sa.Column(sa.Integer)
-    legal_name = sa.Column(sa.String)
-    linked_iid = sa.Column(sa.Integer)
-    nickname_iid = sa.Column(sa.String)
-    file_checked_la = sa.Column(sa.Boolean)
-
     stage_2_id = sao.relationship("Stage_Rels")
 
     state = sa.Column(sa.Enum(State))
@@ -319,6 +311,17 @@ class Calendar(db.Base):
 
 class Chinese_Investor_File(db.Base):
     __tablename__ = 'chinese_investor_file'
+    __table_args__ = {'extend_existing': True}
+
+    pid = sa.Column(sa.Integer, nullable=False, primary_key=True)
+    legal_name = sa.Column(sa.String, nullable=False)
+    linked_iid = sa.Column(sa.Integer, nullable=False)
+    nickname_iid = sa.Column(sa.String, nullable=False)
+    stage_added = sa.Column(sa.Integer, nullable=False)
+    file_checked_la = sa.Column(sa.Boolean)
+
+class Counterpart_Investor_File(db.Base):
+    __tablename__ = 'counterpart_investor_file'
     __table_args__ = {'extend_existing': True}
 
     pid = sa.Column(sa.Integer, nullable=False, primary_key=True)
