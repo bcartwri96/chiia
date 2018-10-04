@@ -261,6 +261,10 @@ class Stage_4(Base_Stage_Task):
     date = sa.Column(sa.DateTime)
     chin_inv_file_no = sa.Column(sa.Integer)
     counterpart_file_no = sa.Column(sa.Integer)
+    # if needs to be redone because of a langauge barrier (chinese speaker )
+    redo_by_mandarin = sa.Column(sa.Boolean)
+    # if needs to be redone because of a langauge barrier (chinese speaker )
+    redo_by_non_mandarin = sa.Column(sa.Boolean)
 
     #mandarin_req = sa.Column(sa.Boolean)
 

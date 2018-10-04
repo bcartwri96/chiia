@@ -1085,7 +1085,8 @@ def stage4(s_id):
 
     if fl.request.method == 'GET':
         form.S4_date.data = dt.datetime.now()
-        if t_db.reviews:
+        if not t_db.reviews == None:
+            # initially, none in db so NoneType returned
             form.S4_reviews.data = t_db.reviews + 1
         else:
             form.S4_reviews.data = 0
@@ -1095,10 +1096,32 @@ def stage4(s_id):
         no_of_reviews = fl.request.form['S4_reviews']
         chin_inv_file_no = fl.request.form['chin_inv_file_no']
         counterpart_file_no =  fl.request.form['counterpart_file_no']
+
+        try:
+            redo_by_mandarin = fl.request.form['redo_by_mandarin']
+        except KeyError:
+            redo_by_mandarin = None
+        if redo_by_mandarin == 'on':
+            redo_by_mandarin = True
+        else:
+            redo_by_mandarin = False
+        #Redo this stage without chinese speaker
+
+        try:
+            redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
+        except KeyError:
+            redo_by_non_mandarin = None
+        if redo_by_non_mandarin == 'on':
+            redo_by_non_mandarin = True
+        else:
+            redo_by_non_mandarin = False
+
         t_db.reviews = no_of_reviews
         t_db.date = assigned_date
         t_db.chin_inv_file_no = chin_inv_file_no
         t_db.counterpart_file_no = counterpart_file_no
+        t_db.redo_by_mandarin = redo_by_mandarin
+        t_db.redo_by_non_mandarin = redo_by_non_mandarin
         db.db_session.add(t_db)
         db.db_session.commit()
         fl.flash("Updated stage4", "success")

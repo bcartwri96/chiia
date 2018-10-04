@@ -103,7 +103,7 @@ class stage2(wtf.FlaskForm):
     nickname_iid = StringField('nickname_iid')
     file_checked_la  = BooleanField('file_checked_la')
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
-    task_submitted = SubmitField('Submit the Task')
+    task_submitted = SubmitField('Submit the Stage2')
 
 class stage3(wtf.FlaskForm):
 
@@ -120,7 +120,7 @@ class stage3(wtf.FlaskForm):
     info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
     info_already_found = StringField('info_already_found', validators=[DataRequired()])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
-    task_submitted = SubmitField('Submit the Task')
+    task_submitted = SubmitField('Submit the Stage3')
 
 
 class stage4(wtf.FlaskForm):
@@ -130,7 +130,10 @@ class stage4(wtf.FlaskForm):
 
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
-#    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+    #dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+    # redo same stage with chinese speaker or without chinese speaker workflow option
+    redo_by_mandarin = BooleanField('redo_by_mandarin')
+    redo_by_non_mandarin = BooleanField('redo_by_non_mandarin')
 
     # IF they select a new file is created
     pid = IntegerField('pid')
@@ -138,7 +141,7 @@ class stage4(wtf.FlaskForm):
     linked_iid = IntegerField('linked_iid')
     nickname_iid = StringField('nickname_iid')
     file_checked_la  = BooleanField('file_checked_la')
-    task_submitted = SubmitField('Submit the Task')
+    task_submitted = SubmitField('Submit the Stage4')
 
 class roster(wtf.FlaskForm):
     from datetime import datetime, timedelta

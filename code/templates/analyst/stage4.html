@@ -53,7 +53,18 @@
             {{ form.chin_inv_file_no(class="form-control") }}
             <label for="exampleFormControlInput1">Counterpart investor file no.</label>
             {{ form.counterpart_file_no(class="form-control") }}
+            
             <br>
+          <input  type="checkbox" name="redo_by_mandarin"  />
+            <label class="exampleFormControlInput1">
+              Redo this stage and assign to a Chinese speaker
+          </label>
+            <br>
+          <input  type="checkbox" name="redo_by_non_mandarin"  />
+            <label class="exampleFormControlInput1">
+              Redo this stage and assign to a non-Chinese speaker
+          </label>
+          <br>
             <input  type="checkbox" name="Counterpart_req" id = "idk1" onclick = "showHide_counter()" />
               <label class="exampleFormControlInput1">
                 New Counterpart investor file required
