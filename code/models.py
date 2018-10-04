@@ -268,14 +268,6 @@ class Stage_4(Base_Stage_Task):
 
     #mandarin_req = sa.Column(sa.Boolean)
 
-    # IF they select a new file is created, then we need to
-    # record the following:
-    pid = sa.Column(sa.Integer)
-    legal_name = sa.Column(sa.String)
-    linked_iid = sa.Column(sa.Integer)
-    nickname_iid = sa.Column(sa.String)
-    file_checked_la = sa.Column(sa.Boolean)
-
     stage_4_id = sao.relationship("Stage_Rels")
 
     state = sa.Column(sa.Enum(State))

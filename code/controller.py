@@ -802,7 +802,8 @@ def stage2(s_id):
 
         new_counter_file.counter_linked_iid.data = s.trans_id
         new_counter_file.counter_nickname_iid.data = sr.entity_name
-        return fl.render_template('analyst/stage2.html', form=form,t=t_db, new_chinese_file=new_chinese_file,new_counter_file = new_counter_file)
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db, \
+        new_chinese_file=new_chinese_file,new_counter_file = new_counter_file)
     else:
         if form.validate_on_submit() and form.task_submitted.data:
             # getting details of stage 2
@@ -955,7 +956,8 @@ def stage2(s_id):
             fl.flash("Failed to update", "error")
             fl.flash(str(form.errors), 'error')
             fl.flash(str(new_chinese_file.errors), 'error')
-        return fl.render_template('analyst/stage2.html', form=form,t=t_db, new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
+        return fl.render_template('analyst/stage2.html', form=form,t=t_db, \
+        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
 
 
 
@@ -1080,6 +1082,8 @@ def stage3(s_id):
 def stage4(s_id):
     import forms as fm
     form = fm.stage4(fl.request.form)
+    new_chinese_file  = fm.chinese_investor_file(fl.request.form)
+    new_counter_file  = fm.counterpart_investor_file(fl.request.form)
     t_db = ml.Stage_4.query.get(s_id)
     import datetime as dt
 
@@ -1090,42 +1094,128 @@ def stage4(s_id):
             form.S4_reviews.data = t_db.reviews + 1
         else:
             form.S4_reviews.data = 0
-        return fl.render_template('analyst/stage4.html', form=form, t=t_db)
+        # get method for adding nnew chinese investor file
+        # getting the related IID(trans_id) from stage_rels
+        s = ml.Stage_Rels.query.filter_by(stage_4_id=s_id ).first()
+        # getting the related entity name from transactions
+        sr = ml.Transactions.query.get(s.trans_id)
+
+        new_chinese_file.linked_iid.data = s.trans_id
+        new_chinese_file.nickname_iid.data = sr.entity_name
+
+        # get method for adding nnew counterpart investor file
+        # getting the related IID(trans_id) from stage_rels
+
+        new_counter_file.counter_linked_iid.data = s.trans_id
+        new_counter_file.counter_nickname_iid.data = sr.entity_name
+        return fl.render_template('analyst/stage4.html', form=form, t=t_db,\
+        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
     else:
-        assigned_date = fl.request.form['S4_date']
-        no_of_reviews = fl.request.form['S4_reviews']
-        chin_inv_file_no = fl.request.form['chin_inv_file_no']
-        counterpart_file_no =  fl.request.form['counterpart_file_no']
+        if form.validate_on_submit() and form.task_submitted.data:
+            assigned_date = fl.request.form['S4_date']
+            no_of_reviews = int(fl.request.form['S4_reviews'])
+            chin_inv_file_no = fl.request.form['chin_inv_file_no']
+            counterpart_file_no =  fl.request.form['counterpart_file_no']
 
-        try:
-            redo_by_mandarin = fl.request.form['redo_by_mandarin']
-        except KeyError:
-            redo_by_mandarin = None
-        if redo_by_mandarin == 'on':
-            redo_by_mandarin = True
+            try:
+                redo_by_mandarin = fl.request.form['redo_by_mandarin']
+            except KeyError:
+                redo_by_mandarin = None
+            if redo_by_mandarin == 'on':
+                redo_by_mandarin = True
+            else:
+                redo_by_mandarin = False
+            #Redo this stage without chinese speaker
+
+            try:
+                redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
+            except KeyError:
+                redo_by_non_mandarin = None
+            if redo_by_non_mandarin == 'on':
+                redo_by_non_mandarin = True
+            else:
+                redo_by_non_mandarin = False
+
+            t_db.reviews = no_of_reviews
+            t_db.date = assigned_date
+            t_db.chin_inv_file_no = chin_inv_file_no
+            t_db.counterpart_file_no = counterpart_file_no
+            t_db.redo_by_mandarin = redo_by_mandarin
+            t_db.redo_by_non_mandarin = redo_by_non_mandarin
+            db.db_session.add(t_db)
+            try:
+                db.db_session.commit()
+                fl.flash("Updated stage4", "success")
+            except sa.exc.InvalidRequestError():
+                fl.flash("Failed to update stage2", "error")
+        elif new_counter_file.validate_on_submit() and new_counter_file.counter_file_submitted.data:
+            counter_file = ml.Counterpart_Investor_File()
+            # getting details of new chinese file investor
+            # get the max id and then increment
+            max_id = db.db_session.query(sa.func.max(ml.Counterpart_Investor_File.pid)).scalar()
+            if not max_id == None:
+                # initially, none in db so NoneType returned
+                pid = max_id + 1
+            else:
+                pid = int(1)
+            legal_name = fl.request.form['counter_legal_name']
+            linked_iid = fl.request.form['counter_linked_iid']
+            nickname_iid = fl.request.form['counter_nickname_iid']
+            stage_added = 4
+            try:
+                file_checked_la = fl.request.form['counter_file_checked_la']
+            except KeyError:
+                file_checked_la = None
+            if file_checked_la == 'on':
+                file_checked_la = True
+            else:
+                file_checked_la = False
+            counter_file.pid = pid
+            counter_file.legal_name = legal_name
+            counter_file.linked_iid = linked_iid
+            counter_file.nickname_iid = nickname_iid
+            counter_file.stage_added = stage_added
+            counter_file.file_checked_la = file_checked_la
+            db.db_session.add(counter_file)
+            db.db_session.commit()
+            fl.flash("create new counterpart investor file", "success")
+        elif new_chinese_file.validate_on_submit() and new_chinese_file.file_submitted.data:
+            chinese_file = ml.Chinese_Investor_File()
+            # getting details of new counterpart file investor
+            # get the max id and then increment
+            max_id = db.db_session.query(sa.func.max(ml.Chinese_Investor_File.pid)).scalar()
+            if not max_id == None:
+                # initially, none in db so NoneType returned
+                pid = max_id + 1
+            else:
+                pid = int(1)
+            legal_name = fl.request.form['legal_name']
+            linked_iid = fl.request.form['linked_iid']
+            nickname_iid = fl.request.form['nickname_iid']
+            stage_added = 4
+            try:
+                file_checked_la = fl.request.form['file_checked_la']
+            except KeyError:
+                file_checked_la = None
+            if file_checked_la == 'on':
+                file_checked_la = True
+            else:
+                file_checked_la = False
+            chinese_file.pid = pid
+            chinese_file.legal_name = legal_name
+            chinese_file.linked_iid = linked_iid
+            chinese_file.nickname_iid = nickname_iid
+            chinese_file.stage_added = stage_added
+            chinese_file.file_checked_la = file_checked_la
+            db.db_session.add(chinese_file)
+            db.db_session.commit()
+            fl.flash("create new chinese investor file", "success")
         else:
-            redo_by_mandarin = False
-        #Redo this stage without chinese speaker
-
-        try:
-            redo_by_non_mandarin = fl.request.form['redo_by_non_mandarin']
-        except KeyError:
-            redo_by_non_mandarin = None
-        if redo_by_non_mandarin == 'on':
-            redo_by_non_mandarin = True
-        else:
-            redo_by_non_mandarin = False
-
-        t_db.reviews = no_of_reviews
-        t_db.date = assigned_date
-        t_db.chin_inv_file_no = chin_inv_file_no
-        t_db.counterpart_file_no = counterpart_file_no
-        t_db.redo_by_mandarin = redo_by_mandarin
-        t_db.redo_by_non_mandarin = redo_by_non_mandarin
-        db.db_session.add(t_db)
-        db.db_session.commit()
-        fl.flash("Updated stage4", "success")
-        return fl.render_template('analyst/stage4.html', form=form,t=t_db)
+            fl.flash("Failed to update", "error")
+            fl.flash(str(form.errors), 'error')
+            fl.flash(str(new_chinese_file.errors), 'error')
+        return fl.render_template('analyst/stage4.html', form=form,t=t_db,\
+        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
 
 
 

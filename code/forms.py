@@ -126,7 +126,7 @@ class stage3(wtf.FlaskForm):
 class stage4(wtf.FlaskForm):
 
     S4_date = DateField('S4_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
-    S4_reviews = IntegerField('S4_reviews', validators=[DataRequired("This column cannot be empty")])
+    S4_reviews = IntegerField('S4_reviews')
 
     chin_inv_file_no = IntegerField('chin_inv_file_no', validators=[DataRequired("This column cannot be empty")])
     counterpart_file_no = IntegerField('counterpart_file_no', validators=[DataRequired("This column cannot be empty")])
@@ -152,7 +152,9 @@ class roster(wtf.FlaskForm):
 
     #start_date = DateField('start_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     #end_date = DateField('end_date', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
-    start_date = SelectField('start_date', choices=[(start, start), (start + timedelta(days=7), start + timedelta(days=7))])
+    start_date = SelectField('start_date', choices=[(start, start), (start + timedelta(days=7), start + timedelta(days=7)), \
+    (start + timedelta(days=14), start + timedelta(days=14)), \
+    (start + timedelta(days=21), start + timedelta(days=21)), (start + timedelta(days=28), start + timedelta(days=28))])
     end_date = SelectField('end_date', choices=[])
     no_of_hours = IntegerField('no_of_hours', validators=[DataRequired("This column cannot be empty")])
     task_submitted = SubmitField('Submit the roster')
