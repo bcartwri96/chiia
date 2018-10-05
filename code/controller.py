@@ -688,6 +688,7 @@ def stage1(id):
             except sa.exc.InvalidRequestError():
                 fl.flash("Failed to update task", "error")
 
+
         elif new_transaction.validate_on_submit() and \
         new_transaction.trans_submitted.data:
                 # process the new transaction here and ensure it is bound
@@ -779,6 +780,11 @@ def stage2(s_id):
     new_chinese_file  = fm.chinese_investor_file(fl.request.form)
     new_counter_file  = fm.counterpart_investor_file(fl.request.form)
     t_db = ml.Stage_2.query.get(s_id)
+    trans = ml.Stage_Rels.query.filter_by(stage_2_id = s_id).first()
+    new_counter_file_tb = ml.Counterpart_Investor_File.query.filter_by(linked_iid = trans.trans_id, stage_added = 2).all()
+    new_chinese_file_tb = ml.Chinese_Investor_File.query.filter_by(linked_iid = trans.trans_id, stage_added = 2).all()
+
+
     import datetime as dt
 
     if fl.request.method == 'GET':
@@ -803,7 +809,8 @@ def stage2(s_id):
         new_counter_file.counter_linked_iid.data = s.trans_id
         new_counter_file.counter_nickname_iid.data = sr.entity_name
         return fl.render_template('analyst/stage2.html', form=form,t=t_db, \
-        new_chinese_file=new_chinese_file,new_counter_file = new_counter_file)
+        new_chinese_file=new_chinese_file,new_counter_file = new_counter_file,\
+         new_counter_file_tb= new_counter_file_tb , new_chinese_file_tb = new_chinese_file_tb)
     else:
         if form.validate_on_submit() and form.task_submitted.data:
             # getting details of stage 2
@@ -919,8 +926,12 @@ def stage2(s_id):
             counter_file.stage_added = stage_added
             counter_file.file_checked_la = file_checked_la
             db.db_session.add(counter_file)
-            db.db_session.commit()
             fl.flash("create new counterpart investor file", "success")
+            try:
+                db.db_session.commit()
+                fl.flash("create new counterpart investor file", "success")
+            except sa.exc.InvalidRequestError:
+                fl.flash("Failed to create new counterpart investor file", "error")
         elif new_chinese_file.validate_on_submit() and new_chinese_file.file_submitted.data:
             chinese_file = ml.Chinese_Investor_File()
             # getting details of new counterpart file investor
@@ -950,14 +961,20 @@ def stage2(s_id):
             chinese_file.stage_added = stage_added
             chinese_file.file_checked_la = file_checked_la
             db.db_session.add(chinese_file)
-            db.db_session.commit()
-            fl.flash("create new chinese investor file", "success")
+            try:
+                db.db_session.commit()
+                fl.flash("create new chinese investor file", "success")
+            except sa.exc.InvalidRequestError:
+                fl.flash("Failed to new chinese investor file", "error")
+
         else:
             fl.flash("Failed to update", "error")
             fl.flash(str(form.errors), 'error')
             fl.flash(str(new_chinese_file.errors), 'error')
+            fl.flash(str(counter_file.errors), 'error')
         return fl.render_template('analyst/stage2.html', form=form,t=t_db, \
-        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
+        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file, \
+        new_counter_file_tb= new_counter_file_tb, new_chinese_file_tb= new_chinese_file_tb)
 
 
 
@@ -1085,6 +1102,9 @@ def stage4(s_id):
     new_chinese_file  = fm.chinese_investor_file(fl.request.form)
     new_counter_file  = fm.counterpart_investor_file(fl.request.form)
     t_db = ml.Stage_4.query.get(s_id)
+    trans = ml.Stage_Rels.query.filter_by(stage_4_id = s_id).first()
+    new_counter_file_tb = ml.Counterpart_Investor_File.query.filter_by(linked_iid = trans.trans_id, stage_added = 4).all()
+    new_chinese_file_tb = ml.Chinese_Investor_File.query.filter_by(linked_iid = trans.trans_id, stage_added = 4).all()
     import datetime as dt
 
     if fl.request.method == 'GET':
@@ -1109,7 +1129,8 @@ def stage4(s_id):
         new_counter_file.counter_linked_iid.data = s.trans_id
         new_counter_file.counter_nickname_iid.data = sr.entity_name
         return fl.render_template('analyst/stage4.html', form=form, t=t_db,\
-        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
+        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file, \
+        new_counter_file_tb= new_counter_file_tb, new_chinese_file_tb= new_chinese_file_tb)
     else:
         if form.validate_on_submit() and form.task_submitted.data:
             assigned_date = fl.request.form['S4_date']
@@ -1215,7 +1236,8 @@ def stage4(s_id):
             fl.flash(str(form.errors), 'error')
             fl.flash(str(new_chinese_file.errors), 'error')
         return fl.render_template('analyst/stage4.html', form=form,t=t_db,\
-        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file)
+        new_chinese_file= new_chinese_file,new_counter_file = new_counter_file, \
+        new_counter_file_tb= new_counter_file_tb, new_chinese_file_tb= new_chinese_file_tb)
 
 
 

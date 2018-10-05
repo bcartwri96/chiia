@@ -162,8 +162,65 @@
           </label>
           <br>
           {{ new_counter_file.counter_file_submitted(class_="btn btn-outline-primary") }}
-
+          <br>
             </div>
+            <div>
+            <br>
+            <h5 class="display-5">Related New Counterpart Investor File</h5>
+            <table class="table table-hover">
+               <thead class="thead-dark">
+                <tr>
+                  <th scope="col">PID</th>
+                  <th scope="col"> Operating legal entity name </th>
+                  <th scope="col"> Related IID </th>
+                  <th scope="col"> Check status </th>
+
+
+                </tr>
+              </thead>
+              <tbody>
+              {% for counter_file in new_counter_file_tb %}
+                <tr>
+                  <td scope="row">{{ counter_file.pid }}</th>
+                  <td scope="row">{{ counter_file.legal_name }}</th>
+                  <td scope="row">{{ counter_file.linked_iid }}</th>
+                  <td scope="row">{{ counter_file.file_checked_la }}</th>
+
+
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+            <br>
+            <br>
+            <h5 class="display-5">Related New Chinese Investor File</h5>
+            <table class="table table-hover">
+               <thead class="thead-dark">
+                <tr>
+                  <th scope="col">PID</th>
+                  <th scope="col"> Operating legal entity name </th>
+                  <th scope="col"> Related IID </th>
+                  <th scope="col"> Check status </th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for chinese_file in new_chinese_file_tb %}
+                <tr>
+                  <td scope="row">{{ chinese_file.pid }}</th>
+                  <td scope="row">{{ chinese_file.legal_name }}</th>
+                  <td scope="row">{{ chinese_file.linked_iid }}</th>
+                  <td scope="row">{{ chinese_file.file_checked_la }}</th>
+
+
+
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
 
     </form>
+
+
+
     </body>
