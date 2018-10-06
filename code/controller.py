@@ -893,6 +893,9 @@ def stage2(s_id):
             t_db.info_already_found = info_already_found
             db.db_session.add(t_db)
             try:
+                # we want to add the transistion to s3
+                s3 = transistion_transaction(t_db)
+                # recall: returns the next stage if successful
                 db.db_session.commit()
                 fl.flash("Updated stage2", "success")
             except sa.exc.InvalidRequestError():
@@ -971,7 +974,7 @@ def stage2(s_id):
             fl.flash("Failed to update", "error")
             fl.flash(str(form.errors), 'error')
             fl.flash(str(new_chinese_file.errors), 'error')
-            fl.flash(str(counter_file.errors), 'error')
+            # fl.flash(str(counter_file.errors), 'error')
         return fl.render_template('analyst/stage2.html', form=form,t=t_db, \
         new_chinese_file= new_chinese_file,new_counter_file = new_counter_file, \
         new_counter_file_tb= new_counter_file_tb, new_chinese_file_tb= new_chinese_file_tb)
@@ -1579,9 +1582,61 @@ def transistion_transaction(trans):
             fl.flash("Failed to transistion into stage two", "error")
 
         return s2
-    elif trans.state == 2:
-        pass # we need to create a stage 3 here and follow the transistion
-        # rules
+    elif trans.stage == 2:
+        # ==========
+        # RULES
+        # ==========
+
+        # MUST PASS LA check, so check whether the LA has
+
+        # CHECK! has it already been accepted by the LA?
+        if trans.stage == State.Accepted:
+            # great! create a s3
+
+            # get the new id for stage 3
+            s3_id = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
+            if s3_id:
+                s3_id += 1
+            else:
+                s3_id = 1
+
+            s3 = ml.Stage_3(s_id = s3_id, state = State.Working)
+
+            # we need to allocate this to a user, so allocate.
+            u = allocate_user(trans, trans.mandarin_req)
+            s3.who_assigned = u
+
+            db.db_session.add(s3)
+
+            # update the stage relations
+            sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id == \
+            trans.s_id).first()
+            sr.stage_3_id = s3_id
+            db.db_session.add(sr)
+        elif trans.state == State.Pending:
+            fl.flash("Lead Analyst is yet to accept", "error")
+            return -1
+        elif trans.state == State.Rejected:
+            fl.flash("Lead Analyst has rejected this work", "error")
+            return -1
+        else:
+            # state == working so we need to actually kick off the process of
+            # getting the LA to accept :)
+
+            # get LA ID
+            la = ml.User.query.filter(ml.User.admin).first()
+            s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
+            there's a new submission that needs to be checked for the \
+            transaction. See the website for more details. Ben.", False)
+
+            fl.flash("Lead analyst contacted.", "success")
+
+            # state change
+            trans.state = State.Pending
+            db.db_sessions.add(trans)
+
+        db.db_session.commit()
+        return s3
     else:
         return None
 
