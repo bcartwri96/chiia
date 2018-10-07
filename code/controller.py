@@ -752,8 +752,8 @@ def stage1(id):
                     db.db_session.commit()
                     fl.flash("Bound new transaction to current task "+str(t_db.nickname), 'success')
 
-                    # transistion into stage 2
-                    s2 = transistion_transaction(trans)
+                    # transition into stage 2
+                    s2 = transition_transaction(trans)
                     # NOTE : Do we really need this as this wont allow us to add more transaction
                     #if s2: # if we created the s2 correctly
                         #return fl.redirect(fl.url_for('stage2', s_id=s2.s_id))
@@ -892,10 +892,12 @@ def stage2(s_id):
             t_db.info_from_correspondence = info_from_correspondence
             t_db.info_already_found = info_already_found
             db.db_session.add(t_db)
+
+            # we want to add the transition to s3
+            s3 = transition_transaction(t_db)
+            # recall: returns the next stage if successful
+
             try:
-                # we want to add the transistion to s3
-                s3 = transistion_transaction(t_db)
-                # recall: returns the next stage if successful
                 db.db_session.commit()
                 fl.flash("Updated stage2", "success")
             except sa.exc.InvalidRequestError():
@@ -1540,7 +1542,7 @@ def working_to_pending(id):
     email to the LA saying it needs approval"""
     pass
 
-def transistion_transaction(trans):
+def transition_transaction(trans):
     """take the current transaction and move the user between this stage and
     the next"""
     if trans.stage == 1:
@@ -1577,9 +1579,9 @@ def transistion_transaction(trans):
 
         try:
             db.db_session.commit()
-            fl.flash("Successful transistion to stage two!", "success")
+            fl.flash("Successful transition to stage two!", "success")
         except sa.exc.InvalidRequestError:
-            fl.flash("Failed to transistion into stage two", "error")
+            fl.flash("Failed to transition into stage two", "error")
 
         return s2
     elif trans.stage == 2:
@@ -1613,6 +1615,10 @@ def transistion_transaction(trans):
             trans.s_id).first()
             sr.stage_3_id = s3_id
             db.db_session.add(sr)
+
+            db.db_session.commit()
+            return s3
+
         elif trans.state == State.Pending:
             fl.flash("Lead Analyst is yet to accept", "error")
             return -1
@@ -1633,10 +1639,13 @@ def transistion_transaction(trans):
 
             # state change
             trans.state = State.Pending
-            db.db_sessions.add(trans)
+            db.db_session.add(trans)
 
-        db.db_session.commit()
-        return s3
+            db.db_session.commit()
+            return 0
+
+    elif trans.state == 3:
+        return None
     else:
         return None
 

@@ -165,6 +165,8 @@ class Base_Stage_Task(db.Base):
 
     who_assigned = sa.Column(sa.Integer)
 
+    stage = sa.Column(sa.Integer, nullable=False)
+
 # transactions (stage 1)
 # =============
 
@@ -190,9 +192,7 @@ class Transactions(Base_Stage_Task):
     # ======== admin area ==========
     # ==============================
 
-    # this is the state of each of the transactions.
-    # can be done, need a redo or archived.
-    stage = sa.Column(sa.Integer, nullable=False)
+    stage = sa.Column(sa.Integer, nullable=False, default=1)
 
     tasks = sa.Column(sa.Integer, sa.ForeignKey('tasks.id'))
 
@@ -226,6 +226,7 @@ class Stage_2(Base_Stage_Task):
     stage_2_id = sao.relationship("Stage_Rels")
 
     state = sa.Column(sa.Enum(State))
+    stage = sa.Column(sa.Integer, nullable=False, default=2)
 
 
 class Stage_3(Base_Stage_Task):
@@ -252,6 +253,8 @@ class Stage_3(Base_Stage_Task):
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
 
+    stage = sa.Column(sa.Integer, nullable=False, default=3)
+
     stage_3_id = sao.relationship("Stage_Rels")
 
 class Stage_4(Base_Stage_Task):
@@ -267,6 +270,7 @@ class Stage_4(Base_Stage_Task):
     redo_by_non_mandarin = sa.Column(sa.Boolean)
 
     #mandarin_req = sa.Column(sa.Boolean)
+    stage = sa.Column(sa.Integer, nullable=False, default=4)
 
     stage_4_id = sao.relationship("Stage_Rels")
 
