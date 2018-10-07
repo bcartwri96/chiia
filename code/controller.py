@@ -1353,7 +1353,7 @@ def update_calendar():
 
 def master_sheet():
     import forms as fm
-    form = fm.roster(fl.request.form)
+    form = fm.master_sheet(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('master_sheet.html',form= form)
     else:
@@ -1366,6 +1366,29 @@ def master_sheet():
         cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
         cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
         return fl.render_template('master_sheet.html', form= form, s1 = s1, s2= s2, s3=s3, s4= s4,cf =cf,cof = cof)
+
+def stage_check():
+    import forms as fm
+    if fl.session['admin']:
+        if fl.request.method == 'GET':
+            s2 = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
+            s4 = ml.Stage_4.query.filter(ml.Stage_4.state == "Pending").all()
+            return fl.render_template('leadanalyst/stage_check.html', stage2=s2)
+
+def stage_2_details(s_id):
+    import forms as fm
+
+    #s_rels = ml.Stage_Rels.query.get(IID)
+    #s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id).all()
+    s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id ).first()
+    s1 = ml.Transactions.query.filter_by(s_id = s_rels.trans_id).first()
+    s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).first()
+    #cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
+    #cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
+    if fl.request.method == 'GET':
+        return fl.render_template('leadanalyst/stage_2_details.html',trans = s1, s2= s2)
+    else:
+        pass
 
 
 
