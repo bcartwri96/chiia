@@ -26,7 +26,7 @@
             <a class="nav-link" href="{{ url_for('manage_datasets') }}">Datasets</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('index') }}">Master Sheet</a>
+            <a class="nav-link" href="{{ url_for('master_sheet') }}">Master Sheet</a>
           </li>
           {% else %}
 
@@ -38,6 +38,9 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('roster') }}">Roster</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('master_sheet') }}">Master Sheet</a>
             </li>
           {% endif %}
       {% elif not current_user.is_authenticated %}

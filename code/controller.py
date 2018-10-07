@@ -1322,7 +1322,7 @@ def search_enddate(start_date):
 
     return fl.jsonify({'End_Date' : endArray})
 
-# to insert into calendar
+# to insert into calendar for next 6 mmonths
 # need to figure out where its should be called
 # presently called in roster (get method)
 def update_calendar():
@@ -1347,6 +1347,25 @@ def update_calendar():
             cal = ml.Calendar(start_date=start_date, end_date=end_date, id=id)
             db.db_session.add(cal)
     db.db_session.commit()
+
+
+def master_sheet():
+    import forms as fm
+    form = fm.roster(fl.request.form)
+    if fl.request.method == 'GET':
+        return fl.render_template('master_sheet.html',form= form)
+    else:
+        IID = int(fl.request.form['IID'])
+        s1 = ml.Transactions.query.filter_by(s_id = IID).all()
+        s_rels = ml.Stage_Rels.query.get(IID)
+        s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).all()
+        s3 = ml.Stage_3.query.filter_by(s_id = s_rels.stage_3_id).all()
+        s4 = ml.Stage_4.query.filter_by(s_id = s_rels.stage_4_id).all()
+        cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
+        cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
+        return fl.render_template('master_sheet.html', form= form, s1 = s1, s2= s2, s3=s3, s4= s4,cf =cf,cof = cof)
+
+
 
 # ================
 # allocation logic

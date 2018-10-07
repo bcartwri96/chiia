@@ -156,8 +156,10 @@ def stage4(s_id):
 def roster():
     return con.roster()
 
-
-
+@app.route('/master_sheet', methods=['GET', 'POST'])
+@flog.login_required
+def master_sheet():
+    return con.master_sheet()
 
 # API
 # ==========================
