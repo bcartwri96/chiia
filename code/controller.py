@@ -1385,10 +1385,30 @@ def stage_2_details(s_id):
     s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).first()
     #cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
     #cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
+
     if fl.request.method == 'GET':
         return fl.render_template('leadanalyst/stage_2_details.html',trans = s1, s2= s2)
     else:
-        pass
+        try:
+            state = fl.request.form['state']
+        except KeyError:
+            state = None
+        if state == '1':
+            s2.state = State.Accepted
+        elif state == '2':
+            s2.state = State.Rejected
+        else:
+            state = ''
+        db.db_session.add(s2)
+        db.db_session.commit()
+        t_db = ml.Stage_2.query.get(s2.s_id)
+        # we want to add the transition to s3
+        if t_db.state == State.Accepted:
+
+            s3 = transition_transaction(t_db)
+        s2_check = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
+
+        return fl.render_template('leadanalyst/stage_check.html', stage2=s2_check)
 
 
 
@@ -1634,7 +1654,7 @@ def transition_transaction(trans):
         # MUST PASS LA check, so check whether the LA has
 
         # CHECK! has it already been accepted by the LA?
-        if trans.stage == State.Accepted:
+        if trans.state == State.Accepted:
             # great! create a s3
 
             # get the new id for stage 3
@@ -1644,7 +1664,7 @@ def transition_transaction(trans):
             else:
                 s3_id = 1
 
-            s3 = ml.Stage_3(s_id = s3_id, state = State.Working)
+            s3 = ml.Stage_3(s_id = s3_id)
 
             # we need to allocate this to a user, so allocate.
             u = allocate_user(trans, trans.mandarin_req)

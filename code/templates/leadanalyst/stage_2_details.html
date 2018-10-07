@@ -1,5 +1,5 @@
 {% include "header.html" %}
-<title>Maste Sheet</title>
+<title>Stage 2 Details</title>
 {% block content %}
   <div class="container">
     <form action="{{ url_for('stage_2_details',s_id =s2.s_id ) }}" method="POST">
@@ -54,5 +54,24 @@
         </tbody>
       </table>
       {% endblock content %}
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Select One of the following</label>
+        <div class="row">
+          <div class="col">
+            <input class="form-check-input" type="radio" name="state" style="margin-left: 5px;" value="1">
+              <label class="form-check-label" style="padding-left: 25px;">
+                Done
+              </label>
+            <input class="form-check-input" type="radio" name="state" style="margin-left: 30px;" value="2">
+              <label class="form-check-label" style="padding-left: 50px;">
+                Redo
+              </label>
+                <br>
+              </div>
+              <br>
+            </div>
+     <button type="submit">Submit</button>
+    </form>
+  </div>
     </div>
   </form>
