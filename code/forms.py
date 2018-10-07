@@ -177,6 +177,10 @@ class counterpart_investor_file(wtf.FlaskForm):
     counter_file_checked_la  = BooleanField('counter_file_checked_la')
     counter_file_submitted = SubmitField('Submit the details of new counterpart investor file')
 
+class master_sheet(wtf.FlaskForm):
+    IID = IntegerField('IID')
+
+
 
 
     # chin_inv_file_no = FloatField('chin_inv_file_no', \

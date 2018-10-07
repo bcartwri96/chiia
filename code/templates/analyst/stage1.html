@@ -1,5 +1,8 @@
 {% include "header.html" %}
+
+
 <div class="container">
+  {% include "timer.html" %}
   <h4 class="display-4">Stage1</h4>
     <body>
     <form action="{{ url_for('stage1', id=t.id) }}" method="POST">

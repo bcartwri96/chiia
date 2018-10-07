@@ -1,0 +1,198 @@
+{% include "header.html" %}
+<title>Maste Sheet</title>
+{% block content %}
+  <div class="container">
+    <!-- in here is where the include will go -->
+    <form action="{{ url_for('master_sheet') }}" method="POST">
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Transaction ID : </label>
+        <input type="text" placeholder="Enter Transaction ID" name="IID">
+     <button type="submit">Submit</button>
+    </form>
+  </div>
+{% for trans in s1 %}
+  <h5 class="display-5">Stage 1 : Transaction </h5>
+  <table class="table table-hover">
+
+     <thead class="thead-dark">
+      <tr>
+        <th scope="col">IID</th>
+        <th scope="col">Entity Name</th>
+        <th scope="col">Rumour date</th>
+        <th scope="col">Announcement date</th>
+        <th scope="col">S1 Analsyt</th>
+
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td scope="row">{{ trans.s_id }}</th>
+        <td scope="row">{{ trans.entity_name }}</th>
+        <td scope="row">{{ trans.rumour_date }}</th>
+        <td scope="row">{{ trans.annoucement_date }}</th>
+        <td scope="row">{{ trans.who_assigned }}</th>
+      </tr>
+
+    </tbody>
+  </table>
+    {% endfor %}
+    {% for s2 in s2 %}
+      <h5 class="display-5">Stage 2 </h5>
+      <table class="table table-hover">
+
+         <thead class="thead-dark">
+          <tr>
+            <th scope="col">S2 Reviews</th>
+            <th scope="col">S2 Date</th>
+            <th scope="col">Chinese investor file no.</th>
+            <th scope="col">Counterpart investor file no.</th>
+            <th scope="col">S2 Analyst</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td scope="row">{{ s2.reviews }}</th>
+            <td scope="row">{{ s2.date_assigned }}</th>
+            <td scope="row">{{ s2.chin_inv_file_no }}</th>
+            <td scope="row">{{ s2.counterpart_file_no }}</th>
+            <td scope="row">{{ s2.who_assigned }}</th>
+          </tr>
+
+        </tbody>
+      </table>
+        {% endfor %}
+
+        {% for s3 in s3 %}
+          <h5 class="display-5">Stage 3  </h5>
+          <table class="table table-hover">
+
+             <thead class="thead-dark">
+              <tr>
+                <th scope="col">S3 Reviews</th>
+                <th scope="col">S3 Date</th>
+                <th scope="col">Dataset type </th>
+                <th scope="col">S3 Analyst</th>
+
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td scope="row">{{ s3.s_reviewsid }}</th>
+                <td scope="row">{{ s3.date_assigned }}</th>
+                <td scope="row">{{ s3.dataset_type }}</th>
+                <td scope="row">{{ s3.who_assigned }}</th>
+              </tr>
+
+            </tbody>
+          </table>
+            {% endfor %}
+
+            {% for s4 in s4 %}
+              <h5 class="display-5">Stage 4 </h5>
+              <table class="table table-hover">
+
+                 <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">S4 Reviews</th>
+                    <th scope="col">S4 Date</th>
+                    <th scope="col">Chinese investor file no.</th>
+                    <th scope="col">Counterpart investor file no.</th>
+                    <th scope="col">S4 Analyst</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <tr>
+                    <td scope="row">{{ s4.reviews }}</th>
+                    <td scope="row">{{ s4.date_assigned }}</th>
+                    <td scope="row">{{ s4.chin_inv_file_no }}</th>
+                    <td scope="row">{{ s4.chin_inv_file_no }}</th>
+                    <td scope="row">{{ s4.who_assigned }}</th>
+                  </tr>
+
+                </tbody>
+              </table>
+                {% endfor %}
+
+
+
+                <div>
+                <br>
+                {% for counter_file in cof %}
+                <h5 class="display-5">Related New Counterpart Investor File</h5>
+                <table class="table table-hover">
+                   <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">PID</th>
+                      <th scope="col"> Operating legal entity name </th>
+                      <th scope="col"> Related IID </th>
+                      <th scope="col"> Check status </th>
+
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td scope="row">{{ counter_file.pid }}</th>
+                      <td scope="row">{{ counter_file.legal_name }}</th>
+                      <td scope="row">{{ counter_file.linked_iid }}</th>
+                      <td scope="row">{{ counter_file.file_checked_la }}</th>
+
+
+                    </tr>
+
+                  </tbody>
+                </table>
+                {% endfor %}
+                <br>
+                <br>
+                {% for chinese_file in cf %}
+                <h5 class="display-5">Related New Chinese Investor File</h5>
+                <table class="table table-hover">
+                   <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">PID</th>
+                      <th scope="col"> Operating legal entity name </th>
+                      <th scope="col"> Related IID </th>
+                      <th scope="col"> Check status </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td scope="row">{{ chinese_file.pid }}</th>
+                      <td scope="row">{{ chinese_file.legal_name }}</th>
+                      <td scope="row">{{ chinese_file.linked_iid }}</th>
+                      <td scope="row">{{ chinese_file.file_checked_la }}</th>
+
+
+
+                    </tr>
+
+                  </tbody>
+                </table>
+                  {% endfor %}
+              </div>
+{% endblock content %}
+
+
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(e) {
+  if (!e.target.matches('.dropbtn')) {
+    var myDropdown = document.getElementById("myDropdown");
+      if (myDropdown.classList.contains('show')) {
+        myDropdown.classList.remove('show');
+      }
+  }
+}
+</script>
