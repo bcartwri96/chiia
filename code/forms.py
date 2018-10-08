@@ -180,6 +180,10 @@ class counterpart_investor_file(wtf.FlaskForm):
 class master_sheet(wtf.FlaskForm):
     IID = IntegerField('IID')
 
+class stage_2_details(wtf.FlaskForm):
+    state = StringField('state', validators=[DataRequired("Please select one of the following")])
+    counter_file_submitted = SubmitField('Submit the details of new counterpart investor file')
+
 
 
 

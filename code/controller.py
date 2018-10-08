@@ -1353,7 +1353,7 @@ def update_calendar():
 
 def master_sheet():
     import forms as fm
-    form = fm.roster(fl.request.form)
+    form = fm.master_sheet(fl.request.form)
     if fl.request.method == 'GET':
         return fl.render_template('master_sheet.html',form= form)
     else:
@@ -1366,6 +1366,57 @@ def master_sheet():
         cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
         cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
         return fl.render_template('master_sheet.html', form= form, s1 = s1, s2= s2, s3=s3, s4= s4,cf =cf,cof = cof)
+
+def stage_check():
+    import forms as fm
+    if fl.session['admin']:
+        if fl.request.method == 'GET':
+            s2 = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
+            s4 = ml.Stage_4.query.filter(ml.Stage_4.state == "Pending").all()
+            return fl.render_template('leadanalyst/stage_check.html', stage2=s2)
+        else:
+            return fl.abort(404)
+    else:
+        return fl.abort(404)
+
+
+
+def stage_2_details(s_id):
+    import forms as fm
+
+    #s_rels = ml.Stage_Rels.query.get(IID)
+    #s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id).all()
+    s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id ).first()
+    s1 = ml.Transactions.query.filter_by(s_id = s_rels.trans_id).first()
+    s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).first()
+    #cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
+    #cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
+    if fl.session['admin']:
+        if fl.request.method == 'GET':
+            return fl.render_template('leadanalyst/stage_2_details.html',trans = s1, s2= s2)
+        else:
+            try:
+                state = fl.request.form['state']
+            except KeyError:
+                state = None
+            if state == '1':
+                s2.state = State.Accepted
+            elif state == '2':
+                s2.state = State.Rejected
+            else:
+                state = ''
+            db.db_session.add(s2)
+            db.db_session.commit()
+            t_db = ml.Stage_2.query.get(s2.s_id)
+            # we want to add the transition to s3
+            if t_db.state == State.Accepted:
+
+                s3 = transition_transaction(t_db)
+            s2_check = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
+
+            return fl.render_template('leadanalyst/stage_check.html', stage2=s2_check)
+    else:
+        return fl.abort(404)
 
 
 
@@ -1581,9 +1632,9 @@ def transition_transaction(trans):
         if new:
             s2.who_assigned = new
             # email user that they have the task now
-            # NOTE : Commenting as of now as we dont have access
-            #s.send_user(new, "New Transaction!",  "Hello, here is a new \
-            #transaction for you __>here<__.", False)
+
+            s.send_user(new, "New Transaction!",  "Hello, here is a new \
+            transaction for you __>here<__.", False)
         else:
             fl.flash("Unable to allocate user to transaction", "error")
 
@@ -1658,7 +1709,7 @@ def transition_transaction(trans):
             else:
                 s4_id = 1
 
-            s4 = ml.Stage_4(s_id = s4_id, state = State.Working)
+            s4 = ml.Stage_4(s_id = s4_id)
 
             # we need to allocate this to a user, so allocate.
             u = allocate_user(trans, trans.mandarin_req)

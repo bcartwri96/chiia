@@ -1,0 +1,28 @@
+{% include "header.html" %}
+
+<div class="container-fluid">
+  <h3 class="display-3">Stage Check</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <!-- <th scope="col">Name</th> -->
+        <th scope="col">Stage</th>
+        <th scope="col">View</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s2 in stage2 %}
+        <tr>
+          <th scope="row">{{ s2.s_id }}</th>
+
+          <td scope="row">2</td>
+          <td scope="row"><a role="button" href="{{ url_for('stage_2_details', s_id=s2.s_id) }}">View</a></td>
+        </tr>
+      {% endfor %}
+
+    </tbody>
+  
+  </table>
+  </div>
+</div>

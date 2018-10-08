@@ -161,6 +161,18 @@ def roster():
 def master_sheet():
     return con.master_sheet()
 
+
+@app.route('/stage_check', methods=['GET'])
+@flog.login_required
+def stage_check():
+    return con.stage_check()
+
+
+@app.route('/stage_2_details/<int:s_id>', methods=['GET', 'POST'])
+@flog.login_required
+def stage_2_details(s_id):
+    return con.stage_2_details(s_id)
+
 # API
 # ==========================
 
