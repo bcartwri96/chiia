@@ -1539,7 +1539,6 @@ def allocate_tasks_analysts(d_id):
         if not entry.already_allocated:
             users.append([entry.user_id, entry.no_of_hours, entry.week_id])
 
-    print(users)
     # now allocate as much work as we can for every user
     current_task_ct = 0
     tasks_remain = True
@@ -1547,10 +1546,8 @@ def allocate_tasks_analysts(d_id):
         if tasks_remain:
             # get user
             u = ml.User.query.get(user[0])
-            print("user: "+u.fname)
             # get user avg_time_to_complete. presumes only one will be returned
             attc = u.avg_time_to_complete
-            print("attc: "+str(attc))
             # get num hours available
             num_hours = user[1] # no need to add in the hours
             print("num hours to complete: "+str(num_hours))
@@ -1566,7 +1563,6 @@ def allocate_tasks_analysts(d_id):
                 # will subtract the number of transactions * the attc
 
                 db.db_session.add(tasks[current_task_ct])
-                print("changed db @ task " + str(current_task_ct))
                 current_task_ct += 1
                 num_hours -= attc
                 if (current_task_ct >= len(tasks)):
@@ -1575,7 +1571,6 @@ def allocate_tasks_analysts(d_id):
             # to do so, fetch the right roster entry again...
             u_adj = ml.Roster.query.filter(sa.and_(sa.and_(ml.Roster.user_id == u.id, \
             ml.Roster.no_of_hours == user[1]), ml.Roster.week_id == user[2])).first()
-            print("user adjustment list: " + str(u_adj))
             u_adj.already_allocated = True
 
             db.db_session.add(u_adj)
@@ -1594,12 +1589,6 @@ def allocate_tasks_analysts(d_id):
     return fl.redirect(fl.url_for('manage_datasets'))
 
 
-# when moving from stage 1 to stage 2, we ask whether the next person
-# needs to speak mando to do the task, so this is run if that's true.
-def reallocate_task_mandarin():
-    return None
-
-
 # allocate on a user level i.e get trans_id then get the right stage then
 # allocate a stage/trans to the next person
 def allocate_user(trans, mandarin):
@@ -1612,15 +1601,7 @@ def allocate_user(trans, mandarin):
     else:
         return t
 
-
-def working_to_pending(id):
-    """get the transaction /stage and then the associated task.
-    write to the task it's not working but pending and then send an
-    email to the LA saying it needs approval"""
-    pass
-
 def transition_transaction(trans):
-    from flask import Markup
     """take the current transaction and move the user between this stage and
     the next"""
     if trans.stage == 1:
@@ -1636,7 +1617,7 @@ def transition_transaction(trans):
         s2 = ml.Stage_2(s_id=s2_id, state=State.Working)
 
         # no email or approval required, so just allocate the next user
-        new = allocate_user(s2, False)
+        new = allocate_user(s2, trans.mandarin_req)
         if new:
             s2.who_assigned = new
             # email user that they have the task now
@@ -1669,20 +1650,59 @@ def transition_transaction(trans):
 
         # CHECK! has it already been accepted by the LA?
         if trans.state == State.Accepted:
-            print("state: accepted")
-            fl.flash("Already accepted...", "success")
-            # get the new id for stage 4
+
+            s3_id = db.db_session.query(sa.func.max(ml.Stage_3.s_id)).scalar()
+            if s3_id:
+                s3_id += 1
+            else:
+                s3_id = 1
+
+            s3 = ml.Stage_3(s_id=s3_id)
+
+            user = allocate_user(trans, False)
+            if user:
+                s3.who_assigned = user
+            else:
+                fl.flash("Unable to allocate user!", "error")
+
+            # get the ID of the transaction which is the parent to this overall
+            # transaction
+            sr = trans.stage_2_id[0] #get's the SR object!
+            # master = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id \
+            # == t_id).first().trans_id
+
+            # sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == master & \
+            # ml.Stage_Rels.stage_2_id == trans.s_id).all() #should only be one!
+
+            # now we want to update it
+            # if len(sr) == 1:
+            sr.stage_3_id = s3_id
+            db.db_session.add(s3)
+            db.db_session.add(sr)
+
+            fl.flash(fl.Markup("Transaction accepted! New stage <a href="+\
+            fl.url_for('stage3', s_id=s3_id)+">here</a>"), "success")
+
+            db.db_session.commit()
 
         elif trans.state == State.Pending:
-            print("state: pending")
             fl.flash("Lead Analyst is yet to accept", "error")
             return -1
         elif trans.state == State.Rejected:
-            print("state: rejected")
-            fl.flash("Lead Analyst has rejected this work", "error")
-            return -1
+            fl.flash("Work rejected.", "success")
+            if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
+            Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            rejected. Please log in to resolve and resubmit. Thank you.") != 202:
+                fl.flash("Server error! Email failed to send.", "error")
+
+            # assume staying with same person
+            trans.state = State.Working
+
+            db.db_session.add(trans)
+            db.db_session.commit()
+            return trans
+
         elif trans.state == State.Working:
-            print("state: working")
             # state == working so we need to actually kick off the process of
             # getting the LA to accept :)
 
@@ -1690,7 +1710,7 @@ def transition_transaction(trans):
             la = ml.User.query.filter(ml.User.admin).first()
             s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
             there's a new submission that needs to be checked for the \
-            transaction. See the website for more details. Ben.", False)
+            transaction. See the website for more details.", False)
 
             fl.flash("Lead analyst contacted.", "success")
 
@@ -1699,43 +1719,10 @@ def transition_transaction(trans):
             db.db_session.add(trans)
 
             db.db_session.commit()
-            return 0
+            return trans
         else:
             fl.flash("Server error DEBUG="+str(trans.s_id)+", stage="+str(trans.state), "error")
             return -1
-
-        s3_id = db.db_session.query(sa.func.max(ml.Stage_3.s_id)).scalar()
-        if s3_id:
-            s3_id += 1
-        else:
-            s3_id = 1
-
-        s3 = ml.Stage_3(s_id=s3_id)
-
-        user = allocate_user(trans, False)
-        if user:
-            s3.who_assigned = user
-        else:
-            fl.flash("Unable to allocate user!", "error")
-
-        # get the ID of the transaction which is the parent to this overall
-        # transaction
-        sr = trans.stage_2_id[0] #get's the SR object!
-        # master = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id \
-        # == t_id).first().trans_id
-
-        # sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == master & \
-        # ml.Stage_Rels.stage_2_id == trans.s_id).all() #should only be one!
-
-        # now we want to update it
-        # if len(sr) == 1:
-        sr.stage_3_id = s3_id
-        db.db_session.add(s3)
-        db.db_session.add(sr)
-
-        fl.flash(fl.Markup("Transaction accepted! New stage <a href="+fl.url_for('stage3', s_id=s3_id)+">here</a>"), "success")
-        db.db_session.commit()
-        return s3
 
     elif trans.stage == 3:
         s4_id = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
@@ -1771,20 +1758,28 @@ def transition_transaction(trans):
 
         # CHECK! has it already been accepted by the LA?
         if trans.state == State.Accepted:
-            print("state: accepted")
             fl.flash("Already accepted...", "success")
             # get the new id for stage 4
+            return trans
 
         elif trans.state == State.Pending:
-            print("state: pending")
             fl.flash("Lead Analyst is yet to accept", "error")
-            return -1
+            return trans
         elif trans.state == State.Rejected:
-            print("state: rejected")
-            fl.flash("Lead Analyst has rejected this work", "error")
-            return -1
+            fl.flash("Work rejected.", "success")
+            if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
+            Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            rejected. Please log in to resolve and resubmit. Thank you.") != 202:
+                fl.flash("Server error! Email failed to send.", "error")
+
+            # assume staying with same person
+            trans.state = State.Working
+
+            db.db_session.add(trans)
+            db.db_session.commit()
+            return trans
+
         elif trans.state == State.Working:
-            print("state: working")
             # state == working so we need to actually kick off the process of
             # getting the LA to accept :)
 
@@ -1801,7 +1796,7 @@ def transition_transaction(trans):
             db.db_session.add(trans)
 
             db.db_session.commit()
-            return 0
+            return trans
         else:
             fl.flash("Server error DEBUG="+str(trans.s_id)+", stage="+str(trans.state), "error")
             return -1
