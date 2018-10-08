@@ -1076,26 +1076,31 @@ def stage3(s_id):
         t_db.info_from_correspondence = info_from_correspondence
         t_db.info_already_found = info_already_found
 
+
+        s4 = transition_transaction(t_db)
+        if not s4 == -1:
+            fl.flash("Created stage 4 successfully", "success")
+
         # create complimentry stage2
         # get current max id
-        s4_max = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
-        if s4_max:
-            s4_max+=1
-        else:
-            s4_max=1
-
-        s4 = ml.Stage_4(s_id=s4_max)
-        # NOTE: Need to check whether entity name is required in stage 4
-        db.db_session.add(s4)
-
-        s = ml.Stage_Rels.query.filter_by(stage_3_id=s_id ).first()
-
-        # now join it to the sr table with the new trans
-        sr = ml.Stage_Rels.query.get(s.trans_id)
-        sr.stage_4_id = s4_max
-
+        # s4_max = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
+        # if s4_max:
+        #     s4_max+=1
+        # else:
+        #     s4_max=1
+        #
+        # s4 = ml.Stage_4(s_id=s4_max)
+        # # NOTE: Need to check whether entity name is required in stage 4
+        # db.db_session.add(s4)
+        #
+        # s = ml.Stage_Rels.query.filter_by(stage_3_id=s_id ).first()
+        #
+        # # now join it to the sr table with the new trans
+        # sr = ml.Stage_Rels.query.get(s.trans_id)
+        # sr.stage_4_id = s4_max
+        #
         db.db_session.add(t_db)
-        db.db_session.add(sr)
+        # db.db_session.add(sr)
         db.db_session.commit()
         fl.flash("Updated stage3", "success")
         return fl.render_template('analyst/stage3.html', form=form,t=t_db)
@@ -1169,6 +1174,8 @@ def stage4(s_id):
             t_db.redo_by_mandarin = redo_by_mandarin
             t_db.redo_by_non_mandarin = redo_by_non_mandarin
             db.db_session.add(t_db)
+
+            state = transition_transaction(t_db)
             try:
                 db.db_session.commit()
                 fl.flash("Updated stage4", "success")
@@ -1613,19 +1620,20 @@ def working_to_pending(id):
     pass
 
 def transition_transaction(trans):
+    from flask import Markup
     """take the current transaction and move the user between this stage and
     the next"""
     if trans.stage == 1:
         # moving into stage 2
 
         # get new ID
-        s2_max = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
-        if s2_max:
-            s2_max+=1
+        s2_id = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
+        if s2_id:
+            s2_id+=1
         else:
-            s2_max=1
+            s2_id=1
 
-        s2 = ml.Stage_2(s_id=s2_max)
+        s2 = ml.Stage_2(s_id=s2_id, state=State.Working)
 
         # no email or approval required, so just allocate the next user
         new = allocate_user(s2, False)
@@ -1649,83 +1657,21 @@ def transition_transaction(trans):
 
         try:
             db.db_session.commit()
-            fl.flash("Successful transition to stage two!", "success")
+            fl.flash(fl.Markup("Transaction accepted! New stage <a href="+fl.url_for('stage2', s_id=s2_id)+">here</a>"), "success")
         except sa.exc.InvalidRequestError:
             fl.flash("Failed to transition into stage two", "error")
 
         return s2
     elif trans.stage == 2:
-        # progression to s3 is simple. create relation and return the new
-        # object
-
-        s3_id = db.db_session.query(sa.func.max(ml.Stage_3.s_id)).scalar()
-        if s3_id:
-            s3_id += 1
-        else:
-            s3_id = 1
-
-        s3 = ml.Stage_3(s_id=s3_id)
-
-        user = allocate_user(trans, False)
-        if user:
-            s3.who_assigned = user
-        else:
-            fl.flash("Unable to allocate user!", "error")
-
-        # get the ID of the transaction which is the parent to this overall
-        # transaction
-        sr = trans.stage_2_id[0] #get's the SR object!
-        # master = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id \
-        # == t_id).first().trans_id
-
-        # sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == master & \
-        # ml.Stage_Rels.stage_2_id == trans.s_id).all() #should only be one!
-
-        # now we want to update it
-        # if len(sr) == 1:
-        sr.stage_3_id = s3_id
-        db.db_session.add(s3)
-        db.db_session.add(sr)
-
-        db.db_session.commit()
-        return s3
-
-    elif trans.state == 3:
-        # ==========
-        # RULES
-        # ==========
-
-        # MUST PASS LA check, so check whether the LA has
+        # progression to s3 is less simple. if the LA has already accepted
+        # the task, then move on but otherwise interact with
+        # state to determine what to do.
 
         # CHECK! has it already been accepted by the LA?
         if trans.state == State.Accepted:
             print("state: accepted")
-            # great! create a s3
-
+            fl.flash("Already accepted...", "success")
             # get the new id for stage 4
-            s4_id = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
-            if s4_id:
-                s4_id += 1
-            else:
-                s4_id = 1
-
-            s4 = ml.Stage_4(s_id = s4_id)
-
-            # we need to allocate this to a user, so allocate.
-            u = allocate_user(trans, trans.mandarin_req)
-            s4.who_assigned = u
-
-            db.db_session.add(s4)
-
-            # update the stage relations
-            sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_3_id == \
-            trans.s_id).first()
-            sr.stage_4_id = s4_id
-            db.db_session.add(sr)
-
-            fl.flash("Transaction accepted! Progressing...", "success")
-            db.db_session.commit()
-            return s4
 
         elif trans.state == State.Pending:
             print("state: pending")
@@ -1758,8 +1704,107 @@ def transition_transaction(trans):
             fl.flash("Server error DEBUG="+str(trans.s_id)+", stage="+str(trans.state), "error")
             return -1
 
-    else:
-        return None
+        s3_id = db.db_session.query(sa.func.max(ml.Stage_3.s_id)).scalar()
+        if s3_id:
+            s3_id += 1
+        else:
+            s3_id = 1
+
+        s3 = ml.Stage_3(s_id=s3_id)
+
+        user = allocate_user(trans, False)
+        if user:
+            s3.who_assigned = user
+        else:
+            fl.flash("Unable to allocate user!", "error")
+
+        # get the ID of the transaction which is the parent to this overall
+        # transaction
+        sr = trans.stage_2_id[0] #get's the SR object!
+        # master = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id \
+        # == t_id).first().trans_id
+
+        # sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == master & \
+        # ml.Stage_Rels.stage_2_id == trans.s_id).all() #should only be one!
+
+        # now we want to update it
+        # if len(sr) == 1:
+        sr.stage_3_id = s3_id
+        db.db_session.add(s3)
+        db.db_session.add(sr)
+
+        fl.flash(fl.Markup("Transaction accepted! New stage <a href="+fl.url_for('stage3', s_id=s3_id)+">here</a>"), "success")
+        db.db_session.commit()
+        return s3
+
+    elif trans.stage == 3:
+        s4_id = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
+        if s4_id:
+            s4_id += 1
+        else:
+            s4_id = 1
+
+        s4 = ml.Stage_4(s_id = s4_id, state=State.Working)
+
+        # we need to allocate this to a user, so allocate.
+        u = allocate_user(trans, trans.mandarin_req)
+        s4.who_assigned = u
+
+        db.db_session.add(s4)
+
+        # update the stage relations
+        sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_3_id == \
+        trans.s_id).first()
+        sr.stage_4_id = s4_id
+        db.db_session.add(sr)
+
+        fl.flash(fl.Markup("Transaction accepted! New stage <a href="+fl.url_for('stage4', s_id=s4_id)+">here</a>"), "success")
+        db.db_session.commit()
+        return s4
+
+    elif trans.stage == 4:
+        # ==========
+        # RULES
+        # ==========
+
+        # MUST PASS LA check, so check whether the LA has
+
+        # CHECK! has it already been accepted by the LA?
+        if trans.state == State.Accepted:
+            print("state: accepted")
+            fl.flash("Already accepted...", "success")
+            # get the new id for stage 4
+
+        elif trans.state == State.Pending:
+            print("state: pending")
+            fl.flash("Lead Analyst is yet to accept", "error")
+            return -1
+        elif trans.state == State.Rejected:
+            print("state: rejected")
+            fl.flash("Lead Analyst has rejected this work", "error")
+            return -1
+        elif trans.state == State.Working:
+            print("state: working")
+            # state == working so we need to actually kick off the process of
+            # getting the LA to accept :)
+
+            # get LA ID
+            la = ml.User.query.filter(ml.User.admin).first()
+            s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
+            there's a new submission that needs to be checked for the \
+            transaction. See the website for more details. Ben.", False)
+
+            fl.flash("Lead analyst contacted.", "success")
+
+            # state change
+            trans.state = State.Pending
+            db.db_session.add(trans)
+
+            db.db_session.commit()
+            return 0
+        else:
+            fl.flash("Server error DEBUG="+str(trans.s_id)+", stage="+str(trans.state), "error")
+            return -1
 
 def get_week_id(cur_date):
     from datetime import datetime, timedelta
