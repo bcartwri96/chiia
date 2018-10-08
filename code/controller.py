@@ -878,8 +878,6 @@ def stage2(s_id):
             else:
                 redo_by_non_mandarin = False
 
-
-
             t_db.reviews = no_of_reviews
             t_db.date_assigned = assigned_date
             t_db.chin_inv_file_no = chin_inv_file_no
@@ -895,6 +893,8 @@ def stage2(s_id):
 
             # we want to add the transition to s3
             s3 = transition_transaction(t_db)
+            if s3 == -1:
+                fl.flash("Something", "error")
             # recall: returns the next stage if successful
 
             try:
@@ -1604,6 +1604,42 @@ def transition_transaction(trans):
 
         return s2
     elif trans.stage == 2:
+        # progression to s3 is simple. create relation and return the new
+        # object
+
+        s3_id = db.db_session.query(sa.func.max(ml.Stage_3.s_id)).scalar()
+        if s3_id:
+            s3_id += 1
+        else:
+            s3_id = 1
+
+        s3 = ml.Stage_3(s_id=s3_id)
+
+        user = allocate_user(trans, False)
+        if user:
+            s3.who_assigned = user
+        else:
+            fl.flash("Unable to allocate user!", "error")
+
+        # get the ID of the transaction which is the parent to this overall
+        # transaction
+        sr = trans.stage_2_id[0] #get's the SR object!
+        # master = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id \
+        # == t_id).first().trans_id
+
+        # sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == master & \
+        # ml.Stage_Rels.stage_2_id == trans.s_id).all() #should only be one!
+
+        # now we want to update it
+        # if len(sr) == 1:
+        sr.stage_3_id = s3_id
+        db.db_session.add(s3)
+        db.db_session.add(sr)
+
+        db.db_session.commit()
+        return s3
+
+    elif trans.state == 3:
         # ==========
         # RULES
         # ==========
@@ -1611,40 +1647,45 @@ def transition_transaction(trans):
         # MUST PASS LA check, so check whether the LA has
 
         # CHECK! has it already been accepted by the LA?
-        if trans.stage == State.Accepted:
+        if trans.state == State.Accepted:
+            print("state: accepted")
             # great! create a s3
 
-            # get the new id for stage 3
-            s3_id = db.db_session.query(sa.func.max(ml.Stage_2.s_id)).scalar()
-            if s3_id:
-                s3_id += 1
+            # get the new id for stage 4
+            s4_id = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
+            if s4_id:
+                s4_id += 1
             else:
-                s3_id = 1
+                s4_id = 1
 
-            s3 = ml.Stage_3(s_id = s3_id, state = State.Working)
+            s4 = ml.Stage_4(s_id = s4_id, state = State.Working)
 
             # we need to allocate this to a user, so allocate.
             u = allocate_user(trans, trans.mandarin_req)
-            s3.who_assigned = u
+            s4.who_assigned = u
 
-            db.db_session.add(s3)
+            db.db_session.add(s4)
 
             # update the stage relations
-            sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id == \
+            sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_3_id == \
             trans.s_id).first()
-            sr.stage_3_id = s3_id
+            sr.stage_4_id = s4_id
             db.db_session.add(sr)
 
+            fl.flash("Transaction accepted! Progressing...", "success")
             db.db_session.commit()
-            return s3
+            return s4
 
         elif trans.state == State.Pending:
+            print("state: pending")
             fl.flash("Lead Analyst is yet to accept", "error")
             return -1
         elif trans.state == State.Rejected:
+            print("state: rejected")
             fl.flash("Lead Analyst has rejected this work", "error")
             return -1
-        else:
+        elif trans.state == State.Working:
+            print("state: working")
             # state == working so we need to actually kick off the process of
             # getting the LA to accept :)
 
@@ -1662,9 +1703,10 @@ def transition_transaction(trans):
 
             db.db_session.commit()
             return 0
+        else:
+            fl.flash("Server error DEBUG="+str(trans.s_id)+", stage="+str(trans.state), "error")
+            return -1
 
-    elif trans.state == 3:
-        return None
     else:
         return None
 
