@@ -127,6 +127,7 @@ class Tasks(db.Base):
     search_term = sa.Column(sa.String)
 
     who_assigned = sa.Column(sa.Integer, nullable=False)
+    stage = sa.Column(sa.Integer, default=1)
 
     trans = sao.relationship("Transactions", backref="Tasks", cascade="all, delete-orphan")
 

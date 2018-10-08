@@ -103,7 +103,7 @@ class stage2(wtf.FlaskForm):
     nickname_iid = StringField('nickname_iid')
     file_checked_la  = BooleanField('file_checked_la')
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
-    task_submitted = SubmitField('Submit the Stage2')
+    task_submitted = SubmitField('Submit stage to LA')
 
 class stage3(wtf.FlaskForm):
 
@@ -120,7 +120,7 @@ class stage3(wtf.FlaskForm):
     info_from_correspondence = StringField('info_from_correspondence', validators=[DataRequired()])
     info_already_found = StringField('info_already_found', validators=[DataRequired()])
 #    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
-    task_submitted = SubmitField('Submit the Stage3')
+    task_submitted = SubmitField('Submit and Transition to Stage 4')
 
 
 class stage4(wtf.FlaskForm):
@@ -141,7 +141,7 @@ class stage4(wtf.FlaskForm):
     linked_iid = IntegerField('linked_iid')
     nickname_iid = StringField('nickname_iid')
     file_checked_la  = BooleanField('file_checked_la')
-    task_submitted = SubmitField('Submit the Stage4')
+    task_submitted = SubmitField('Submit stage to LA')
 
 class roster(wtf.FlaskForm):
     from datetime import datetime, timedelta
@@ -157,7 +157,7 @@ class roster(wtf.FlaskForm):
     (start + timedelta(days=21), start + timedelta(days=21)), (start + timedelta(days=28), start + timedelta(days=28))])
     end_date = SelectField('end_date', choices=[])
     no_of_hours = IntegerField('no_of_hours', validators=[DataRequired("This column cannot be empty")])
-    task_submitted = SubmitField('Submit the roster')
+    task_submitted = SubmitField('Submit roster')
 
 class chinese_investor_file(wtf.FlaskForm):
     pid = IntegerField('pid')
@@ -166,7 +166,7 @@ class chinese_investor_file(wtf.FlaskForm):
     nickname_iid = StringField('nickname_iid')
     stage_added = IntegerField('stage_added')
     file_checked_la  = BooleanField('file_checked_la')
-    file_submitted = SubmitField('Submit the details of new chinese investor file')
+    file_submitted = SubmitField('Submit Details of new Chinese Investor File')
 
 class counterpart_investor_file(wtf.FlaskForm):
     counter_pid = IntegerField('counter_pid')
@@ -175,19 +175,11 @@ class counterpart_investor_file(wtf.FlaskForm):
     counter_nickname_iid = StringField('counter_nickname_iid')
     counter_stage_added = IntegerField('counter_stage_added')
     counter_file_checked_la  = BooleanField('counter_file_checked_la')
-    counter_file_submitted = SubmitField('Submit the details of new counterpart investor file')
+    counter_file_submitted = SubmitField('Submit Details of new Counterpart Investor File')
 
 class master_sheet(wtf.FlaskForm):
     IID = IntegerField('IID')
 
 class stage_2_details(wtf.FlaskForm):
     state = StringField('state', validators=[DataRequired("Please select one of the following")])
-    counter_file_submitted = SubmitField('Submit the details of new counterpart investor file')
-
-
-
-
-    # chin_inv_file_no = FloatField('chin_inv_file_no', \
-    # validators=[NumberRange(0, 99999999, "Invalid file number")])
-    # counterpart_file_no = FloatField('counterpart_file_no', \
-    # validators=[NumberRange(0, 99999999, "Invalid file number")])
+    counter_file_submitted = SubmitField('Submit the Details of new Counterpart Investor File')

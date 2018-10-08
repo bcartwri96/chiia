@@ -317,7 +317,7 @@ def create_dataset(**kwargs):
             # now break up this into the correct amount of tasks
             freq_list, start, end = get_time_list(form.year_start.data, \
             form.year_end.data, form.freq.data)
-            ds_id = ml.Dataset.query.order_by(asc(ml.Dataset.id)).first()
+            ds_id = ml.Dataset.query.order_by(sa.desc(ml.Dataset.id)).first()
             if ds_id == None:
                 ds_id = 1
             else:
@@ -803,14 +803,15 @@ def stage2(s_id):
         new_chinese_file.linked_iid.data = s.trans_id
         new_chinese_file.nickname_iid.data = sr.entity_name
 
+
         # get method for adding nnew counterpart investor file
         # getting the related IID(trans_id) from stage_rels
 
         new_counter_file.counter_linked_iid.data = s.trans_id
         new_counter_file.counter_nickname_iid.data = sr.entity_name
         return fl.render_template('analyst/stage2.html', form=form,t=t_db, \
-        new_chinese_file=new_chinese_file,new_counter_file = new_counter_file,\
-         new_counter_file_tb= new_counter_file_tb , new_chinese_file_tb = new_chinese_file_tb)
+        new_chinese_file=new_chinese_file,new_counter_file = new_counter_file, \
+        new_counter_file_tb= new_counter_file_tb , new_chinese_file_tb = new_chinese_file_tb)
     else:
         if form.validate_on_submit() and form.task_submitted.data:
             # getting details of stage 2
@@ -1433,9 +1434,9 @@ def stage_2_details(s_id):
 def allocate_transactions(dataset):
     """take any dataset and allocate any unallocated transactions to
     all the people"""
-    # if 'admin' not in fl.session():
-    #     fl.flash("You must be an admin to do this!")
-    #     return fl.redirect(fl.url_for('index'))
+    if not(fl.session['admin']):
+        fl.flash("You must be an admin to do this!")
+        return fl.redirect(fl.url_for('index'))
 
     # get all the transactions which relate to the dataset
     all_trans = []
@@ -1452,8 +1453,18 @@ def allocate_transactions(dataset):
             all_trans.append(ml.Stage_3.query.get(c_sr.stage_3_id))
         else:
             pass
+    print(str(all_trans))
 
+    # CONSIDER tasks LAST!
+    # get admin user id
+    la = ml.User.query.filter(ml.User.admin).first() # should only be 1!
+
+    tasks = ml.Tasks.query.filter(ml.Tasks.who_assigned == la.id).all()
+    # ones allocated to the LA are able to be manually allocated (because owned
+    # by the LA) but we want them to be allocated to someone else automatically
     # get the roster for the next week
+    for t in tasks:
+        all_trans.append(t)
     cur_week = get_week_id(dt.datetime.now())
     roster = ml.Roster.query.filter(ml.Roster.week_id == cur_week+1).all()
     users = []
@@ -1462,45 +1473,73 @@ def allocate_transactions(dataset):
         users.append([r.user_id, r.no_of_hours])
     # check the settings to figure out which method we'll use to process the
     # queue.
-    print(all_trans)
     if ml.Admin.query.filter(ml.Admin.prefer_all_stages).first() == None:
         # preference is to get stages to stage 5 as soon as possible.
-        print("allocating!")
         # allocate transactions first, then tasks
-        for t in all_trans:
-            ct_trans = 0 # count tasks
-            # trans in descending order; allocate
-            if not t.mandarin_req:
-                print("not mando")
+        # simply, while transactions and users remain, allocate a user to
+        # a transaction
 
-                if u_count < len(users):
-                    cur = users[u_count]
+        for u in users:
+            user = ml.User.query.filter(ml.User.id == u[0]).first()
+            fl.flash("user: "+str(user.fname))
+            for t in all_trans:
+                if t.stage != 1:
+                    m_r = t.mandarin_req
                 else:
-                    break
+                    m_r = False
+                if not m_r:
+                    while u[1] >= user.avg_time_to_complete:
+                        u[1] -= user.avg_time_to_complete
+                        t.who_assigned = u[0]
+                        db.db_session.add(t)
+                        # adjust roster
+                        for r in roster:
+                            if r.user_id == u[0] and r.no_of_hours == u[1]:
+                                r.already_allocated += user.avg_time_to_complete
+                                db.db_session.add(r)
+                    # now move on to the next task - user expired!
+                else:
+                    pass # deal with mandarin later!
 
-                u = ml.User.query.get(cur[0])
-                tasks_remain = True
-                print("uattc = "+str(u.avg_time_to_complete)+" cur"+str(cur[1]))
-                while (cur[1] >= u.avg_time_to_complete) & tasks_remain:
-                    cur[1] -= u.avg_time_to_complete
-                    # get appropriate user
-                    t.who_assigned = u.id
-                    db.db_session.add(t)
-                    ct_trans += 1
-                    print("added "+u.fname+".")
-
-                    # now set the allocated var to true in the roster
-                    roster[u_count].already_allocated +=u.avg_time_to_complete
-                    db.db_session.add(roster[u_count])
-
-                    if ct_trans == len(transactions):
-                        # just make sure we have more trans before allocating
-                        break
-                u_count+=1
-
-            else:
-                pass # not allocating mandarin ones yet. To come
+        # for t in all_trans:
+        #     ct_trans = 0 # count tasks
+        #     # trans in descending order; allocate
+        #     if not t.mandarin_req:
+        #
+        #         if u_count < len(users):
+        #             cur = users[u_count]
+        #         else:
+        #             break
+        #
+        #         u = ml.User.query.get(cur[0])
+        #         print("allocating user")
+        #         tasks_remain = True
+        #         while (cur[1] >= u.avg_time_to_complete) & tasks_remain:
+        #             cur[1] -= u.avg_time_to_complete
+        #             # get appropriate user
+        #             t.who_assigned = u.id
+        #             db.db_session.add(t)
+        #             ct_trans += 1
+        #
+        #             # now set the allocated var to true in the roster
+        #             roster[u_count].already_allocated +=u.avg_time_to_complete
+        #             db.db_session.add(roster[u_count])
+        #
+        #             print("allocated "+u.fname+" to "+str(t.s_id))
+        #
+        #             if ct_trans == len(transactions):
+        #                 # just make sure we have more trans before allocating
+        #                 print("prepare to break")
+        #                 tasks_remain = False
+        #
+        #         u_count+=1
+        #
+        #
+        #     else:
+        #         pass # not allocating mandarin ones yet. To come
         db.db_session.commit()
+        fl.flash("Allocated", "success")
+        return fl.redirect(fl.url_for('index'))
     else:
         pass
 
