@@ -173,6 +173,11 @@ def stage_check():
 def stage_2_details(s_id):
     return con.stage_2_details(s_id)
 
+@app.route('/stage_4_details/<int:s_id>', methods=['GET', 'POST'])
+@flog.login_required
+def stage_4_details(s_id):
+    return con.stage_4_details(s_id)
+
 # API
 # ==========================
 
