@@ -367,7 +367,7 @@ def get_time_list(initial, end, interval):
     name = []
     start_date = []
     end_date = []
-    for i in range(0, round(time_delta.days/int.days), 1):
+    for i in range(0, round(time_delta.days/int.days), 7):
         t_start = initial + dt.timedelta(i*int.days)
         t_end = t_start + dt.timedelta(7 - 1)
         start_date.append(t_start)
@@ -1846,7 +1846,7 @@ def transition_transaction(trans):
         elif trans.state == State.Rejected:
             fl.flash("Work rejected.", "success")
             if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
-            Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            our work for transaction "+str(trans.s_id)+" @ stage 2 has been \
             rejected. Please log in to resolve and resubmit. Thank you.") != 202:
                 fl.flash("Server error! Email failed to send.", "error")
 
