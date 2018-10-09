@@ -1432,12 +1432,16 @@ def stage_2_details(s_id):
 # allocation logic
 
 def allocate_transactions(dataset):
+    import sys
     """take any dataset and allocate any unallocated transactions to
     all the people"""
     if not(fl.session['admin']):
         fl.flash("You must be an admin to do this!")
         return fl.redirect(fl.url_for('index'))
-
+    else:
+        fl.flash("Currently in midst of bug fixing", "error")
+        return fl.redirect(fl.url_for("index"))
+        
     # get all the transactions which relate to the dataset
     all_trans = []
     transactions = ml.Transactions.query.filter(ml.Transactions.dataset_id == \
@@ -1466,11 +1470,13 @@ def allocate_transactions(dataset):
     for t in tasks:
         all_trans.append(t)
     cur_week = get_week_id(dt.datetime.now())
+    print(cur_week)
     roster = ml.Roster.query.filter(ml.Roster.week_id == cur_week+1).all()
     users = []
     u_count = 0 # user count
+
     for r in roster:
-        users.append([r.user_id, r.no_of_hours])
+        users.append([r.user_id, r.no_of_hours, r.week_id])
     # check the settings to figure out which method we'll use to process the
     # queue.
     if ml.Admin.query.filter(ml.Admin.prefer_all_stages).first() == None:
@@ -1482,67 +1488,85 @@ def allocate_transactions(dataset):
         for u in users:
             user = ml.User.query.filter(ml.User.id == u[0]).first()
             fl.flash("user: "+str(user.fname))
-            for t in all_trans:
-                if t.stage != 1:
-                    m_r = t.mandarin_req
-                else:
-                    m_r = False
-                if not m_r:
-                    while u[1] >= user.avg_time_to_complete:
-                        u[1] -= user.avg_time_to_complete
-                        t.who_assigned = u[0]
-                        db.db_session.add(t)
-                        # adjust roster
-                        for r in roster:
-                            if r.user_id == u[0] and r.no_of_hours == u[1]:
-                                r.already_allocated += user.avg_time_to_complete
-                                db.db_session.add(r)
-                    # now move on to the next task - user expired!
-                else:
-                    pass # deal with mandarin later!
+            if user.language: #eng only
+                for t in all_trans:
+                    if t.stage == 0:
+                        m_r = False
+                        # print("it's called "+str(t.id))
+                    elif t.stage >= 1:
+                        m_r = t.mandarin_req
+                        # print("it's called: "+str(t.s_id))
+                    if not m_r:
+                        # print("testing; HERE user is "+str(u[0])+" and the week is "+str(u[2]))
+                        while u[1] >= user.avg_time_to_complete:
+                            print("user has time remaining")
+                            u[1] -= user.avg_time_to_complete
+                            t.who_assigned = u[0]
+                            print("t object: "+str(t)+" assigned to "+str(u[0]))
+                            db.db_session.add(t)
+                            # print("user assigned to task "+str(t.s_id)+" is "+str(u[0]))
+                            # adjust roster
+                            # print(str(roster))
+                            for r in roster:
+                                # print(str(r.user_id)+" "+str(r.week_id))
+                                if r.user_id == u[0] and r.week_id == u[2]:
+                                    print("success! @ "+str(r))
+                                    r.already_allocated += user.avg_time_to_complete
+                                    db.db_session.add(r)
+                                    try:
+                                        all_trans.remove(t) # remove by _value_
+                                    except Exception as e:
+                                        print(str(e))
+                        # append_if_user_time(u, t, user, all_trans, roster)
+                    else:
+                        pass # leave mandarin for people who can speak it!
+            else:
+                for t in all_trans:
+                    if t.stage == 1:
+                        m_r = False
+                    else:
+                        m_r = t.mandarin_req
 
-        # for t in all_trans:
-        #     ct_trans = 0 # count tasks
-        #     # trans in descending order; allocate
-        #     if not t.mandarin_req:
-        #
-        #         if u_count < len(users):
-        #             cur = users[u_count]
-        #         else:
-        #             break
-        #
-        #         u = ml.User.query.get(cur[0])
-        #         print("allocating user")
-        #         tasks_remain = True
-        #         while (cur[1] >= u.avg_time_to_complete) & tasks_remain:
-        #             cur[1] -= u.avg_time_to_complete
-        #             # get appropriate user
-        #             t.who_assigned = u.id
-        #             db.db_session.add(t)
-        #             ct_trans += 1
-        #
-        #             # now set the allocated var to true in the roster
-        #             roster[u_count].already_allocated +=u.avg_time_to_complete
-        #             db.db_session.add(roster[u_count])
-        #
-        #             print("allocated "+u.fname+" to "+str(t.s_id))
-        #
-        #             if ct_trans == len(transactions):
-        #                 # just make sure we have more trans before allocating
-        #                 print("prepare to break")
-        #                 tasks_remain = False
-        #
-        #         u_count+=1
-        #
-        #
-        #     else:
-        #         pass # not allocating mandarin ones yet. To come
+                    if m_r:
+                        lang_queue.append(t)
+
+                for l in lang_queue:
+                    append_if_user_time(u, l, user, all_trans, roster)
+                # now just give them the normal type of work once mandarin
+                # work expires
+                for t in all_trans:
+                    res = append_if_user_time(u, t, user, all_trans, roster)
+
+        print("commiting all changes to the db")
+        sys.stdout.flush()
         db.db_session.commit()
         fl.flash("Allocated", "success")
         return fl.redirect(fl.url_for('index'))
     else:
         pass
 
+def append_if_user_time(u, t, user, all_trans, roster):
+    import sys
+    print("testing; HERE user is "+str(u[0])+" and the week is "+str(u[2]))
+    while u[1] >= user.avg_time_to_complete:
+        u[1] -= user.avg_time_to_complete
+        t.who_assigned = u[0]
+        db.db_session.add(t)
+        # print("user assigned to task "+str(t.s_id)+" is "+str(u[0]))
+        # adjust roster
+        print(str(roster))
+        sys.stdout.flush()
+        for r in roster:
+            print(str(r.user_id)+" "+str(r.week_id))
+            if r.user_id == u[0] and r.week_id == u[2]:
+                print("success! @ "+str(r))
+                r.already_allocated += user.avg_time_to_complete
+                db.db_session.add(r)
+                try:
+                    all_trans.remove(t) # remove by _value_
+                except Exception as e:
+                    print(str(e))
+    # now move on to the next task - user expired!
 
 # dataset & tasks created, so we need to allocate analysts to the tasks
 # inputs: dataset id, analyst availability, time delta of the
