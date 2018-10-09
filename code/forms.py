@@ -182,4 +182,6 @@ class master_sheet(wtf.FlaskForm):
 
 class stage_2_details(wtf.FlaskForm):
     state = StringField('state', validators=[DataRequired("Please select one of the following")])
-    counter_file_submitted = SubmitField('Submit the Details of new Counterpart Investor File')
+
+class stage_4_details(wtf.FlaskForm):
+    state = StringField('state', validators=[DataRequired("Please select one of the following")])

@@ -367,7 +367,7 @@ def get_time_list(initial, end, interval):
     name = []
     start_date = []
     end_date = []
-    for i in range(0, round(time_delta.days/int.days), 1):
+    for i in range(0, round(time_delta.days/int.days), 7):
         t_start = initial + dt.timedelta(i*int.days)
         t_end = t_start + dt.timedelta(7 - 1)
         start_date.append(t_start)
@@ -1381,7 +1381,7 @@ def stage_check():
         if fl.request.method == 'GET':
             s2 = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
             s4 = ml.Stage_4.query.filter(ml.Stage_4.state == "Pending").all()
-            return fl.render_template('leadanalyst/stage_check.html', stage2=s2)
+            return fl.render_template('leadanalyst/stage_check.html', stage2=s2, stage4 = s4)
         else:
             return fl.abort(404)
     else:
@@ -1421,8 +1421,47 @@ def stage_2_details(s_id):
 
                 s3 = transition_transaction(t_db)
             s2_check = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
+            s4_check = ml.Stage_4.query.filter(ml.Stage_4.state == "Pending").all()
+            return fl.render_template('leadanalyst/stage_check.html', stage2=s2_check, stage4 = s4_check)
+    else:
+        return fl.abort(404)
 
-            return fl.render_template('leadanalyst/stage_check.html', stage2=s2_check)
+def stage_4_details(s_id):
+    import forms as fm
+
+    #s_rels = ml.Stage_Rels.query.get(IID)
+    #s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id).all()
+    form = fm.stage_4_details(fl.request.form)
+    s_rels = ml.Stage_Rels.query.filter_by(stage_4_id = s_id ).first()
+    s1 = ml.Transactions.query.filter_by(s_id = s_rels.trans_id).first()
+    s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).first()
+    s3 = ml.Stage_3.query.filter_by(s_id = s_rels.stage_3_id).first()
+    s4 = ml.Stage_4.query.filter_by(s_id = s_rels.stage_4_id).first()
+
+    if fl.session['admin']:
+        if fl.request.method == 'GET':
+            return fl.render_template('leadanalyst/stage_4_details.html',trans = s1, s2= s2, s3= s3, s4= s4)
+        else:
+            try:
+                state = fl.request.form['state']
+            except KeyError:
+                state = None
+            if state == '1':
+                s4.state = State.Accepted
+            elif state == '2':
+                s4.state = State.Rejected
+            else:
+                state = ''
+            db.db_session.add(s4)
+            db.db_session.commit()
+            t_db = ml.Stage_4.query.get(s4.s_id)
+            # we want to add the transition to s3
+            if t_db.state == State.Accepted:
+
+                s = transition_transaction(t_db)
+            s2_check = ml.Stage_2.query.filter(ml.Stage_2.state == "Pending").all()
+            s4_check = ml.Stage_4.query.filter(ml.Stage_4.state == "Pending").all()
+            return fl.render_template('leadanalyst/stage_check.html', stage2=s2_check, stage4 = s4_check)
     else:
         return fl.abort(404)
 
@@ -1821,7 +1860,7 @@ def transition_transaction(trans):
 
         # CHECK! has it already been accepted by the LA?
         if trans.state == State.Accepted:
-            fl.flash("Already accepted...", "success")
+            fl.flash("Transaction accepted!", "success")
             # get the new id for stage 4
             return trans
 
@@ -1831,7 +1870,7 @@ def transition_transaction(trans):
         elif trans.state == State.Rejected:
             fl.flash("Work rejected.", "success")
             if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
-            Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            our work for transaction "+str(trans.s_id)+" @ stage 2 has been \
             rejected. Please log in to resolve and resubmit. Thank you.") != 202:
                 fl.flash("Server error! Email failed to send.", "error")
 

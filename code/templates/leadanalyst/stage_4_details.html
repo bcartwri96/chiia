@@ -1,16 +1,9 @@
 {% include "header.html" %}
-<title>Maste Sheet</title>
+<title>Stage 2 Details</title>
 {% block content %}
   <div class="container">
-    <!-- in here is where the include will go -->
-    <form action="{{ url_for('master_sheet') }}" method="POST">
-      <div class="form-group">
-        <label for="exampleFormControlInput1">Transaction ID : </label>
-        <input type="text" placeholder="Enter Transaction ID" name="IID">
-     <button type="submit">Submit</button>
-    </form>
-  </div>
-{% for trans in s1 %}
+    <form action="{{ url_for('stage_4_details',s_id =s2.s_id ) }}" method="POST">
+
   <h5 class="display-5">Stage 1 : Transaction </h5>
   <table class="table table-hover">
 
@@ -36,8 +29,6 @@
 
     </tbody>
   </table>
-    {% endfor %}
-    {% for s2 in s2 %}
       <h5 class="display-5">Stage 2 </h5>
       <table class="table table-hover">
 
@@ -61,10 +52,7 @@
           </tr>
 
         </tbody>
-      </table>
-        {% endfor %}
-
-        {% for s3 in s3 %}
+  </table>
           <h5 class="display-5">Stage 3  </h5>
           <table class="table table-hover">
 
@@ -88,9 +76,7 @@
 
             </tbody>
           </table>
-            {% endfor %}
 
-            {% for s4 in s4 %}
               <h5 class="display-5">Stage 4 </h5>
               <table class="table table-hover">
 
@@ -115,62 +101,26 @@
 
                 </tbody>
               </table>
-                {% endfor %}
-                <div>
+
+      {% endblock content %}
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Select One of the following</label>
+        <div class="row">
+          <div class="col">
+            <input class="form-check-input" type="radio" name="state" style="margin-left: 5px;" value="1">
+              <label class="form-check-label" style="padding-left: 25px;">
+                Done
+              </label>
+            <input class="form-check-input" type="radio" name="state" style="margin-left: 30px;" value="2">
+              <label class="form-check-label" style="padding-left: 50px;">
+                Redo
+              </label>
                 <br>
-                {% for counter_file in cof %}
-                <h5 class="display-5">Related New Counterpart Investor File</h5>
-                <table class="table table-hover">
-                   <thead class="thead-dark">
-                    <tr>
-                      <th scope="col">PID</th>
-                      <th scope="col"> Operating legal entity name </th>
-                      <th scope="col"> Related IID </th>
-                      <th scope="col"> Check status </th>
-
-
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td scope="row">{{ counter_file.pid }}</th>
-                      <td scope="row">{{ counter_file.legal_name }}</th>
-                      <td scope="row">{{ counter_file.linked_iid }}</th>
-                      <td scope="row">{{ counter_file.file_checked_la }}</th>
-
-
-                    </tr>
-
-                  </tbody>
-                </table>
-                {% endfor %}
-                <br>
-                <br>
-                {% for chinese_file in cf %}
-                <h5 class="display-5">Related New Chinese Investor File</h5>
-                <table class="table table-hover">
-                   <thead class="thead-dark">
-                    <tr>
-                      <th scope="col">PID</th>
-                      <th scope="col"> Operating legal entity name </th>
-                      <th scope="col"> Related IID </th>
-                      <th scope="col"> Check status </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-                    <tr>
-                      <td scope="row">{{ chinese_file.pid }}</th>
-                      <td scope="row">{{ chinese_file.legal_name }}</th>
-                      <td scope="row">{{ chinese_file.linked_iid }}</th>
-                      <td scope="row">{{ chinese_file.file_checked_la }}</th>
-
-
-
-                    </tr>
-
-                  </tbody>
-                </table>
-                  {% endfor %}
               </div>
-{% endblock content %}
+              <br>
+            </div>
+     <button type="submit">Submit</button>
+    </form>
+  </div>
+    </div>
+  </form>

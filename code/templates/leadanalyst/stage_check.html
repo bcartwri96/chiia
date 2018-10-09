@@ -22,7 +22,18 @@
       {% endfor %}
 
     </tbody>
-  
+    <tbody>
+      {% for s4 in stage4 %}
+        <tr>
+          <th scope="row">{{ s4.s_id }}</th>
+
+          <td scope="row">4</td>
+          <td scope="row"><a role="button" href="{{ url_for('stage_4_details', s_id=s4.s_id) }}">View</a></td>
+        </tr>
+      {% endfor %}
+
+    </tbody>
+
   </table>
   </div>
 </div>
