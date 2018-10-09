@@ -1654,9 +1654,9 @@ def allocate_tasks_analysts(d_id):
             db.db_session.add(u_adj)
 
             # send user an email
-            #em = s.send_user(user[0], "CHIIA: New Task!", \
-            #"Hi there "+u.fname+", \n You've been allocated a new task. \
-            #Please check the website for details. Thanks!", False)
+            em = s.send_user(user[0], "CHIIA: New Task!", \
+            "Hi there "+u.fname+", \n You've been allocated a new task. \
+            Please check the website for details. Thanks!", False)
     try:
         db.db_session.commit()
         fl.flash('Manually allocated for next two weeks', 'success')
@@ -1700,8 +1700,8 @@ def transition_transaction(trans):
             s2.who_assigned = new
             # email user that they have the task now
 
-            #s.send_user(new, "New Transaction!",  "Hello, here is a new \
-            #transaction for you __>here<__.", False)
+            s.send_user(new, "New Transaction!",  "Hello, here is a new \
+            transaction for you __>here<__.", False)
         else:
             fl.flash("Unable to allocate user to transaction", "error")
 
@@ -1768,10 +1768,10 @@ def transition_transaction(trans):
             return -1
         elif trans.state == State.Rejected:
             fl.flash("Work rejected.", "success")
-            #if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
-            #Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
-            #rejected. Please log in to resolve and resubmit. Thank you.") != 202:
-                #fl.flash("Server error! Email failed to send.", "error")
+            if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
+            Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            rejected. Please log in to resolve and resubmit. Thank you.") != 202:
+                fl.flash("Server error! Email failed to send.", "error")
 
             # assume staying with same person
             trans.state = State.Working
@@ -1786,9 +1786,9 @@ def transition_transaction(trans):
 
             # get LA ID
             la = ml.User.query.filter(ml.User.admin).first()
-            #s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
-            #there's a new submission that needs to be checked for the \
-            #transaction. See the website for more details.", False)
+            s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
+            there's a new submission that needs to be checked for the \
+            transaction. See the website for more details.", False)
 
             fl.flash("Lead analyst contacted.", "success")
 
@@ -1845,10 +1845,10 @@ def transition_transaction(trans):
             return trans
         elif trans.state == State.Rejected:
             fl.flash("Work rejected.", "success")
-            #if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
-            #Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
-            #rejected. Please log in to resolve and resubmit. Thank you.") != 202:
-                #fl.flash("Server error! Email failed to send.", "error")
+            if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
+            Your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            rejected. Please log in to resolve and resubmit. Thank you.") != 202:
+                fl.flash("Server error! Email failed to send.", "error")
 
             # assume staying with same person
             trans.state = State.Working
@@ -1863,9 +1863,9 @@ def transition_transaction(trans):
 
             # get LA ID
             la = ml.User.query.filter(ml.User.admin).first()
-            #s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
-            #there's a new submission that needs to be checked for the \
-            #transaction. See the website for more details. Ben.", False)
+            s.send_user(la.id, "Checkpoint for transactions!", "Hey there, \
+            there's a new submission that needs to be checked for the \
+            transaction. See the website for more details. Ben.", False)
 
             fl.flash("Lead analyst contacted.", "success")
 
