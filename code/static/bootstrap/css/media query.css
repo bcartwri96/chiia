@@ -1,0 +1,10 @@
+
+@media screen and (max-width:780px){
+    
+	#product .product-list ul{width: 800px;flex-wrap: nowrap;}
+    
+	#product .product-list ul li{width: 100px;}
+    
+	#product .product-list{width:500px;overflow-x:scroll;}
+
+£ý
