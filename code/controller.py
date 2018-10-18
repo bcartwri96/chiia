@@ -1471,118 +1471,77 @@ def stage_4_details(s_id):
 # allocation logic
 
 def allocate_transactions(dataset):
-    import sys
-    """take any dataset and allocate any unallocated transactions to
-    all the people"""
-    if not(fl.session['admin']):
-        fl.flash("You must be an admin to do this!")
-        return fl.redirect(fl.url_for('index'))
+    # get all feasible users (all which aren't already allocated for the \
+    # prospective week)
+    t = get_week_id(dt.datetime.now())
+
+    roster = ml.Roster.query.filter(sa.and_(ml.Roster.already_allocated < \
+    ml.Roster.no_of_hours, ml.Roster.week_id == t+1)).all()
+
+    # get a list of transactions which are unallocated AND in the correct
+    # order (realtime or historical)
+    transactions = get_ordered_trans(dataset)
+
+    if transactions != None:
+        for tran in transactions:
+            for r in roster:
+                if r.no_of_hours > r.already_allocated:
+                    # they have hours to spare!
+                    # get their user object
+                    u = ml.User.query.get(r.user_id)
+                    tran.who_assigned = r.user_id
+                    # add that to their hours
+                    r.already_allocated += u.avg_time_to_complete
+                    db.db_session.add(tran)
+                    db.db_session.add(r)
+        try:
+            db.db_session.commit()
+            fl.flash("Succesfully refreshed allocation", "success")
+        except sa.sqlalchemy.InvalidRequestError as e:
+            fl.flash("Server error!", "error")
+        return fl.redirect(fl.url_for('manage_datasets'))
+
+
+def get_ordered_trans(ds_id):
+    transactions = []
+    if ml.Admin.query.filter(ml.Admin.pref_historical):
+        # get all the trans in s1 first, descending in stage order
+        trans = ml.Transactions.query.filter(sa.and_(ml.Transactions.who_assigned == \
+        None, ml.Transactions.dataset_id == ds_id)).order_by(ml.Transactions.s_id.desc()).all()
+
+        for i in trans:
+            transactions.append(i)
+
+        s2 = ml.Stage_2.query.filter(ml.Stage_2.who_assigned == \
+        None).order_by(ml.Stage_2.s_id.desc()).all()
+
+        for i in s2:
+            # NB: expensive operations here (two db queries and an addition
+            # to a the list for each s2.) Potential optimisation!
+            rel_sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_2_id == i.s_id).first()
+            if ml.Transactions.query.get(rel_sr.trans_id).dataset_id == ds_id:
+                transactions.append(i)
+
+        s3 = ml.Stage_3.query.filter(ml.Stage_3.who_assigned == \
+        None).order_by(ml.Stage_3.s_id.desc()).all()
+
+        for i in s3:
+            rel_sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_3_id == i.s_id).first()
+            if ml.Transactions.query.get(rel_sr.trans_id).dataset_id == ds_id:
+                transactions.append(i)
+
+        s4 = ml.Stage_4.query.filter(ml.Stage_4.who_assigned == \
+        None).order_by(ml.Stage_4.who_assigned.desc()).all()
+
+        for i in s4:
+            rel_sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.stage_4_id == i.s_id).first()
+            if ml.Transactions.query.get(rel_sr.trans_id).dataset_id == ds_id:
+                transactions.append(i)
+
     else:
-        fl.flash("Currently in midst of bug fixing", "error")
-        return fl.redirect(fl.url_for("index"))
-        
-    # get all the transactions which relate to the dataset
-    all_trans = []
-    transactions = ml.Transactions.query.filter(ml.Transactions.dataset_id == \
-    dataset).order_by(sa.desc(ml.Transactions.stage)).all()
-    for t in transactions:
-        all_trans.append(t)
-
-    for t in transactions:
-        c_sr = ml.Stage_Rels.query.filter(ml.Stage_Rels.trans_id == t.s_id).first()
-        if not c_sr.stage_2_id == None:
-            all_trans.append(ml.Stage_2.query.get(c_sr.stage_2_id))
-        elif not c_sr.stage_3_id == None:
-            all_trans.append(ml.Stage_3.query.get(c_sr.stage_3_id))
-        else:
-            pass
-    print(str(all_trans))
-
-    # CONSIDER tasks LAST!
-    # get admin user id
-    la = ml.User.query.filter(ml.User.admin).first() # should only be 1!
-
-    tasks = ml.Tasks.query.filter(ml.Tasks.who_assigned == la.id).all()
-    # ones allocated to the LA are able to be manually allocated (because owned
-    # by the LA) but we want them to be allocated to someone else automatically
-    # get the roster for the next week
-    for t in tasks:
-        all_trans.append(t)
-    cur_week = get_week_id(dt.datetime.now())
-    print(cur_week)
-    roster = ml.Roster.query.filter(ml.Roster.week_id == cur_week+1).all()
-    users = []
-    u_count = 0 # user count
-
-    for r in roster:
-        users.append([r.user_id, r.no_of_hours, r.week_id])
-    # check the settings to figure out which method we'll use to process the
-    # queue.
-    if ml.Admin.query.filter(ml.Admin.prefer_all_stages).first() == None:
-        # preference is to get stages to stage 5 as soon as possible.
-        # allocate transactions first, then tasks
-        # simply, while transactions and users remain, allocate a user to
-        # a transaction
-
-        for u in users:
-            user = ml.User.query.filter(ml.User.id == u[0]).first()
-            fl.flash("user: "+str(user.fname))
-            if user.language: #eng only
-                for t in all_trans:
-                    if t.stage == 0:
-                        m_r = False
-                        # print("it's called "+str(t.id))
-                    elif t.stage >= 1:
-                        m_r = t.mandarin_req
-                        # print("it's called: "+str(t.s_id))
-                    if not m_r:
-                        # print("testing; HERE user is "+str(u[0])+" and the week is "+str(u[2]))
-                        while u[1] >= user.avg_time_to_complete:
-                            print("user has time remaining")
-                            u[1] -= user.avg_time_to_complete
-                            t.who_assigned = u[0]
-                            print("t object: "+str(t)+" assigned to "+str(u[0]))
-                            db.db_session.add(t)
-                            # print("user assigned to task "+str(t.s_id)+" is "+str(u[0]))
-                            # adjust roster
-                            # print(str(roster))
-                            for r in roster:
-                                # print(str(r.user_id)+" "+str(r.week_id))
-                                if r.user_id == u[0] and r.week_id == u[2]:
-                                    print("success! @ "+str(r))
-                                    r.already_allocated += user.avg_time_to_complete
-                                    db.db_session.add(r)
-                                    try:
-                                        all_trans.remove(t) # remove by _value_
-                                    except Exception as e:
-                                        print(str(e))
-                        # append_if_user_time(u, t, user, all_trans, roster)
-                    else:
-                        pass # leave mandarin for people who can speak it!
-            else:
-                for t in all_trans:
-                    if t.stage == 1:
-                        m_r = False
-                    else:
-                        m_r = t.mandarin_req
-
-                    if m_r:
-                        lang_queue.append(t)
-
-                for l in lang_queue:
-                    append_if_user_time(u, l, user, all_trans, roster)
-                # now just give them the normal type of work once mandarin
-                # work expires
-                for t in all_trans:
-                    res = append_if_user_time(u, t, user, all_trans, roster)
-
-        print("commiting all changes to the db")
-        sys.stdout.flush()
-        db.db_session.commit()
-        fl.flash("Allocated", "success")
-        return fl.redirect(fl.url_for('index'))
-    else:
+        # s4, s3, s2, trans is the order for this one!
         pass
+    return transactions
 
 def append_if_user_time(u, t, user, all_trans, roster):
     import sys
@@ -1723,9 +1682,11 @@ def transition_transaction(trans):
         if new:
             s2.who_assigned = new
             # email user that they have the task now
-
-            s.send_user(new, "New Transaction!",  "Hello, here is a new \
-            transaction for you __>here<__.", False)
+            try:
+                s.send_user(new, "New Transaction!",  "Hello, here is a new \
+                transaction for you __>here<__.", False)
+            except error as e:
+                fl.flash(e, "error");
         else:
             fl.flash("Unable to allocate user to transaction", "error")
 

@@ -16,7 +16,8 @@ class User(db.Base):
     fname = sa.Column(sa.String, nullable=False)
     lname = sa.Column(sa.String, nullable=False)
     email = sa.Column(sa.String, nullable=False)
-    language = sa.Column(sa.Boolean, nullable=False) # true is english alone, false is mandarin, too.
+    language = sa.Column(sa.Boolean, nullable=False, default=True)
+    # true is english alone, false is mandarin, too.
     pw_hashed = sa.Column(sa.String, nullable=False)
     admin = sa.Column(sa.Boolean)
     confirmed = sa.Column(sa.Boolean, default=False)
@@ -84,7 +85,7 @@ class Admin(db.Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column(sa.Integer, primary_key=True)
-    prefer_all_stages = sa.Column(sa.Boolean)
+    pref_historical = sa.Column(sa.Boolean, default=True)
     search_names = sao.relationship('Search_Names', backref='admin', lazy=True)
 
 class Search_Names(db.Base):
