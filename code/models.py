@@ -85,7 +85,6 @@ class Admin(db.Base):
     __table_args__ = {'extend_existing': True}
 
     id = sa.Column(sa.Integer, primary_key=True)
-    pref_historical = sa.Column(sa.Boolean, default=True)
     search_names = sao.relationship('Search_Names', backref='admin', lazy=True)
 
 class Search_Names(db.Base):

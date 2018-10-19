@@ -10,7 +10,8 @@ from wtforms.validators import DataRequired, EqualTo, Required, NumberRange
 from wtforms.fields.html5 import DateField
 
 class Settings_Search(wtf.FlaskForm):
-    search_name = StringField('name', validators=[DataRequired()])
+    search_name = StringField('name')
+    allocation_pref_historical = BooleanField('allocation_pref_historical')
 
 class Create_Dataset(wtf.FlaskForm):
     name = StringField('name', validators=[DataRequired()])

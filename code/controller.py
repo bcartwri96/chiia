@@ -245,22 +245,58 @@ def manage_profile():
 
 # serve a form and then if it's a POST request we validate and submit
 def settings():
+    import configparser
+    from configparser import SafeConfigParser
+    config = SafeConfigParser()
+
+    config.read("config.ini")
+    # not sure whether file exists, so test by creating a section and
+    # handling any errors
+    try:
+        config.add_section('settings')
+    except configparser.DuplicateSectionError as e:
+        # this means it already exists
+        pass
+
+    # present the form
     import forms as fm
     form = fm.Settings_Search(fl.request.form)
+
     if fl.request.method == 'GET':
+        # get the variables!
+        try:
+            pref_hist = config.getboolean('settings', 'pref_hist')
+        except configparser.NoOptionError as e:
+            # not written to yet.
+            pref_hist = None
+
+        if pref_hist != None:
+            form.allocation_pref_historical.data = pref_hist
+
         return fl.render_template('settings.html', form=form)
 
     else:
         if form.validate_on_submit():
+            if form.allocation_pref_historical.data:
+                config.set('settings', 'pref_hist', 'True')
+            else:
+                config.set('settings', 'pref_hist', 'False')
+
+            # write the settings back out
+            with open('config.ini', 'w') as f:
+                config.write(f)
+
             update = ml.Admin()
-            new_search_names = ml.Search_Names(name=form.search_name.data)
-            update.search_names.append(new_search_names)
-            db.db_session.add(update)
+            if form.search_name.data != None:
+                new_search_names = ml.Search_Names(name=form.search_name.data)
+                update.search_names.append(new_search_names)
+                db.db_session.add(update)
+
             db.db_session.commit()
-            fl.flash("Search updated with "+form.search_name.data, "success")
+            fl.flash("Settings updated", "success")
             return fl.render_template('settings.html', form=form)
         else:
-            fl.flash("Search not updated", "error")
+            fl.flash("Settings not updated", "error")
             return fl.render_template("settings.html", form=form)
 
 # get info about each dataset and then display it to a user
@@ -1678,17 +1714,17 @@ def transition_transaction(trans):
         s2 = ml.Stage_2(s_id=s2_id, state=State.Working)
 
         # no email or approval required, so just allocate the next user
-        new = allocate_user(s2, trans.mandarin_req)
-        if new:
-            s2.who_assigned = new
-            # email user that they have the task now
-            try:
-                s.send_user(new, "New Transaction!",  "Hello, here is a new \
-                transaction for you __>here<__.", False)
-            except error as e:
-                fl.flash(e, "error");
-        else:
-            fl.flash("Unable to allocate user to transaction", "error")
+        # new = allocate_user(s2, trans.mandarin_req)
+        # if new:
+        #     s2.who_assigned = new
+        #     # email user that they have the task now
+        #     try:
+        #         s.send_user(new, "New Transaction!",  "Hello, here is a new \
+        #         transaction for you __>here<__.", False)
+        #     except error as e:
+        #         fl.flash(e, "error");
+        # else:
+        #     fl.flash("Unable to allocate user to transaction", "error")
 
 
         # NOTE: check here for whether the analyst says we need a
