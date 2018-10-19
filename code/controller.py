@@ -349,6 +349,7 @@ def create_dataset(**kwargs):
             ds.access.append(ds_auth)
             ds.access.append(ds_auth_owner)
             db.db_session.add(ds)
+            db.db_session.commit()
             fl.flash("Added the dataset!", "success")
             # now break up this into the correct amount of tasks
             freq_list, start, end = get_time_list(form.year_start.data, \
@@ -371,6 +372,7 @@ def create_dataset(**kwargs):
                 t_cur.num_inv_found = 0
                 t_cur.num_inv_progressing = 0
                 t_cur.date_modified = dt.datetime.now()
+
                 db.db_session.add(t_cur)
 
             db.db_session.commit()
@@ -586,10 +588,30 @@ def reject_task(id):
     db.db_session.commit()
     return fl.redirect(fl.url_for('manage_tasks'))
 
-# delete a ds.
+# delete a ds.s
 def delete_dataset(id):
     if fl.request.method == 'GET':
         ds = ml.Dataset.query.get(id)
+        task = ml.Tasks.query.filter_by(dataset_owner=ds.id).all()
+        for tl in task:
+            tran = ml.Transactions.query.filter_by(tasks=tl.id).all()
+            for tr in tran:
+                sr = ml.Stage_Rels.query.filter_by(trans_id=tr.s_id).first()
+                s2 = ml.Stage_2.query.filter_by(s_id = sr.stage_2_id).first()
+                s3 = ml.Stage_3.query.filter_by(s_id = sr.stage_3_id).first()
+                s4 = ml.Stage_4.query.filter_by(s_id = sr.stage_4_id).first()
+                db.db_session.delete(sr)
+                db.db_session.commit()
+                if s4 != None:
+                    db.db_session.delete(s4)
+                if s3 != None:
+                    db.db_session.delete(s3)
+                if s2 != None:
+                    db.db_session.delete(s2)
+                #db.db_session.delete(s3)
+                #db.db_session.delete(s2)
+                db.db_session.delete(tr)
+            db.db_session.delete(tl)
         db.db_session.delete(ds)
         db.db_session.commit()
         return fl.redirect(fl.url_for('manage_datasets'))
@@ -933,7 +955,6 @@ def stage2(s_id):
             if s3 == -1:
                 fl.flash("Something", "error")
             # recall: returns the next stage if successful
-
             try:
                 db.db_session.commit()
                 fl.flash("Updated stage2", "success")
@@ -1867,7 +1888,7 @@ def transition_transaction(trans):
         elif trans.state == State.Rejected:
             fl.flash("Work rejected.", "success")
             if s.send_user(trans.who_assigned, "Work Failed!", "Hi there, \
-            our work for transaction "+str(trans.s_id)+" @ stage 2 has been \
+            your work for transaction "+str(trans.s_id)+" @ stage 2 has been \
             rejected. Please log in to resolve and resubmit. Thank you.") != 202:
                 fl.flash("Server error! Email failed to send.", "error")
 

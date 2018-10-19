@@ -26,6 +26,9 @@ a.navbar-brand {
     letter-spacing: 1.4px;
     /*border-bottom: solid 1px #006600;*/
     text-transform: uppercase;
+    padding-left:5%;
+    padding-right:5%;
+    margin-top:5vh;
 }
 
 a.nav-link {
