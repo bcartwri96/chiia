@@ -59,6 +59,7 @@ def create_account():
         lname = fl.request.form['lname']
         email = fl.request.form['email']
         lang = fl.request.form['language']
+        type_analyst = fl.request.form['type_analyst']
         pw_raw = fl.request.form['pw_raw']
 
         # hash the password
@@ -70,8 +71,14 @@ def create_account():
         elif lang == '2':
             lang = True
 
+        # convert to bool
+        if type_analyst == '1':
+            type_analyst = False
+        elif type_analyst == '2':
+            type_analyst = True
+
         # create user object and then commit to db
-        new_user = ml.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_hashed, admin=False)
+        new_user = ml.User(fname=fname, lname=lname, email=email, language=lang, pw_hashed=pw_hashed, admin=False, liaison = type_analyst)
         db.db_session.add(new_user)
         db.db_session.commit()
         fl.flash('success', 'User created.')

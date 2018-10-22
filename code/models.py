@@ -20,6 +20,7 @@ class User(db.Base):
     # true is english alone, false is mandarin, too.
     pw_hashed = sa.Column(sa.String, nullable=False)
     admin = sa.Column(sa.Boolean)
+    liaison = sa.Column(sa.Boolean)
     confirmed = sa.Column(sa.Boolean, default=False)
     avg_time_to_complete = sa.Column(sa.Float, default=2)
 
