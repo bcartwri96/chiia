@@ -58,7 +58,8 @@ class Dataset(db.Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String, nullable=False)
-    search_type = sa.Column(sa.String, nullable=False)
+    factiva_search_type = sa.Column(sa.Boolean)
+    acx_factiva_search_type = sa.Column(sa.Boolean)
     user_created = sa.Column(sa.Integer, nullable=False)
     freq = sa.Column(sa.Integer, nullable=False)
     # daily = 1; weekly = 2; monthly = 3;
@@ -75,7 +76,7 @@ class Dataset_Authd(db.Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     access = sa.Column(sa.Integer, nullable=False)
-    dataset_id = sa.Column(sa.Integer, sa.ForeignKey('dataset.id', ondelete='SET NULL'))
+    dataset_id = sa.Column(sa.Integer, sa.ForeignKey('dataset.id'))
 
 
 # settings page
@@ -126,6 +127,7 @@ class Tasks(db.Base):
     no_of_result_to_s2 = sa.Column(sa.Integer)
 
     search_term = sa.Column(sa.String)
+    search_type = sa.Column(sa.String)
 
     who_assigned = sa.Column(sa.Integer, nullable=False)
     stage = sa.Column(sa.Integer, default=0)

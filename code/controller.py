@@ -325,11 +325,11 @@ def manage_datasets():
                      c += 1
             access_id_num[i] = c # add the count to the dictionary at ith entry
         # map id of search type to name
-        for ds in all_ds:
-            st = ml.Search_Names.query.filter(ml.Search_Names.id == ds.search_type).first()
-            final[ds.id] = st.name
+        # for ds in all_ds:
+        #     st = ml.Search_Names.query.filter(ml.Search_Names.id == ds.search_type).first()
+        #     final[ds.id] = st.name
         return fl.render_template('leadanalyst/dataset/manage.html', \
-        list=all_ds, st=final, access_id_num=access_id_num)
+        list=all_ds,  access_id_num=access_id_num)
     else:
         fl.abort(404)
 
@@ -345,10 +345,32 @@ def create_dataset(**kwargs):
         if form.validate_on_submit():
             # submit to db
             user = fl.session['logged_in']
+            try:
+                factiva_search_type = fl.request.form['factiva_search_type']
+            except KeyError:
+                factiva_search_type = None
+            if factiva_search_type == 'on':
+                factiva_search_type = True
+            else:
+                factiva_search_type = False
+
+            try:
+                acx_factiva_search_type = fl.request.form['acx_factiva_search_type']
+            except KeyError:
+                acx_factiva_search_type = None
+            if acx_factiva_search_type == 'on':
+                acx_factiva_search_type = True
+            else:
+                acx_factiva_search_type = False
             ds = ml.Dataset(name=form.name.data, \
-            search_type=int(form.search_type.data), user_created=int(user), \
-            year_start=form.year_start.data, year_end=form.year_end.data, \
-            owner=user, freq=int(form.freq.data))
+            #search_type=int(form.search_type.data), \
+            user_created=int(user), \
+            year_start=form.year_start.data, \
+            year_end=form.year_end.data, \
+            owner=user, \
+            acx_factiva_search_type = acx_factiva_search_type,\
+            factiva_search_type = factiva_search_type, \
+            freq=int(form.freq.data))
             ds_auth_owner = ml.Dataset_Authd(access=user)
             ds_auth = ml.Dataset_Authd(access=form.access.data)
             time_created = dt.datetime.now()
@@ -359,28 +381,53 @@ def create_dataset(**kwargs):
             db.db_session.commit()
             fl.flash("Added the dataset!", "success")
             # now break up this into the correct amount of tasks
-            freq_list, start, end = get_time_list(form.year_start.data, \
-            form.year_end.data, form.freq.data)
-            ds_id = ml.Dataset.query.order_by(sa.desc(ml.Dataset.id)).first()
-            if ds_id == None:
-                ds_id = 1
-            else:
-                ds_id = ds_id.id
-            for i in range(0, len(freq_list), 1):
-                # create a task for every frequency object
+            if factiva_search_type == True:
+                freq_list, start, end = get_time_list(form.year_start.data, \
+                form.year_end.data, form.freq.data)
+                ds_id = ml.Dataset.query.order_by(sa.desc(ml.Dataset.id)).first()
+                if ds_id == None:
+                    ds_id = 1
+                else:
+                    ds_id = ds_id.id
+                for i in range(0, len(freq_list), 1):
+                    # create a task for every frequency object
 
-                t_cur = ml.Tasks()
-                t_cur.nickname = freq_list[i]
-                t_cur.date_created = dt.datetime.now()
-                t_cur.dataset_owner = int(ds_id)
-                t_cur.date_start = start[i]
-                t_cur.date_end = end[i]
-                t_cur.who_assigned = int(user)
-                t_cur.num_inv_found = 0
-                t_cur.num_inv_progressing = 0
-                t_cur.date_modified = dt.datetime.now()
+                    t_cur = ml.Tasks()
+                    t_cur.nickname = freq_list[i]
+                    t_cur.date_created = dt.datetime.now()
+                    t_cur.dataset_owner = int(ds_id)
+                    t_cur.date_start = start[i]
+                    t_cur.date_end = end[i]
+                    t_cur.who_assigned = int(user)
+                    t_cur.num_inv_found = 0
+                    t_cur.num_inv_progressing = 0
+                    t_cur.search_type= 'Factiva'
+                    t_cur.date_modified = dt.datetime.now()
+                    db.db_session.add(t_cur)
 
-                db.db_session.add(t_cur)
+            if acx_factiva_search_type == True:
+                freq_list, start, end = get_time_list(form.year_start.data, \
+                form.year_end.data, form.freq.data)
+                ds_id = ml.Dataset.query.order_by(sa.desc(ml.Dataset.id)).first()
+                if ds_id == None:
+                    ds_id = 1
+                else:
+                    ds_id = ds_id.id
+                for i in range(0, len(freq_list), 1):
+                    # create a task for every frequency object
+
+                    t_cur = ml.Tasks()
+                    t_cur.nickname = freq_list[i]
+                    t_cur.date_created = dt.datetime.now()
+                    t_cur.dataset_owner = int(ds_id)
+                    t_cur.date_start = start[i]
+                    t_cur.date_end = end[i]
+                    t_cur.who_assigned = int(user)
+                    t_cur.num_inv_found = 0
+                    t_cur.num_inv_progressing = 0
+                    t_cur.search_type= 'ACX Factiva'
+                    t_cur.date_modified = dt.datetime.now()
+                    db.db_session.add(t_cur)
 
             db.db_session.commit()
             return fl.render_template('leadanalyst/dataset/create.html', form=form)
@@ -600,6 +647,9 @@ def delete_dataset(id):
     if fl.request.method == 'GET':
         ds = ml.Dataset.query.get(id)
         task = ml.Tasks.query.filter_by(dataset_owner=ds.id).all()
+        ds_auth = ml.Dataset_Authd.query.filter_by(dataset_id=ds.id).all()
+        for ds_au in ds_auth:
+            db.db_session.delete(ds_au)
         for tl in task:
             tran = ml.Transactions.query.filter_by(tasks=tl.id).all()
             for tr in tran:
@@ -619,6 +669,7 @@ def delete_dataset(id):
                 #db.db_session.delete(s2)
                 db.db_session.delete(tr)
             db.db_session.delete(tl)
+
         db.db_session.delete(ds)
         db.db_session.commit()
         return fl.redirect(fl.url_for('manage_datasets'))

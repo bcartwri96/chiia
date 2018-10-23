@@ -9,8 +9,10 @@
         <th scope="col">Name</th>
         <th scope="col">Who Assigned</th>
         <th scope="col">Week</th>
+        <th scope="col">Search Type</th>
         <th scope="col">Search Term</th>
         <th scope="col">Investors Found</th>
+
         <th scope="col"># of Progressing Investors</th>
         <th scope="col">Edit</th>
       </tr>
@@ -24,9 +26,10 @@
           <td scope="row">{{ t.nickname }}</td>
           <td scope="row">{{ t.who_assigned }}</td>
           <td scope="row">{{ w }}</td>
+          <td scope="row">{{ t.search_type }}</td>
           <td scope="row">{{ t.search_term }}</td>
-          <td scope="row">{{ t.num_inv_found }}</td>
-          <td scope="row">{{ t.num_inv_progressing }}</td>
+          <td scope="row">{{ t.total_no_of_result }}</td>
+          <td scope="row">{{ t.no_of_result_to_s2 }}</td>
           <!-- <td scope="row"><a role="button" href="{{ url_for('accept_task', id=t.id)}}">Accept/</a><a role="button" href="{{ url_for('reject_task', id=t.id)}}">Reject</a></td> -->
           <td scope="row"><a role="button" href="{{ url_for('edit_task', id=t.id) }}">Edit</a></td>
         </tr>
@@ -42,6 +45,7 @@
         <th scope="col">Name</th>
         <th scope="col">Who Assigned</th>
         <th scope="col">Week</th>
+        <th scope="col">Search Type</th>
         <th scope="col">Search Term</th>
         <th scope="col">Investors Found</th>
         <th scope="col"># of Progressing Investors</th>
@@ -57,9 +61,10 @@
           <td scope="row">{{ t.nickname }}</td>
           <td scope="row">{{ t.who_assigned }}</td>
           <td scope="row">{{ w }}</td>
+          <td scope="row">{{ t.search_type }}</td>
           <td scope="row">{{ t.search_term }}</td>
-          <td scope="row">{{ t.num_inv_found }}</td>
-          <td scope="row">{{ t.num_inv_progressing }}</td>
+          <td scope="row">{{ t.total_no_of_result }}</td>
+          <td scope="row">{{ t.no_of_result_to_s2 }}</td>
           <!-- <td scope="row">{{ t.state }}</td> -->
           <!-- <td scope="row"><a role="button" href="{{ url_for('accept_task', id=t.id)}}">Accept/</a><a role="button" href="{{ url_for('reject_task', id=t.id)}}">Reject</a></td> -->
           <td scope="row"><a role="button" href="{{ url_for('edit_task', id=t.id) }}">Edit</a></td>
@@ -70,7 +75,7 @@
 
   <script type="text/javascript">
    $(document).ready(function() {
-      $("#recent_table").tablesorter(); 
+      $("#recent_table").tablesorter();
    });
   </script>
   </div>

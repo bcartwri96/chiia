@@ -17,7 +17,9 @@ class Create_Dataset(wtf.FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     # get the search types available
     res = ml.Search_Names.query.all()
-    search_type = SelectField(u'Search Type', coerce=str, validators=[Required("Please enter your name.")], choices=[(str(r.id), r.name) for r in res])
+    #search_type = SelectField(u'Search Type', coerce=str, validators=[Required("Please enter your name.")], choices=[(str(r.id), r.name) for r in res])
+    factiva_search_type = BooleanField('factiva_search_type')
+    acx_factiva_search_type = BooleanField('acx_factiva_search_type')
     year_start = DateField('year_start', validators=[Required("Please enter the correct date.")], format='%Y-%m-%d')
     year_end = DateField('year_end', validators=[Required("Please enter the correct date.")], format='%Y-%m-%d')
     access = IntegerField('access_id')

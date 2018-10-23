@@ -10,11 +10,22 @@
       {{ form.name(class_="form-control", placeholder="Name") }}
     </div>
     <div class="form-group">
-      <label for="exampleFormControlSelect1">{{ form.search_type.label }}</label>
-      {% for error in form.search_type.errors %}
-       {{ error }}
-      {% endfor %}
-      {{ form.search_type(class_="form-control") }}
+      <label class="display-6">Search Type:</label>
+    <br>
+<div class="row">
+  <div class="col">
+
+      <input  type="checkbox" name="acx_factiva_search_type" />
+        <label class="exampleFormControlInput1">
+          Acx Factiva
+      </label>
+      <input  type="checkbox" name="factiva_search_type" />
+        <label class="exampleFormControlInput1">
+          Factiva
+      </label>
+  </div>
+</div>
+<br>
     <div class="form-group">
       {% for error in form.year_start.errors %}
        {{ error }}
@@ -34,7 +45,7 @@
       {% for error in form.access.errors %}
        {{ error }}
       {% endfor %}
-      {{ form.access(class_="form-control", placeholder="User ID") }}
+       {{ form.access(class_="form-control", placeholder="User ID") }}
     </div>
     <button class="btn btn-secondary"" type="submit">Make Dataset</button>
   </form>

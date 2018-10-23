@@ -11,13 +11,13 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col">Name</th>
-          <th scope="col">Search Type</th>
+          <!-- <th scope="col">Search Type</th> -->
           <th scope="col">Year Start</th>
           <th scope="col">Year End</th>
           <th scope="col">Owner</th>
           <th scope="col">Time Created</th>
           <th scope="col"># with Access</th>
-          <th scope="col">Edit?</th>
+          <!-- #<th scope="col">Edit?</th> -->
           {% if current_user.admin %}
             <th scope="col">Schedule Manually?</th>
             <th scope="col">Delete?</th>
@@ -29,13 +29,14 @@
         <tr>
           <th scope="row">{{ set.id }}</th>
           <td>{{ set.name }}</td>
-          <td>{{ st[set.id] }}</td>
+          
           <td>{{ set.year_start }}</td>
           <td>{{ set.year_end }}</td>
           <td>{{ set.owner }}</td>
           <td>{{ set.time_created }}</td>
           <td>{{ access_id_num[set.id] }}</td>
-          <td><a href="{{ url_for('edit_dataset', id=set.id) }}" type="button">Edit</a></td>
+          <!-- <td><a href="{{ url_for('edit_dataset', id=set.id) }}" type="button">Edit</a></td> -->
+
           {% if current_user.admin %}
             <td><a href="{{ url_for('schedule_manual', id=set.id) }}">
               <i class="material-icons" style="font-size: 18px">timer</i></a><td>
