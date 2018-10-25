@@ -90,6 +90,13 @@ def confirm_account(id):
     user = ml.User.query.get(id)
     if user:
         user.confirmed = True
+
+        ## adding the liaison into Correspondence_Task_Allocation
+        if user.liaison == True:
+            r = ml.Correspondence_Task_Allocation()
+            r.user_id = id
+            r.no_of_task = 0
+            db.db_session.add(r)
         db.db_session.commit()
         fl.flash("User confirmed", "success")
     else:
@@ -223,6 +230,10 @@ def delete_user(id):
                 current_user = fl.session['logged_in']
                 if not current_user == this_is_the_one.id:
                     db.db_session.delete(this_is_the_one)
+                    ## delete the user details from Correspondence_Task_Allocation also
+                    r = ml.Correspondence_Task_Allocation.query.filter_by(user_id=id ).first()
+                    db.db_session.delete(r)
+
                     db.db_session.commit()
                     fl.flash("Successful deletion of "+this_is_the_one.fname+"!", "success")
                     return fl.redirect(fl.url_for('manage'))
@@ -766,6 +777,7 @@ def stage1(id):
         form.date_conducted.data = dt.datetime.now()
         form.date_start.data = t_db.date_start
         form.date_end.data = t_db.date_end
+        form.search_type.data = t_db.search_type
 
         # get all the related transactions to this task
         return fl.render_template('analyst/stage1.html', form=form, t=t_db, \
@@ -1006,18 +1018,31 @@ def stage2(s_id):
             t_db.type_correspondence = type_correspondence
             t_db.info_from_correspondence = info_from_correspondence
             t_db.info_already_found = info_already_found
-            db.db_session.add(t_db)
 
-            # we want to add the transition to s3
-            s3 = transition_transaction(t_db)
-            if s3 == -1:
-                fl.flash("Something", "error")
-            # recall: returns the next stage if successful
-            try:
+
+
+            if correspondence_req ==  True :
+                #ca = ml.Correspondence_Task_Allocation()
+                min_assign = db.db_session.query(sa.func.min(ml.Correspondence_Task_Allocation.no_of_task)).scalar()
+                ca = ml.Correspondence_Task_Allocation.query.filter_by(no_of_task = min_assign ).first()
+                ca.no_of_task = ca.no_of_task + 1;
+                t_db.correspondence_user = ca.user_id
+                t_db.state =  State.Allocated_to_Correspondence
+                db.db_session.add(t_db)
+                db.db_session.add(ca)
                 db.db_session.commit()
-                fl.flash("Updated stage2", "success")
-            except sa.exc.InvalidRequestError():
-                fl.flash("Failed to update stage2", "error")
+                fl.flash("Request Send to Correspondence", "success")
+            else:
+                # we want to add the transition to s3
+                s3 = transition_transaction(t_db)
+                if s3 == -1:
+                    fl.flash("Something", "error")
+                    # recall: returns the next stage if successful
+                try:
+                    db.db_session.commit()
+                    fl.flash("Updated stage2", "success")
+                except sa.exc.InvalidRequestError():
+                    fl.flash("Failed to update stage2", "error")
         elif new_counter_file.validate_on_submit() and new_counter_file.counter_file_submitted.data:
             counter_file = ml.Counterpart_Investor_File()
             # getting details of new chinese file investor
@@ -1192,33 +1217,27 @@ def stage3(s_id):
         t_db.info_from_correspondence = info_from_correspondence
         t_db.info_already_found = info_already_found
 
+        if correspondence_req ==  True :
+            #ca = ml.Correspondence_Task_Allocation()
+            min_assign = db.db_session.query(sa.func.min(ml.Correspondence_Task_Allocation.no_of_task)).scalar()
+            ca = ml.Correspondence_Task_Allocation.query.filter_by(no_of_task = min_assign ).first()
+            ca.no_of_task = ca.no_of_task + 1;
+            t_db.correspondence_user = ca.user_id
+            #t_db.state =  "Allocated_to_Correspondence"
+            db.db_session.add(t_db)
+            db.db_session.add(ca)
+            db.db_session.commit()
+            fl.flash("Request Send to Correspondence", "success")
+        else:
+            s4 = transition_transaction(t_db)
+            if not s4 == -1:
+                fl.flash("Created stage 4 successfully", "success")
 
-        s4 = transition_transaction(t_db)
-        if not s4 == -1:
-            fl.flash("Created stage 4 successfully", "success")
 
-        # create complimentry stage2
-        # get current max id
-        # s4_max = db.db_session.query(sa.func.max(ml.Stage_4.s_id)).scalar()
-        # if s4_max:
-        #     s4_max+=1
-        # else:
-        #     s4_max=1
-        #
-        # s4 = ml.Stage_4(s_id=s4_max)
-        # # NOTE: Need to check whether entity name is required in stage 4
-        # db.db_session.add(s4)
-        #
-        # s = ml.Stage_Rels.query.filter_by(stage_3_id=s_id ).first()
-        #
-        # # now join it to the sr table with the new trans
-        # sr = ml.Stage_Rels.query.get(s.trans_id)
-        # sr.stage_4_id = s4_max
-        #
-        db.db_session.add(t_db)
-        # db.db_session.add(sr)
-        db.db_session.commit()
-        fl.flash("Updated stage3", "success")
+            db.db_session.add(t_db)
+            # db.db_session.add(sr)
+            db.db_session.commit()
+            fl.flash("Updated stage3", "success")
         return fl.render_template('analyst/stage3.html', form=form,t=t_db)
 
 
@@ -1579,6 +1598,91 @@ def stage_4_details(s_id):
             return fl.render_template('leadanalyst/stage_check.html', stage2=s2_check, stage4 = s4_check)
     else:
         return fl.abort(404)
+
+
+
+def manage_correspondence_tasks():
+    import forms as fm
+    if fl.request.method == 'GET':
+        current_user = fl.session['logged_in']
+        # not LA, so only get tasks allocated to them
+
+        s2 = ml.Stage_2.query.filter(ml.Stage_2.correspondence_user == current_user).all()
+        s3 = ml.Stage_3.query.filter(ml.Stage_3.correspondence_user == current_user).all()
+
+        return fl.render_template('analyst/correspondence_task.html',stage2 = s2, stage3 = s3)
+    else:
+        return fl.abort(404)
+
+def stage_2_liaison_details(s_id):
+    import forms as fm
+
+    #s_rels = ml.Stage_Rels.query.get(IID)
+    #s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id).all()
+    s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id ).first()
+    s1 = ml.Transactions.query.filter_by(s_id = s_rels.trans_id).first()
+    s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).first()
+    current_user = fl.session['logged_in']
+    #cf = ml.Chinese_Investor_File.query.filter_by(linked_iid = IID).all()
+    #cof = ml.Counterpart_Investor_File.query.filter_by(linked_iid = IID).all()
+
+    if fl.request.method == 'GET':
+        return fl.render_template('analyst/stage_2_liaison_details.html',trans = s1, s2= s2)
+    else:
+        try:
+            state = fl.request.form['state']
+        except KeyError:
+            state = None
+        if state == '1':
+            s2.state = State.Working
+        else:
+            state = ''
+        s2.correspondence_req = False
+        s2.correspondence_user = None
+
+
+        ca = ml.Correspondence_Task_Allocation.query.get(current_user)
+
+        ca.no_of_task = ca.no_of_task - 1;
+        db.db_session.add(ca)
+        db.db_session.add(s2)
+        db.db_session.commit()
+
+        return fl.redirect(fl.url_for('index'))
+
+def stage_3_liaison_details(s_id):
+    import forms as fm
+
+    #s_rels = ml.Stage_Rels.query.get(IID)
+    #s_rels = ml.Stage_Rels.query.filter_by(stage_2_id = s_id).all()
+    #form = fm.stage_4_details(fl.request.form)
+    s_rels = ml.Stage_Rels.query.filter_by(stage_3_id = s_id ).first()
+    s1 = ml.Transactions.query.filter_by(s_id = s_rels.trans_id).first()
+    s2 = ml.Stage_2.query.filter_by(s_id = s_rels.stage_2_id).first()
+    s3 = ml.Stage_3.query.filter_by(s_id = s_rels.stage_3_id).first()
+    if fl.request.method == 'GET':
+        return fl.render_template('analyst/stage_3_liaison_details.html',trans = s1, s2= s2, s3= s3)
+    else:
+        try:
+            state = fl.request.form['state']
+        except KeyError:
+            state = None
+        if state == '1':
+            s3.correspondence_req = False
+            s3.correspondence_user = None
+
+        ca = ml.Correspondence_Task_Allocation.query.get(current_user)
+
+        ca.no_of_task = ca.no_of_task - 1;
+        db.db_session.add(ca)
+        db.db_session.add(s3)
+        db.db_session.commit()
+
+        return fl.redirect(fl.url_for('index'))
+
+
+
+
 
 
 

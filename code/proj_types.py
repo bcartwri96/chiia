@@ -11,3 +11,4 @@ class State(Enum):
     Pending = 2
     Accepted = 3
     Rejected = 4
+    Allocated_to_Correspondence = 5

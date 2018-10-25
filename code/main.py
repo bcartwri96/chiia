@@ -178,6 +178,21 @@ def stage_2_details(s_id):
 def stage_4_details(s_id):
     return con.stage_4_details(s_id)
 
+@app.route('/manage_correspondence_task', methods=['GET', 'POST'])
+@flog.login_required
+def manage_correspondence_tasks():
+    return con.manage_correspondence_tasks()
+
+@app.route('/stage_2_liaison_details/<int:s_id>', methods=['GET', 'POST'])
+@flog.login_required
+def stage_2_liaison_details(s_id):
+    return con.stage_2_liaison_details(s_id)
+
+@app.route('/stage_3_liaison_details/<int:s_id>', methods=['GET', 'POST'])
+@flog.login_required
+def stage_3_liaison_details(s_id):
+    return con.stage_3_liaison_details(s_id)
+
 # API
 # ==========================
 
