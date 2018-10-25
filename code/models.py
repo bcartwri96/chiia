@@ -226,6 +226,7 @@ class Stage_2(Base_Stage_Task):
     type_correspondence = sa.Column(sa.String)
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
+    correspondence_user = sa.Column(sa.Integer)
 
     stage_2_id = sao.relationship("Stage_Rels")
 
@@ -256,6 +257,7 @@ class Stage_3(Base_Stage_Task):
     type_correspondence = sa.Column(sa.String)
     info_from_correspondence = sa.Column(sa.String)
     info_already_found = sa.Column(sa.String)
+    correspondence_user = sa.Column(sa.Integer)
 
     stage = sa.Column(sa.Integer, nullable=False, default=3)
 
@@ -334,3 +336,10 @@ class Counterpart_Investor_File(db.Base):
     nickname_iid = sa.Column(sa.String, nullable=False)
     stage_added = sa.Column(sa.Integer, nullable=False)
     file_checked_la = sa.Column(sa.Boolean)
+
+class Correspondence_Task_Allocation(db.Base):
+    __tablename__ = 'correspondence_task_allocation'
+    __table_args__ = {'extend_existing': True}
+
+    user_id = sa.Column(sa.Integer, nullable=False, primary_key=True)
+    no_of_task = sa.Column(sa.Integer, default=0 )
