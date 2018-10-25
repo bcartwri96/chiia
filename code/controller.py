@@ -1422,10 +1422,45 @@ def search_id(id):
     res = ml.User.query.get(id)
     return js.dumps([res.id, res.fname, res.lname])
 
+def get_fname_lname(query):
+    fname = []
+    lname = []
+    space = False
+    # find the ith where the space occurs, if it occurs
+    for i in range(0, len(query), 1):
+        if query[i] == " ":
+            # from this point on we record in lname
+            i = i+1
+            space = True
+            # now get the last letters
+            lname = list(query[i:])
+            break
+        elif not space:
+            # record in fname
+            fname.append(query[i])
+
+    if len(fname) > 0:
+        fname = ''.join(fname)
+    else:
+        fname = None
+
+    if len(lname) > 0:
+        lname = ''.join(lname)
+    else:
+        lname = None
+
+    return fname, lname
 
 # implementation of the searching for a username with some query function
 def search_username(query):
-    res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(query))).all()
+    fname, lname = get_fname_lname(query)
+    print(fname, lname)
+    if fname and lname:
+        res = ml.User.query.filter(sa.and_(ml.User.fname.like("%{0}%".format(fname)),ml.User.lname.like("%{0}%".format(lname)))).all()
+    elif len(fname)>0:
+        res = ml.User.query.filter(ml.User.fname.like("%{0}%".format(fname))).all()
+    else:
+        res = None
     ret = []
     for r in res:
         ret.append([r.id, r.fname, r.lname])

@@ -27,11 +27,12 @@ include the following:
     <!-- Bootstrap CSS -->
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
       <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
 
     <link id="pagestyle" rel"stylesheet" type="text/css" href="large.css">
 
     <link rel="stylesheet" type="text/css" media="media screen and (max-width:780px)" href="media query.css">
-    
+
     <script>
     function layoutManager(){
       var styleLink=document.getElementById("pagestyle");
@@ -49,8 +50,8 @@ include the following:
     </script>
 
     <!-- add the bootstrap toggle plugin -->
-    <link href="{{ url_for('static', filename='bower_components/bootstrap-toggle/css/bootstrap-toggle.min.css') }}" rel="stylesheet">
-    <script src="{{ url_for('static', filename='bower_components/bootstrap-toggle/js/bootstrap-toggle.min.js') }}"></script>
+    <!-- <link href="{{ url_for('static', filename='bower_components/bootstrap-toggle/css/bootstrap-toggle.min.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='bower_components/bootstrap-toggle/js/bootstrap-toggle.min.js') }}"></script> -->
 
   {% endblock head %}
 </html>
