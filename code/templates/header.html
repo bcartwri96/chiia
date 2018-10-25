@@ -50,6 +50,7 @@
             <a class="nav-link" href="{{ url_for('master_sheet') }}">Master Sheet</a>
           </li>
           {% else %}
+          {% if current_user.liaison %}
 
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('manage') }}">Manage Profile</a>
@@ -63,6 +64,23 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('master_sheet') }}">Master Sheet</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('manage_correspondence_tasks') }}">Correspondence Task</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('manage') }}">Manage Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('manage_tasks') }}">Tasks</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('roster') }}">Roster</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('master_sheet') }}">Master Sheet</a>
+            </li>
+            {% endif %}
           {% endif %}
       {% elif not current_user.is_authenticated %}
 

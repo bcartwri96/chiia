@@ -70,6 +70,7 @@ class stage1(wtf.FlaskForm):
     date_conducted = DateField('date_conducted', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     who_assigned = StringField('who_assigned', validators=[DataRequired("Please ensure you've entered a name")])
     search_term = StringField('search_term', validators=[DataRequired()])
+    search_type = StringField('search_term')
     date_start = DateField('date_start', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     date_end = DateField('date_end', format='%Y-%m-%d', validators=[DataRequired("This date cannot be empty")])
     # no_of_result_to_s2 = IntegerField('no_of_result_to_s2', validators=[DataRequired("This column cannot be empty")])

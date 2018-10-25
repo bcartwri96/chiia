@@ -1,0 +1,78 @@
+{% include "header.html" %}
+<title>Stage 2 Details</title>
+{% block content %}
+  <div class="container">
+    <form action="{{ url_for('stage_2_liaison_details',s_id =s2.s_id ) }}" method="POST">
+
+  <h5 class="display-5">Stage 1 : Transaction </h5>
+  <table class="table table-hover">
+
+     <thead class="thead-dark">
+      <tr>
+        <th scope="col">IID</th>
+        <th scope="col">Entity Name</th>
+        <th scope="col">Rumour date</th>
+        <th scope="col">Announcement date</th>
+        <th scope="col">S1 Analsyt</th>
+
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td scope="row">{{ trans.s_id }}</th>
+        <td scope="row">{{ trans.entity_name }}</th>
+        <td scope="row">{{ trans.rumour_date }}</th>
+        <td scope="row">{{ trans.annoucement_date }}</th>
+        <td scope="row">{{ trans.who_assigned }}</th>
+      </tr>
+
+    </tbody>
+  </table>
+      <h5 class="display-5">Stage 2 </h5>
+      <table class="table table-hover">
+
+         <thead class="thead-dark">
+          <tr>
+            <th scope="col">S2 Reviews</th>
+            <th scope="col">S2 Date</th>
+            <th scope="col">Chinese investor file no.</th>
+            <th scope="col">Counterpart investor file no.</th>
+            <th scope="col">S2 Analyst</th>
+            <th scope="col">Type Correspondence</th>
+            <th scope="col">Info From Correspondence</th>
+            <th scope="col">Info Already Found</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td scope="row">{{ s2.reviews }}</th>
+            <td scope="row">{{ s2.date_assigned }}</th>
+            <td scope="row">{{ s2.chin_inv_file_no }}</th>
+            <td scope="row">{{ s2.counterpart_file_no }}</th>
+            <td scope="row">{{ s2.who_assigned }}</th>
+            <td scope="row">{{ s2.type_correspondence }}</th>
+            <td scope="row">{{ s2.info_from_correspondence }}</th>
+            <td scope="row">{{ s2.info_already_found }}</th>
+          </tr>
+
+        </tbody>
+      </table>
+      {% endblock content %}
+      <div class="form-group">
+        <div class="row">
+          <div class="col">
+            <input class="form-check-input" type="radio" name="state" style="margin-left: 5px;" value="1">
+              <label class="form-check-label" style="padding-left: 25px;">
+                Done
+              </label>
+                <br>
+              </div>
+              <br>
+            </div>
+     <button type="submit">Submit</button>
+    </form>
+  </div>
+    </div>
+  </form>
