@@ -526,7 +526,7 @@ def edit_task(id):
     a task."""
     import forms as fm
     form = fm.Edit_Task(fl.request.form)
-    new_transaction = fm.Create_Transaction(fl.request.form)
+    new_transaction = fm.Edit_Task(fl.request.form)
     t_db = ml.Tasks.query.get(id)
     all_trans = t_db.trans
     if fl.request.method == 'GET':

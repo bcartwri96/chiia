@@ -62,7 +62,7 @@ class Edit_Task(wtf.FlaskForm):
     date_end = DateField('date_end', format='%Y-%m-%d', validators=[DataRequired("End date cannot be empty")])
     who_assigned = StringField('who_assigned')
     # search_term = StringField('search_term', validators=[DataRequired()])
-    dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
+    # dataset_owner = StringField('dataset_owner', validators=[DataRequired("The dataset must have an owner")])
     who_assigned_real = HiddenField()
     task_submitted = SubmitField('Submit the Task')
 

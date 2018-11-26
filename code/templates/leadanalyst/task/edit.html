@@ -14,11 +14,9 @@
         {{ form.date_end(class="form-control") }}
         <label for="exampleFormControlInput1">Who is assigned?</label>
         {{ form.who_assigned(class="form-control") }}
-        <p>Note: this table will present a number of options, and the selected option
-          is the top one is selected by default.</p>
+        <p>Note: this table will present a number of options. The selected option
+          is the highest by default.</p>
         <table id="users"></table>
-        <label for="exampleFormControlInput1">Who owns the dataset?</label>
-        {{ form.dataset_owner(class_="form-control") }}
         {{ form.task_submitted(class_="btn btn-outline-primary") }}
         {{ form.who_assigned_real() }}
 
@@ -35,27 +33,9 @@
         {% if form.who_assigned.errors %}
           {{ form.who_assigned.errors[0] }}
         {% endif %}
-        {% if form.dataset_owner.errors %}
-          {{ form.dataset_owner.errors[0] }}
-        {% endif %}
 
         <br>
-        <!-- <h5 class="display-5">Transactions</h5><a href="someJSWhichPopsUpANewForm()"><i class="material-icons"
-          style="font-size: 36px">add_box</i></a><br>
-        <label for="exampleFormControlInput1">What's the entity name?</label>
-        {{ trans.csrf_token }}
-        {{ trans.entity_name(class_="form-control") }}
-        <label for="exampleFormControlInput1">What was the rumour date?</label>
-        {{ trans.rumour_date(class_="form-control") }}
-        <label for="exampleFormControlInput1">What was the annoucement date?</label>
-        {{ trans.anouncement_date(class_="form-control") }}
-        <label for="exampleFormControlInput1">Mandarin skills required?</label>
-        {{ trans.mandarin_req(class_="form-control") }}
 
-        <label for="exampleFormControlInput1">Manually allocate users?</label>
-        {{ trans.who_assigned(id_="search_user", class_="form-control") }}
-        {{ trans.trans_submitted(class_="btn btn-outline-primary") }}
-      </div> -->
 
       <h5 class="display-5">Related Transactions</h5>
       <table class="table table-hover">
@@ -77,7 +57,7 @@
         {% for trans in related_trans %}
           <tr>
             <td scope="row">{{ trans.s_id }}</th>
-            <td scope="row">{{ trans.entity_name }}</th>
+            <td scope="row">{{ trans.nickname }}</th>
             <td scope="row"><a role="button" href="{{ url_for('edit_transaction', id=trans.s_id)}}">Edit</a></td>
           </tr>
         {% endfor %}
